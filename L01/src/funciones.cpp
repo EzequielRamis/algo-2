@@ -121,7 +121,24 @@ vector<char> traducir(vector<pair<char, char>> tr, vector<char> str)
 // Ejercicio 10
 bool integrantes_repetidos(vector<Mail> s)
 {
-    return true;
+    bool res = false;
+    map<LU, int> alumnosXapariciones;
+    for (Mail m : s)
+    {
+        set<LU> libs = m.libretas();
+        for (LU l : libs)
+        {
+            alumnosXapariciones[l]++;
+        }
+    }
+    for (pair<LU, int> a : alumnosXapariciones)
+    {
+        if (a.second > 1)
+        {
+            res = true;
+        }
+    }
+    return res;
 }
 
 // Ejercicio 11
