@@ -7,15 +7,17 @@
 using namespace std;
 
 class ConexionJugador {
-  public:
+public:
     ConexionJugador(string ip);
+
     void enviarMensaje(string mensaje);
+
     string ip() const;
 
-  private:
+private:
     string _ip;
 
-    Internet* _internet = &Internet::internet();
+    Internet *_internet = &Internet::internet();
 
 };
 

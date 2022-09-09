@@ -3,9 +3,12 @@
 
 #include "ConexionJugador.h"
 #include <string>
+#include <vector>
 
 #if EJ == 4 || EJ == 5
+
 #include "Proxy.h"
+
 #elif EJ == 6
 #include "Proxy2.h"
 #endif
@@ -13,10 +16,12 @@
 using namespace std;
 
 class SistemaDeMensajes {
-  public:
+public:
     SistemaDeMensajes();
+
     // Pre: 0 <= id < 4
     void registrarJugador(int id, string ip);
+
     // Pre: 0 <= id < 4
     bool registrado(int id) const;
 
@@ -26,8 +31,18 @@ class SistemaDeMensajes {
     // Pre: registrado(id)
     string ipJugador(int id) const;
 
-  private:
-    ConexionJugador* _conns[4];
+    // Ejercicio 2
+    ~SistemaDeMensajes();
+
+    // Ejercicio 3
+    void desregistrarJugador(int id);
+
+    // Ejercicio 4
+    Proxy *obtenerProxy(int id);
+
+private:
+    ConexionJugador *_conns[4];
+    vector<Proxy *> _proxys;
 };
 
 #endif

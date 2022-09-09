@@ -8,14 +8,15 @@ using namespace std;
 
 class Proxy {
 public:
-    Proxy(ConexionJugador* conn);
+    Proxy(ConexionJugador *conn);
+
     void enviarMensaje(string msg);
 
 private:
-    ConexionJugador* _conn;
+    ConexionJugador *_conn;
 
     // No puedo copiarlo
-    Proxy(const Proxy&);
+    Proxy(const Proxy &);
 };
 
 #endif
