@@ -1,4 +1,4 @@
 #include "SistemaDeMensajes.h"
 
 // Completar...
-foo bar
+foo bar bar
