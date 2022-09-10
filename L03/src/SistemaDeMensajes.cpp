@@ -37,6 +37,7 @@ void SistemaDeMensajes::desregistrarJugador(int id) {
 }
 
 // Ejercicio 4
+
 //Proxy *SistemaDeMensajes::obtenerProxy(int id) {
 //    Proxy *p = new Proxy(_conns[id]);
 //    _proxys.push_back(p);
