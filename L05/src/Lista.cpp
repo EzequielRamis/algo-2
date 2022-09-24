@@ -2,6 +2,8 @@
 
 Lista::Lista() : _pri(nullptr), _ult(nullptr) {}
 
+Lista::Nodo::Nodo(int v) : anterior(nullptr), valor(v), siguiente(nullptr) {}
+
 Lista::Lista(const Lista &l) : Lista() {
     //Inicializa una lista vacía y luego utiliza operator= para no duplicar el código de la copia de una lista.
     *this = l;

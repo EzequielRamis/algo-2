@@ -93,7 +93,7 @@ private:
         int valor;
         Nodo *siguiente;
 
-        Nodo(int v) : anterior(nullptr), valor(v), siguiente(nullptr) {}
+        Nodo(int v);
     };
 
     Nodo *_pri;
