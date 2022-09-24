@@ -92,11 +92,14 @@ int &Lista::iesimo(Nat i) {
 }
 
 void Lista::mostrar(ostream &o) {
-    o << "[" << this->_pri;
-    Nodo *actual = this->_pri->siguiente;
-    while (actual != nullptr) {
-        o << ", " << actual->valor;
-        actual = actual->siguiente;
+    o << "[";
+    if (this->_pri != nullptr) {
+        o << this->_pri->valor;
+        Nodo *actual = this->_pri->siguiente;
+        while (actual != nullptr) {
+            o << ", " << actual->valor;
+            actual = actual->siguiente;
+        }
     }
     o << "]";
 }
