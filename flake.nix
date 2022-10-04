@@ -17,7 +17,11 @@
             bear
             gdb
             ninja
-            texlive.combined.scheme-medium
+            (texlive.combine {
+              inherit (pkgs.texlive)
+                scheme-medium geometry babel fancyhdr lastpage framed todonotes
+                hyperref amsmath xargs;
+            })
             texlab
           ];
         };

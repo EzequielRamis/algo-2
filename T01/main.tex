@@ -1,0 +1,324 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[paper=a4paper, left=1.5cm, right=1.5cm, bottom=1.5cm, top=3.5cm]{geometry}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{indentfirst}
+\usepackage{fancyhdr}
+\usepackage{latexsym}
+\usepackage{lastpage}
+\usepackage{framed}
+\usepackage{todonotes} % para dejar notitas de to-do!
+\usepackage{aed2-symb,aed2-itef,aed2-tad}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+\usepackage{calc}
+
+%
+
+% ========== Para escribir pseudo ==========
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}  % "noend" es para no mostrar los endfor, endif
+\algrenewcommand\alglinenumber[1]{\tiny #1:}  % Para que los numeros de linea del pseudo sean pequeños
+\renewcommand{\thealgorithm}{}  % Que no aparezca el numero luego de "Algorithm"
+\floatname{algorithm}{ }    % Entre {  } que quiero que aparezca en vez de "Algorithm"
+
+% traducciones
+\algrenewcommand\algorithmicwhile{\textbf{mientras}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicreturn{\textbf{devolver}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+%=========================================================
+
+
+\newcommand{\f}[1]{\text{#1}}
+\renewcommand{\paratodo}[2]{$\forall~#2$: #1}
+\newcommand{\numeroEjercicio}[1]{\textbf{\large{Ejercicio #1:}}\\}
+\newcommand{\tituloSubEjercicio}[1]{$\newline$\tadNombre{#1:}}
+
+\sloppy
+
+\hypersetup{%
+ % Para que el PDF se abra a página completa.
+ pdfstartview= {FitH \hypercalcbp{\paperheight-\topmargin-1in-\headheight}},
+ pdfauthor={Cátedra de Algoritmos y Estructuras de Datos II - DC - UBA},
+ pdfkeywords={Template TADs básicos},
+ pdfsubject={Template TADs básicos}
+}
+
+\parskip=5pt % 10pt es el tamaño de fuente
+
+% Pongo en 0 la distancia extra entre ítemes.
+\let\olditemize\itemize
+\def\itemize{\olditemize\itemsep=0pt}
+
+% Acomodo fancyhdr.
+\pagestyle{fancy}
+\thispagestyle{fancy}
+\addtolength{\headheight}{1pt}
+\lhead{Algoritmos y Estructuras de Datos II}
+\rhead{$1^{\mathrm{er}}$ cuatrimestre de 2020}
+\cfoot{\thepage /\pageref{LastPage}}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\author{Algoritmos y Estructuras de Datos II, DC, UBA.}
+\date{}
+\title{Trabajo Pr\'actico de Algoritmos y Estructuras de Datos II}
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{caratula}[2003/4/13 v0.1 Para componer caratulas de TPs del DC]
+
+
+% ----- Imprimir un mensajito al procesar un .tex que use este package -----
+
+\typeout{Cargando package 'caratula' v0.2 (21/4/2003)}
+
+
+% ----- Algunas variables --------------------------------------------------
+
+\let\Materia\relax
+\let\Submateria\relax
+\let\Titulo\relax
+\let\Subtitulo\relax
+\let\Grupo\relax
+
+
+% ----- Comandos para que el usuario defina las variables ------------------
+
+\def\materia#1{\def\Materia{#1}}
+\def\submateria#1{\def\Submateria{#1}}
+\def\titulo#1{\def\Titulo{#1}}
+\def\subtitulo#1{\def\Subtitulo{#1}}
+\def\grupo#1{\def\Grupo{#1}}
+
+
+% ----- Token list para los integrantes ------------------------------------
+
+\newtoks\intlist\intlist={}
+
+
+% ----- Comando para que el usuario agregue integrantes
+
+\def\integrante#1#2#3{\intlist=\expandafter{\the\intlist
+    \rule{0pt}{1.2em}#1&#2&\tt #3\\[0.2em]}}
+
+
+% ----- Macro para generar la tabla de integrantes -------------------------
+
+\integrante{Church, Alonso}{1/20}{alonso@iglesia.com}
+\integrante{Lovelace, Ada}{10/19}{ada\_de\_los\_dientes@tatooine.com}
+\integrante{Null, Linda}{100/18}{null@null.null}
+\integrante{Turing, Alan}{314/16}{halting@problem.com}
+
+\def\tablaints{
+    \begin{tabular}{|l@{\hspace{4ex}}c@{\hspace{4ex}}l|}
+        \hline
+        \rule{0pt}{1.2em}Integrante & LU & Correo electr\'onico\\[0.2em]
+        \hline
+        \the\intlist
+        \hline
+    \end{tabular}}
+
+% ----- Macro para generar la parte reservada para la c�tedra -------------------------
+
+\def\tablacatedra{%
+    \\
+    \textbf{Reservado para la c\'atedra}\par\bigskip
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \rule{0pt}{1.2em}Instancia & Docente & Nota\\[0.2em]
+        \hline
+        \rule{0pt}{1.2em}Primera entrega & \phantom{mmmmmmmmmmmmmmmmmm} & \phantom{mmmmmm} \\
+        \hline
+        \rule{0pt}{1.2em}Segunda entrega & & \\
+        \hline
+    \end{tabular}}
+
+% ----- Codigo para manejo de errores --------------------------------------
+
+\def\se{\let\ifsetuperror\iftrue}
+\def\ifsetuperror{%
+    \let\ifsetuperror\iffalse
+    \ifx\Materia\relax\se\errhelp={Te olvidaste de proveer una \materia{}.}\fi
+    \ifx\Titulo\relax\se\errhelp={Te olvidaste de proveer un \titulo{}.}\fi
+    \edef\mlist{\the\intlist}\ifx\mlist\empty\se%
+    \errhelp={Tenes que proveer al menos un \integrante{nombre}{lu}{email}.}\fi
+    \expandafter\ifsetuperror}
+
+
+% ----- Reemplazamos el comando \maketitle de LaTeX con el nuestro ---------
+
+\def\maketitle{%
+    \ifsetuperror\errmessage{Faltan datos de la caratula! Ingresar 'h' para mas informacion.}\fi
+    \thispagestyle{empty}
+    \begin{center}
+    \vspace*{\stretch{2}}
+    \materia{Algoritmos y Estructuras de Datos II}
+
+    {\LARGE\textbf{\Materia}}\\[1em]
+    \submateria{Trabajo Pr\'actico 1}
+    \ifx\Submateria\relax\else{\Large \Submateria}\\[0.5em]\fi
+
+%\def\titulo#1{\def\Titulo{#1}}
+%\def\subtitulo#1{\def\Subtitulo{#1}}
+%\def\grupo#1{\def\Grupo{#1}}
+    \par\vspace{\stretch{1}}
+    \titulo{El diseño contraataca}
+    \subtitulo{La cosa se pone compleja}
+    {\large Departamento de Computaci\'on}\\[0.5em]
+    {\large Facultad de Ciencias Exactas y Naturales}\\[0.5em]
+    {\large Universidad de Buenos Aires}
+    \par\vspace{\stretch{3}}
+    {\Large \textbf{\Titulo}}\\[0.8em]
+    {\Large \Subtitulo}
+    \par\vspace{\stretch{3}}
+    \grupo
+    \ifx\Grupo\relax\else\textbf{\Grupo}\par\bigskip\fi
+    \tablaints
+    \vspace*{\stretch{3}}
+    \medskip
+    \tablacatedra
+    \end{center}
+    \vspace*{\stretch{3}}
+    \newpage
+    }
+
+% Comandos para cositas de complejidad
+
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rpos}{\mathbb{R}_{>0}}
+\newcommand{\eqdef}{\overset{\mathrm{def}}{=}}
+\newcommand{\eqprop}{\overset{\mathrm{prop}}{=}}
+%\newcommand{\ssi}{\leftrightarrow}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+Esta es la introducción en \LaTeX.
+
+\section{Desarrollo}
+\subsection{Escribir TADs}
+Por ahora es una versión $\beta$ 2.0. Para la eñe (\~n), escribir eso, y para los acentos, probar con \'esto (recordar que la \href{http://www.rae.es}{RAE}\footnote{Pero, ¿qué me importa lo que dice la RAE?} ya no acepta la tilde salvo para desambiguar).
+
+\begin{tad}{\tadNombre{NombreDelTad}}
+\tadUsa{Tipo1, Tipo2, Nat}
+\tadExporta{observadores, operación adicional}
+\tadGeneros{súperTAD}
+
+\tadObservadores
+\tadOperacion{obs1}{súperTAD}{nat}{}
+\tadOperacion{obs2}{súperTAD/s,nat/n_1,nat/n_2}{nat}{condición(s,$n_1$) $\land n_2<10$}
+
+\tadGeneradores
+\tadOperacion{gen1}{}{súperTAD}{}
+\tadOperacion{gen2}{súperTAD/s,nat/n}{súperTAD}{condición(s,n)}
+
+\tadOtrasOperaciones
+\tadOperacion{condición}{súperTAD,nat}{bool}{}
+
+\tadAxiomas[$\ldots$]
+
+\tadAxioma{obs1(gen1)}{0}
+\tadAxioma{obs1(gen2($s,n$))}{1 + obs1($s$)}
+
+\tadAxioma{condicion($s,n$)}{\IF $n>5$ THEN condicion($s,n-1$) ELSE condicion($s,n+1$) FI\\
+	$\lor$ $n>$ \IF obs1($s$) $<$ $n$ THEN 1 ELSE 10 FI}
+\end{tad}
+
+
+\begin{tad}{\tadNombre{TuplaRara($\alpha$)} es $\langle$\tadNombre{Nat}, \tadNombre{secu($\alpha$)}$\rangle$ }
+\end{tad}
+
+Otra opción, para que no aparezca el Fin TAD:
+
+\textbf{TAD} \tadNombre{OtraTuplaRara($\alpha$)} es \tadNombre{Tupla}(\tadNombre{Nat} $\times$ \tadNombre{secu($\alpha$)})
+
+\subsection{Escribir pseudoc\'odigo}
+Tambi\'en presentaremos el algoritmo del \'exito\footnote{Puede fallar. }:
+
+% atajo para asignarle un valor a una variable en el entorno de algorithm!
+% uso: \asignar{i}{0}
+\newcommand{\asignar}[2]{$#1 \gets #2$}
+
+\begin{algorithm}[H]
+    \caption{\textsc{hacerGuia}(\textbf{in} \textit{A} : \texttt{guia}, \textit{parámetroInútil} : \texttt{Nat}) $\longrightarrow$ \texttt{bool}}
+    \begin{algorithmic}[1]
+      \State \asignar{i}{0} \Comment{esto es $\Theta$(1)}
+
+      \State \asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
+
+     \State \asignar{consultas}{\textsc{diccVacio}}
+
+      \State \textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
+
+      \While {$i < n$}
+      \State \textsc{pensarEjercicio(i)}
+      \If{\textsc{tengoConsultas($i$)}}
+        \State \textsc{escribirConsultasEjercicio($i$,$consultas$)}
+      \Else
+        \State \textsc{comerBizochito()}
+      \EndIf
+        \State \textsc{comerBizochito()}
+      \EndWhile
+
+      \For{miVariable}
+           \State hacer algo
+      \EndFor
+
+      \State \Return{\textsc{vacio?}($consultas$)}
+    \end{algorithmic}
+  \end{algorithm}
+
+\todo[inline]{¡Una forma piola de anotar lo que les falte!}
+
+\subsection{Elección de estructuras}
+
+\subsubsection*{Ejercicio 2: Sistema de estadísticas}
+
+Se desea diseñar un sistema de estadísticas para la cantidad de personas
+que ingresan a un banco. Al final del día, un empleado del banco ingresa en
+el sistema el total de ingresantes para ese día. Se desea saber, en cualquier
+intervalo de días, la cantidad total de personas que ingresaron al banco.
+La siguiente es una especificación del problema.
+
+\begin{framed}
+\vspace{-0.2cm}
+\small
+\begin{tad}{\tadNombre{IngresosAlBanco}}
+\tadObservadores
+\tadOperacion{totDias}{iab}{nat}{}
+\tadOperacion{cantPersonas}{iab/i,nat/d,nat/h}{nat}{$1 \le d \land d \le h \land h \le totDias(i)$}
+
+\tadGeneradores
+\tadOperacion{Comenzar}{}{iab}{}
+\tadOperacion{TerminaDia}{iab,nat}{iab}{}
+
+\tadAxiomas[$\ldots$]
+
+\tadAxioma{totDias(Comenzar)}{0}
+\tadAxioma{totDias(TerminaDia($i,n$))}{1 + totDias($i$)}
+
+\tadAxioma{cantPersonas(TerminaDia($i,n$),$d,h$)}{\IF totDias($i$) $<$ $h$ THEN $n$ ELSE 0 FI
+	$+$ \IF totDias($i$) $<$ $d$ THEN 0 ELSE cantPersonas($i,d,\min(h,$totDias$(i))$) FI}
+\end{tad}
+\vspace{-0.2cm}
+\end{framed}
+
+\begin{enumerate}
+\item Dar una estructura de representación que permita que la función
+\textit{cantPersonas} tome $O(1)$.
+\item Calcular cuánta memoria usa la estructura, en función de la cantidad de
+días que pasaron $n$.
+\item Si el cálculo del punto anterior fue una función que no es $O(n)$, piense
+otra estructura que permita resolver el problema utilizando $O(n)$ memoria.
+\end{enumerate}
+
+\section{Conclusiones}
+Esta cátedra es la mejor. Especialmente en humildad.
+\end{document}
