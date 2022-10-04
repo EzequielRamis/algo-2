@@ -17,6 +17,8 @@
             bear
             gdb
             ninja
+            texlive.combined.scheme-medium
+            texlab
           ];
         };
       });
