@@ -9,9 +9,14 @@
 \usepackage{lastpage}
 \usepackage{framed}
 \usepackage{todonotes} % para dejar notitas de to-do!
-\usepackage{aed2-symb,aed2-itef,aed2-tad}
+\usepackage{aed2-symb,aed2-itef,aed2-tad,aed2-diseno}
 \usepackage[colorlinks=true, linkcolor=blue]{hyperref}
 \usepackage{calc}
+\usepackage{hyperref}% http://ctan.org/pkg/hyperref
+\hypersetup{%
+  colorlinks = true,
+  linkcolor  = black
+}
 
 %
 
@@ -23,12 +28,12 @@
 \floatname{algorithm}{ }    % Entre {  } que quiero que aparezca en vez de "Algorithm"
 
 % traducciones
-\algrenewcommand\algorithmicwhile{\textbf{mientras}}
-\algrenewcommand\algorithmicdo{\textbf{hacer}}
-\algrenewcommand\algorithmicreturn{\textbf{devolver}}
-\algrenewcommand\algorithmicif{\textbf{si}}
-\algrenewcommand\algorithmicthen{\textbf{entonces}}
-\algrenewcommand\algorithmicfor{\textbf{para}}
+% \algrenewcommand\algorithmicwhile{\textbf{mientras}}
+% \algrenewcommand\algorithmicdo{\textbf{hacer}}
+% \algrenewcommand\algorithmicreturn{\textbf{devolver}}
+% \algrenewcommand\algorithmicif{\textbf{si}}
+% \algrenewcommand\algorithmicthen{\textbf{entonces}}
+% \algrenewcommand\algorithmicfor{\textbf{para}}
 %=========================================================
 
 
@@ -58,13 +63,13 @@
 \thispagestyle{fancy}
 \addtolength{\headheight}{1pt}
 \lhead{Algoritmos y Estructuras de Datos II}
-\rhead{$1^{\mathrm{er}}$ cuatrimestre de 2020}
+\rhead{$2^{\mathrm{do}}$ cuatrimestre de 2022}
 \cfoot{\thepage /\pageref{LastPage}}
 \renewcommand{\footrulewidth}{0.4pt}
 
 \author{Algoritmos y Estructuras de Datos II, DC, UBA.}
 \date{}
-\title{Trabajo Pr\'actico de Algoritmos y Estructuras de Datos II}
+\title{Trabajo Práctico de Algoritmos y Estructuras de Datos II}
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{caratula}[2003/4/13 v0.1 Para componer caratulas de TPs del DC]
@@ -150,7 +155,6 @@
 % ----- Reemplazamos el comando \maketitle de LaTeX con el nuestro ---------
 
 \def\maketitle{%
-    \ifsetuperror\errmessage{Faltan datos de la caratula! Ingresar 'h' para mas informacion.}\fi
     \thispagestyle{empty}
     \begin{center}
     \vspace*{\stretch{2}}
@@ -199,126 +203,9 @@
 
 \maketitle
 
-\section{Introducción}
-Esta es la introducción en \LaTeX.
+\tableofcontents
+\newpage
 
-\section{Desarrollo}
-\subsection{Escribir TADs}
-Por ahora es una versión $\beta$ 2.0. Para la eñe (\~n), escribir eso, y para los acentos, probar con \'esto (recordar que la \href{http://www.rae.es}{RAE}\footnote{Pero, ¿qué me importa lo que dice la RAE?} ya no acepta la tilde salvo para desambiguar).
+\input{tp.tex}
 
-\begin{tad}{\tadNombre{NombreDelTad}}
-\tadUsa{Tipo1, Tipo2, Nat}
-\tadExporta{observadores, operación adicional}
-\tadGeneros{súperTAD}
-
-\tadObservadores
-\tadOperacion{obs1}{súperTAD}{nat}{}
-\tadOperacion{obs2}{súperTAD/s,nat/n_1,nat/n_2}{nat}{condición(s,$n_1$) $\land n_2<10$}
-
-\tadGeneradores
-\tadOperacion{gen1}{}{súperTAD}{}
-\tadOperacion{gen2}{súperTAD/s,nat/n}{súperTAD}{condición(s,n)}
-
-\tadOtrasOperaciones
-\tadOperacion{condición}{súperTAD,nat}{bool}{}
-
-\tadAxiomas[$\ldots$]
-
-\tadAxioma{obs1(gen1)}{0}
-\tadAxioma{obs1(gen2($s,n$))}{1 + obs1($s$)}
-
-\tadAxioma{condicion($s,n$)}{\IF $n>5$ THEN condicion($s,n-1$) ELSE condicion($s,n+1$) FI\\
-	$\lor$ $n>$ \IF obs1($s$) $<$ $n$ THEN 1 ELSE 10 FI}
-\end{tad}
-
-
-\begin{tad}{\tadNombre{TuplaRara($\alpha$)} es $\langle$\tadNombre{Nat}, \tadNombre{secu($\alpha$)}$\rangle$ }
-\end{tad}
-
-Otra opción, para que no aparezca el Fin TAD:
-
-\textbf{TAD} \tadNombre{OtraTuplaRara($\alpha$)} es \tadNombre{Tupla}(\tadNombre{Nat} $\times$ \tadNombre{secu($\alpha$)})
-
-\subsection{Escribir pseudoc\'odigo}
-Tambi\'en presentaremos el algoritmo del \'exito\footnote{Puede fallar. }:
-
-% atajo para asignarle un valor a una variable en el entorno de algorithm!
-% uso: \asignar{i}{0}
-\newcommand{\asignar}[2]{$#1 \gets #2$}
-
-\begin{algorithm}[H]
-    \caption{\textsc{hacerGuia}(\textbf{in} \textit{A} : \texttt{guia}, \textit{parámetroInútil} : \texttt{Nat}) $\longrightarrow$ \texttt{bool}}
-    \begin{algorithmic}[1]
-      \State \asignar{i}{0} \Comment{esto es $\Theta$(1)}
-
-      \State \asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
-
-     \State \asignar{consultas}{\textsc{diccVacio}}
-
-      \State \textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
-
-      \While {$i < n$}
-      \State \textsc{pensarEjercicio(i)}
-      \If{\textsc{tengoConsultas($i$)}}
-        \State \textsc{escribirConsultasEjercicio($i$,$consultas$)}
-      \Else
-        \State \textsc{comerBizochito()}
-      \EndIf
-        \State \textsc{comerBizochito()}
-      \EndWhile
-
-      \For{miVariable}
-           \State hacer algo
-      \EndFor
-
-      \State \Return{\textsc{vacio?}($consultas$)}
-    \end{algorithmic}
-  \end{algorithm}
-
-\todo[inline]{¡Una forma piola de anotar lo que les falte!}
-
-\subsection{Elección de estructuras}
-
-\subsubsection*{Ejercicio 2: Sistema de estadísticas}
-
-Se desea diseñar un sistema de estadísticas para la cantidad de personas
-que ingresan a un banco. Al final del día, un empleado del banco ingresa en
-el sistema el total de ingresantes para ese día. Se desea saber, en cualquier
-intervalo de días, la cantidad total de personas que ingresaron al banco.
-La siguiente es una especificación del problema.
-
-\begin{framed}
-\vspace{-0.2cm}
-\small
-\begin{tad}{\tadNombre{IngresosAlBanco}}
-\tadObservadores
-\tadOperacion{totDias}{iab}{nat}{}
-\tadOperacion{cantPersonas}{iab/i,nat/d,nat/h}{nat}{$1 \le d \land d \le h \land h \le totDias(i)$}
-
-\tadGeneradores
-\tadOperacion{Comenzar}{}{iab}{}
-\tadOperacion{TerminaDia}{iab,nat}{iab}{}
-
-\tadAxiomas[$\ldots$]
-
-\tadAxioma{totDias(Comenzar)}{0}
-\tadAxioma{totDias(TerminaDia($i,n$))}{1 + totDias($i$)}
-
-\tadAxioma{cantPersonas(TerminaDia($i,n$),$d,h$)}{\IF totDias($i$) $<$ $h$ THEN $n$ ELSE 0 FI
-	$+$ \IF totDias($i$) $<$ $d$ THEN 0 ELSE cantPersonas($i,d,\min(h,$totDias$(i))$) FI}
-\end{tad}
-\vspace{-0.2cm}
-\end{framed}
-
-\begin{enumerate}
-\item Dar una estructura de representación que permita que la función
-\textit{cantPersonas} tome $O(1)$.
-\item Calcular cuánta memoria usa la estructura, en función de la cantidad de
-días que pasaron $n$.
-\item Si el cálculo del punto anterior fue una función que no es $O(n)$, piense
-otra estructura que permita resolver el problema utilizando $O(n)$ memoria.
-\end{enumerate}
-
-\section{Conclusiones}
-Esta cátedra es la mejor. Especialmente en humildad.
 \end{document}
