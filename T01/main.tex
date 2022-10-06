@@ -13,6 +13,7 @@
 \usepackage[colorlinks=true, linkcolor=blue]{hyperref}
 \usepackage{calc}
 \usepackage{hyperref}% http://ctan.org/pkg/hyperref
+\usepackage{graphicx}
 \hypersetup{%
   colorlinks = true,
   linkcolor  = black
@@ -168,8 +169,11 @@
 %\def\subtitulo#1{\def\Subtitulo{#1}}
 %\def\grupo#1{\def\Grupo{#1}}
     \par\vspace{\stretch{1}}
-    \titulo{El diseño contraataca}
-    \subtitulo{La cosa se pone compleja}
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=0.5\linewidth]{caratula.png}
+    \end{figure}
+    \par\vspace{\stretch{1}}
     {\large Departamento de Computaci\'on}\\[0.5em]
     {\large Facultad de Ciencias Exactas y Naturales}\\[0.5em]
     {\large Universidad de Buenos Aires}
