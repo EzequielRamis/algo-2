@@ -1,7 +1,7 @@
 \section{Módulo Juego}
 \begin{interfaz}{\subsection{Interfaz}}
   \seExplica{Juego}{juego}\\
-  \usa{Nat, Cola, Letra, Variante, Ocurrencia, \falta}
+  \usa{\falta}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoJuego}
@@ -9,7 +9,7 @@
       \In{k}{nat},
       \In{v}{variante}
     }{juego}
-    [true]
+    [$k>0$]
     {$\exists r: \texttt{cola(letra)} \mid res \igobs nuevoJuego(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
     [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo juego con el tablero vacío y con un repositorio de fichas acorde.]
@@ -33,9 +33,9 @@
       \Inout{j}{juego},
       \In{o}{occurrencia}
     }{}
-    [$jugadaVálida(j,o) \land j = J_{0} $]
+    [$jugadaVálida(j,o) \land j\igobs J_{0} $]
     {$j\igobs ubicar(J_{0},o)$}
-    [$O(L_{máx}^{2})$]
+    [$O(m)$, donde $m$ es el número de fichas que se ubican.]
     [Ubica un conjunto de fichas en el juego.]
     [\falta]
     [\falta]\\
@@ -58,7 +58,7 @@
     [true]
     {$res\igobs turno(j)$}
     [$O(1)$]
-    [Obtiene el turno actual.]
+    [Obtiene al jugador del turno actual.]
     [\falta]
     [\falta]\\
 
