@@ -20,7 +20,7 @@
             (texlive.combine {
               inherit (pkgs.texlive)
                 scheme-medium geometry babel fancyhdr lastpage framed todonotes
-                hyperref amsmath xargs;
+                hyperref amsmath xargs changepage;
             })
             texlab
           ];

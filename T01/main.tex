@@ -1,7 +1,7 @@
 \documentclass[10pt, a4paper]{article}
 \usepackage[paper=a4paper, left=1.5cm, right=1.5cm, bottom=1.5cm, top=3.5cm]{geometry}
-%\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
 \usepackage{indentfirst}
 \usepackage{fancyhdr}
@@ -10,15 +10,10 @@
 \usepackage{framed}
 \usepackage{todonotes} % para dejar notitas de to-do!
 \usepackage{aed2-symb,aed2-itef,aed2-tad,aed2-diseno}
-\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+\usepackage[colorlinks=true, linkcolor=black]{hyperref}
 \usepackage{calc}
-\usepackage{hyperref}% http://ctan.org/pkg/hyperref
 \usepackage{graphicx}
-\hypersetup{%
-  colorlinks = true,
-  linkcolor  = black
-}
-
+\usepackage{changepage}
 %
 
 % ========== Para escribir pseudo ==========
@@ -202,6 +197,32 @@
 \newcommand{\eqprop}{\overset{\mathrm{prop}}{=}}
 %\newcommand{\ssi}{\leftrightarrow}
 
+\newcommand{\seExplica}[2]{
+\textbf{se explica con}: \NombreFuncion{#1}\par\noindent
+\textbf{géneros}: \TipoVariable{#2}
+}
+
+\newcommand{\usa}[1] {
+\textbf{usa}: \NombreFuncion{#1}\par
+}
+
+\newenvironment{interfaz}[1]
+  {#1
+  \adjustwidth{3em}{}}
+  {\endadjustwidth}
+
+\newenvironment{operaciones}
+  {\textbf{operaciones} :
+  \adjustwidth{2em}{}}
+  {\endadjustwidth}
+
+\newcommand{\asignar}[2]{$#1 \gets #2$}
+
+\newcommand{\falta}{\todo[inline, inlinewidth=1.7em, noinlinepar]{??}}
+
+\newcommand{\defun}[3]{
+  \caption{\textsc{#1}(#2) $\longrightarrow$ \texttt{#3}}
+}
 
 \begin{document}
 
@@ -210,6 +231,9 @@
 \tableofcontents
 \newpage
 
-\input{tp.tex}
+\input{preambulo.tex}
+\input{juego.tex}
+\input{servidor.tex}
+\input{auxiliares.tex}
 
 \end{document}

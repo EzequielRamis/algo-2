@@ -15,9 +15,9 @@
 \newcommandx{\TipoFuncion}[3]{%
   \NombreFuncion{#1}(#2) \ifx#3\empty\else $\to$ \res\,: \TipoVariable{#3}\fi%
 }
-\newcommand{\In}[2]{\ModificadorArgumento{in} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
-\newcommand{\Out}[2]{\ModificadorArgumento{out} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
-\newcommand{\Inout}[2]{\ModificadorArgumento{in/out} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\In}[2]{\ModificadorArgumento{in} \textit{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\Out}[2]{\ModificadorArgumento{out} \textit{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\Inout}[2]{\ModificadorArgumento{in/out} \texit{#1}\,: \TipoVariable{#2}\xspace}
 \newcommand{\Aplicar}[2]{\NombreFuncion{#1}(#2)}
 
 \newlength{\IntFuncionLengthA}
@@ -44,11 +44,11 @@
   \ifx#7\empty\else\\\textbf{Complejidad:} #7\fi%
 }
 
-\newenvironment{Interfaz}{%
-  \parskip=2ex%
-  \noindent\textbf{\Large Interfaz}%
-  \par%
-}{}
+% \newenvironment{Interfaz}{%
+%   \parskip=2ex%
+%   \noindent\textbf{\Large Interfaz}%
+%   \par%
+% }{}
 
 \newenvironment{Representacion}{%
   \vspace*{2ex}%

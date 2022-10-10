@@ -1,0 +1,158 @@
+\section{Módulo Juego}
+\begin{interfaz}{\subsection{Interfaz}}
+  \seExplica{Juego}{juego}\\
+  \usa{Nat, Cola, Letra, Variante, Ocurrencia, \falta}
+  \par\noindent
+  \begin{operaciones}
+    \InterfazFuncion{nuevoJuego}
+    {
+      \In{k}{nat},
+      \In{v}{variante}
+    }{juego}
+    [true]
+    {$\exists r: \texttt{cola(letra)} \mid res \igobs nuevoJuego(k,v,r)$}
+    [$O(N^{2}+|\Sigma|K+FK)$]
+    [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo juego con el tablero vacío y con un repositorio de fichas acorde.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{jugadaVálida?}
+    {
+      \In{j}{juego},
+      \In{o}{occurrencia}
+    }{bool}
+    [true]
+    {$res\igobs jugadaVálida?(j,o)$}
+    [$O(L_{máx}^{2})$]
+    [Determina si una jugada es válida.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{ubicar}
+    {
+      \Inout{j}{juego},
+      \In{o}{occurrencia}
+    }{}
+    [$jugadaVálida(j,o) \land j = J_{0} $]
+    {$j\igobs ubicar(J_{0},o)$}
+    [$O(L_{máx}^{2})$]
+    [Ubica un conjunto de fichas en el juego.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{variante}
+    {
+      \In{j}{juego}
+    }{variante}
+    [true]
+    {$res\igobs variante(j)$}
+    [$O(1)$]
+    [Obtiene información sobre la variante del juego.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{turno}
+    {
+      \In{j}{juego}
+    }{nat}
+    [true]
+    {$res\igobs turno(j)$}
+    [$O(1)$]
+    [Obtiene el turno actual.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{puntaje}
+    {
+      \In{j}{juego},
+      \In{i}{nat}
+    }{nat}
+    [$i < \#jugadores(j)$]
+    {$res\igobs puntaje(j,i)$}
+    [$O(m\cdot L_{máx})$, donde $m$ es la cantidad de fichas que ubicó el
+jugador desde la última vez que se invocó a esta operación.]
+    [Obtiene el puntaje de un jugador.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{celda}
+    {
+      \In{J}{juego},
+      \In{i}{nat},
+      \In{j}{nat},
+    }{puntero(letra)}
+    [$enTablero?(tablero(J),i,j)$]
+    {$res\igobs\IFL{hayLetra?(tablero(J),i,j)}THEN{\&letra(tablero(J),i,j)}ELSE{NULL}FI$}
+    [$O(1)$]
+    [Obtiene el contenido del tablero en una coordenada $(i,j)$.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{\#letraTieneJugador}
+    {
+      \In{j}{juego},
+      \In{x}{letra},
+      \In{i}{nat}
+    }{nat}
+    [$i < \#jugadores(j)$]
+    {$res\igobs \#(x,fichas(j,i))$}
+    [$O(1)$]
+    [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]
+    [\falta]
+    [\falta]\\
+
+  \end{operaciones}
+\end{interfaz}
+
+\subsection{Implementación}
+\subsubsection*{Representación}
+\begin{Estructura}{foo}
+\begin{Tupla}
+  \tupItem{foo}{bar}
+  \tupItem{foo}{bar}
+\end{Tupla}
+\end{Estructura}
+
+\subsubsection*{Invariante de Representación}
+\Rep{foo}
+
+\par\vspace*{3ex}%
+
+\subsubsection*{Función de Abstracción}
+\Abs[estr]{foo}[e]{p}{bar}
+
+\subsubsection*{Algoritmos}
+\begin{algorithm}[H]
+  \defun{hacerGuia}{\In{A}{guia}, \In{parámetroInútil}{Nat}}{bool}
+  \begin{algorithmic}[1]
+    \State \asignar{i}{0} \Comment{esto es $\Theta$(1)}
+
+    \State \asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
+
+    \State \asignar{consultas}{\textsc{diccVacio}}
+
+    \State \textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
+
+    \While {$i < n$}
+    \State \textsc{pensarEjercicio(i)}
+    \If{\textsc{tengoConsultas($i$)}}
+      \State \textsc{escribirConsultasEjercicio($i$,$consultas$)}
+    \Else
+      \State \textsc{comerBizochito()}
+    \EndIf
+      \State \textsc{comerBizochito()}
+    \EndWhile
+
+    \For{miVariable}
+         \State hacer algo
+    \EndFor
+
+    \State \Return{\textsc{vacio?}($consultas$)}
+  \end{algorithmic}
+\end{algorithm}
+\newpage
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:
