@@ -73,7 +73,7 @@
 
 % ----- Imprimir un mensajito al procesar un .tex que use este package -----
 
-\typeout{Cargando package 'caratula' v0.2 (21/4/2003)}
+\typeout{Cargando package `caratula' v0.2 (21/4/2003)}
 
 
 % ----- Algunas variables --------------------------------------------------
@@ -212,7 +212,7 @@
   {\endadjustwidth}
 
 \newenvironment{operaciones}
-  {\textbf{operaciones} :
+  {\textbf{operaciones}:
   \adjustwidth{2em}{}}
   {\endadjustwidth}
 
@@ -223,6 +223,8 @@
 \newcommand{\defun}[3]{
   \caption{\textsc{#1}(#2) $\longrightarrow$ \texttt{#3}}
 }
+
+\newcommand{\NULL}{\textsc{NULL}}
 
 \begin{document}
 

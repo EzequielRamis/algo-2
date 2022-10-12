@@ -22,8 +22,8 @@
       \In{o}{occurrencia}
     }{bool}
     [true]
-    {$res\igobs jugadaVálida?(j,o)$}
-    [$O(L_{máx}^{2})$]
+    {$res\igobs jugadaV\acute{a}lida?(j,o)$}
+    [$O(L_{\texttt{máx}}^{2})$]
     [Determina si una jugada es válida.]
     [\falta]
     [\falta]\\
@@ -33,7 +33,7 @@
       \Inout{j}{juego},
       \In{o}{occurrencia}
     }{}
-    [$jugadaVálida(j,o) \land j\igobs J_{0} $]
+    [$jugadaV\acute{a}lida(j,o) \land j\igobs J_{0} $]
     {$j\igobs ubicar(J_{0},o)$}
     [$O(m)$, donde $m$ es el número de fichas que se ubican.]
     [Ubica un conjunto de fichas en el juego.]
@@ -69,7 +69,7 @@
     }{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs puntaje(j,i)$}
-    [$O(m\cdot L_{máx})$, donde $m$ es la cantidad de fichas que ubicó el
+    [$O(m\cdot L_{\texttt{máx}})$, donde $m$ es la cantidad de fichas que ubicó el
 jugador desde la última vez que se invocó a esta operación.]
     [Obtiene el puntaje de un jugador.]
     [\falta]
@@ -79,10 +79,10 @@ jugador desde la última vez que se invocó a esta operación.]
     {
       \In{J}{juego},
       \In{i}{nat},
-      \In{j}{nat},
+      \In{j}{nat}
     }{puntero(letra)}
     [$enTablero?(tablero(J),i,j)$]
-    {$res\igobs\IFL{hayLetra?(tablero(J),i,j)}THEN{\&letra(tablero(J),i,j)}ELSE{NULL}FI$}
+    {$res\igobs\IFL{hayLetra?(tablero(J),i,j)}THEN{\&letra(tablero(J),i,j)}ELSE{\NULL}FI$}
     [$O(1)$]
     [Obtiene el contenido del tablero en una coordenada $(i,j)$.]
     [\falta]
@@ -125,29 +125,23 @@ jugador desde la última vez que se invocó a esta operación.]
 \begin{algorithm}[H]
   \defun{hacerGuia}{\In{A}{guia}, \In{parámetroInútil}{Nat}}{bool}
   \begin{algorithmic}[1]
-    \State \asignar{i}{0} \Comment{esto es $\Theta$(1)}
-
-    \State \asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
-
-    \State \asignar{consultas}{\textsc{diccVacio}}
-
-    \State \textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
-
-    \While {$i < n$}
-    \State \textsc{pensarEjercicio(i)}
+    \State\asignar{i}{0} \Comment{esto es $\Theta$(1)}
+    \State\asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
+    \State\asignar{consultas}{\textsc{diccVacio}}
+    \State\textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
+    \While{$i < n$}
+    \State\textsc{pensarEjercicio(i)}
     \If{\textsc{tengoConsultas($i$)}}
-      \State \textsc{escribirConsultasEjercicio($i$,$consultas$)}
+      \State\textsc{escribirConsultasEjercicio($i$,$consultas$)}
     \Else
-      \State \textsc{comerBizochito()}
+      \State\textsc{comerBizochito()}
     \EndIf
-      \State \textsc{comerBizochito()}
+      \State\textsc{comerBizochito()}
     \EndWhile
-
     \For{miVariable}
          \State hacer algo
     \EndFor
-
-    \State \Return{\textsc{vacio?}($consultas$)}
+    \State\Return{\textsc{vacio?}($consultas$)}
   \end{algorithmic}
 \end{algorithm}
 \newpage
