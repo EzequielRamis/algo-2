@@ -69,7 +69,7 @@
     }{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs puntaje(j,i)$}
-    [$O(m\cdot L_{\texttt{máx}})$, donde $m$ es la cantidad de fichas que ubicó el
+    [$O(1+m\cdot L_{\texttt{máx}})$, donde $m$ es la cantidad de fichas que ubicó el
 jugador desde la última vez que se invocó a esta operación.]
     [Obtiene el puntaje de un jugador.]
     [\falta]
@@ -96,7 +96,7 @@ jugador desde la última vez que se invocó a esta operación.]
     }{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs \#(x,fichas(j,i))$}
-    [$O(1)$]
+    [$O(1)$ \falta $O(F)$]
     [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]
     [\falta]
     [\falta]\\
@@ -106,10 +106,15 @@ jugador desde la última vez que se invocó a esta operación.]
 
 \subsection{Implementación}
 \subsubsection*{Representación}
-\begin{Estructura}{foo}
-\begin{Tupla}
-  \tupItem{foo}{bar}
-  \tupItem{foo}{bar}
+\begin{Estructura}{juego}[juego\_estr]
+\begin{Tupla}[juego\_estr]
+\begin{adjustwidth}{3em}{}\ \
+  \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(letra)))}\\
+  \tupItem{jugadores}{array\_dimensionable(tupla(\textrm{$puntaje$:} nat\textrm{, $mazo$:} array\_dimensionable(letra)))}\\
+  \tupItem{jugadorActual}{nat}\\
+  \tupItem{repositorio}{cola(letra)}\\
+  \tupItem{variante}{variante}
+\end{adjustwidth}\ \ \ \ \ \ \
 \end{Tupla}
 \end{Estructura}
 

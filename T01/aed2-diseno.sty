@@ -77,14 +77,14 @@
 \newboolean{EstructuraHayItems}
 \newlength{\lenTupla}
 \newenvironmentx{Tupla}[1][1={estr}]{%
-    \settowidth{\lenTupla}{\hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($}%
+    % \settowidth{\lenTupla}{\hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($}%
     \addtolength{\lenTupla}{\parindent}%
     \hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($%
-    \begin{minipage}[t]{\linewidth-\lenTupla}%
+    % \begin{minipage}[t]{\linewidth-\lenTupla}%
     \setboolean{EstructuraHayItems}{false}%
 }{%
     $)$%
-    \end{minipage}
+    % \end{minipage}
 }
 
 \newcommandx{\tupItem}[3][1={\ }]{%

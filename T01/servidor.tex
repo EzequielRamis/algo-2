@@ -1,6 +1,104 @@
 \section{Módulo Servidor}
-\subsection{Interfaz}
+\begin{interfaz}{\subsection{Interfaz}}
+  \seExplica{Servidor}{servidor}\\
+  \usa{\falta}
+  \par\noindent
+  \begin{operaciones}
+    \InterfazFuncion{nuevoServidor}
+    {
+      \In{k}{nat},
+      \In{v}{variante}
+    }{servidor}
+    [true]
+    {$\exists r: \texttt{cola(letra)} \mid res \igobs nuevoServidor(k,v,r)$}
+    [$O(N^{2}+|\Sigma|K+FK)$]
+    [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo servidor y una nueva partida de juego.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{conectar}
+    {
+      \Inout{s}{servidor}
+    }{}
+    [$\lnot empez\acute{o}?(s) \land s\igobs S_{0}$]
+    {$s\igobs conectarCliente(S_{0})$}
+    [$O(1)$]
+    [Conecta un cliente a un servidor.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{consultar}
+    {
+      \Inout{s}{servidor},
+      \In{cid}{nat}
+    }{}
+    [$cid\leq \#conectados(s) \land s\igobs S_{0}$]
+    {$s\igobs consultar(S_{0},cid)$}
+    [$O(n)$, donde $n$ es la cantidad de mensajes en la cola de dicho cliente.]
+    [Consulta la cola de notificaciones de un cliente (lo cual vacía dicha cola).]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{recibir}
+    {
+      \Inout{s}{servidor},
+      \In{cid}{nat},
+      \In{o}{ocurrencia}
+    }{}
+    [$cid\leq \#conectados(s) \land s\igobs S_{0}$]
+    {$s\igobs recibirMensaje(S_{0},cid,o)$}
+    [\falta]
+    [Recibe un mensaje de un cliente.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{clientesEsperados}
+    {
+      \In{s}{servidor}
+    }{nat}
+    [true]
+    {$res\igobs \#esperados(s)$}
+    [$O(1)$]
+    [Obtiene el número de clientes esperados.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{clientesConectados}
+    {
+      \In{s}{servidor}
+    }{nat}
+    [true]
+    {$res\igobs \#conectados(s)$}
+    [$O(1)$]
+    [Obtiene el número de clientes conectados.]
+    [\falta]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{partida}
+    {
+      \In{s}{servidor}
+    }{juego}
+    [true]
+    {$res\igobs juego(s)$}
+    [$O(1)$]
+    [Obtiene el juego que se está jugando en el servidor.]
+    [\falta]
+    [\falta]\\
+  \end{operaciones}
+\end{interfaz}
 \subsection{Implementación}
+\subsubsection*{Representación}
+\begin{Estructura}{servidor}[servidor\_estr]
+\begin{Tupla}[servidor\_estr]
+\begin{adjustwidth}{3em}{}\ \
+  \tupItem{cantJugadores}{nat}\\
+  \tupItem{mensajes}{array\_dimensionable(ocurrencia)}\\
+  \tupItem{notificaciones}{dicc(cliente,cola(notificacion))}\\
+
+  \falta
+\end{adjustwidth}\ \ \ \ \ \ \
+\end{Tupla}
+\end{Estructura}
 \newpage
 
 %%% Local Variables:

@@ -1,3 +1,14 @@
+\section{Dudas}
+\begin{itemize}
+        \item Igualdad observacional sin tenerla definida en los TADs.
+        \item Nuevo Juego: ¿El repo se pasa por parámetro o se genera ``aleatoriamente'' dentro de la función como un comportamiento automático? Si es el 1º caso se tendría que copiar para coincidir con la complejidad del ejercicio. Si es el segundo ver cómo se genera ``aleatoriamente''.
+        \item ¿Qué tipo es \texttt{letra}? Si es \texttt{char} la complejidad de nuevoJuego no se cumple ($\Sigma$ sería muy grande). En caso de pasar por parámetro un conjunto de \texttt{chars} como alfabeto, habría que checkear que todas las fichas del repo inicial sean de ese alfabeto. Lo más probable es que sea un \texttt{enum}.
+        \item ¿Se puede usar operaciones de interfaz dentro de \textbf{Pre} y \textbf{Post}? Por ejemplo para acceder a elemento de tablero, si es otro módulo.
+        \item Si se quiere que \texttt{variante} sea un módulo, ¿qué tipo de parámetro de entrada se usan para la operación ``nuevaVariante''? ¿Las ya definidas en la representación? ¿Puede ser un módulo que no tenga interfaz y solamente el \textbf{Rep} y \textbf{Abs}?
+        \item ¿Hay que poner el item ``usa'' o sólo completar los ``requiere''?
+        \item Complejidad de operación \textsc{\#letraTieneJugador}.
+\end{itemize}
+
 \section{Preámbulo}
 Antes de presentar los módulos, definimos las siguientes variables para las complejidades temporales:
 \begin{itemize}
