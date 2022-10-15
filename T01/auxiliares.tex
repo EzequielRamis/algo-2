@@ -17,143 +17,38 @@
     [$n>0\land f>0$]
     {$res \igobs nuevaVariante(n,f,puntajes,leg\acute{\imath}timas)$}
     [$O(1)$]
-    [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo juego con el tablero vacío y con un repositorio de fichas acorde.]
-    [\falta]
+    [Genera una variante de juego.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{jugadaVálida?}
-    {
-      \In{j}{juego},
-      \In{o}{occurrencia}
-    }{bool}
+    \noindent\InterfazFuncion{tamañoTablero}
+    {\In{v}{variante}}{nat}
     [true]
-    {$res\igobs jugadaV\acute{a}lida?(j,o)$}
-    [$O(L_{\texttt{máx}}^{2})$]
-    [Determina si una jugada es válida.]
-    [\falta]
+    {$res \igobs tama\tilde{n}oTablero(v)$}
+    [$O(1)$]
+    [Devuelve el tamaño del tablero.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{ubicar}
-    {
-      \Inout{j}{juego},
-      \In{o}{occurrencia}
-    }{}
-    [$jugadaV\acute{a}lida(j,o) \land j\igobs J_{0} $]
-    {$j\igobs ubicar(J_{0},o)$}
-    [$O(m)$, donde $m$ es el número de fichas que se ubican.]
-    [Ubica un conjunto de fichas en el juego.]
-    [\falta]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{variante}
-    {
-      \In{j}{juego}
-    }{variante}
+    \noindent\InterfazFuncion{fichasPorJugador}
+    {\In{v}{variante}}{nat}
     [true]
-    {$res\igobs variante(j)$}
+    {$res \igobs \#fichas(v)$}
     [$O(1)$]
-    [Obtiene información sobre la variante del juego.]
-    [\falta]
+    [Devuelve la cantidad de fichas que debe de tener cada jugador.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{turno}
-    {
-      \In{j}{juego}
-    }{nat}
+    \noindent\InterfazFuncion{puntajeLetra}
+    {\In{v}{variante}, \In{l}{letra}}{nat}
     [true]
-    {$res\igobs turno(j)$}
+    {$res \igobs \#fichas(v)$}
     [$O(1)$]
-    [Obtiene al jugador del turno actual.]
-    [\falta]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{puntaje}
-    {
-      \In{j}{juego},
-      \In{i}{nat}
-    }{nat}
-    [$i < \#jugadores(j)$]
-    {$res\igobs puntaje(j,i)$}
-    [$O(1+m\cdot L_{\texttt{máx}})$, donde $m$ es la cantidad de fichas que ubicó el
-jugador desde la última vez que se invocó a esta operación.]
-    [Obtiene el puntaje de un jugador.]
-    [\falta]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{celda}
-    {
-      \In{J}{juego},
-      \In{i}{nat},
-      \In{j}{nat}
-    }{puntero(letra)}
-    [$enTablero?(tablero(J),i,j)$]
-    {$res\igobs\IFL{hayLetra?(tablero(J),i,j)}THEN{\&letra(tablero(J),i,j)}ELSE{\NULL}FI$}
-    [$O(1)$]
-    [Obtiene el contenido del tablero en una coordenada $(i,j)$.]
-    [\falta]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{\#letraTieneJugador}
-    {
-      \In{j}{juego},
-      \In{x}{letra},
-      \In{i}{nat}
-    }{nat}
-    [$i < \#jugadores(j)$]
-    {$res\igobs \#(x,fichas(j,i))$}
-    [$O(1)$ \falta $O(F)$]
-    [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]
-    [\falta]
+    [Devuelve la cantidad de fichas que debe de tener cada jugador.]
     [\falta]\\
 
   \end{operaciones}
 \end{interfaz}
 
-\subsubsection{Implementación}
-\textbf{Representación}
-\begin{Estructura}{juego}[juego\_estr]
-\begin{Tupla}[juego\_estr]
-\begin{adjustwidth}{3em}{}\ \
-  \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(letra)))}\\
-  \tupItem{jugadores}{array\_dimensionable(tupla(\textrm{$puntaje$:} nat\textrm{, $mazo$:} array\_dimensionable(letra)))}\\
-  \tupItem{jugadorActual}{nat}\\
-  \tupItem{repositorio}{cola(letra)}\\
-  \tupItem{variante}{variante}
-\end{adjustwidth}\ \ \ \ \ \ \
-\end{Tupla}
-\end{Estructura}
-
-\textbf{Invariante de Representación}
-\Rep{foo}
-
-\par\vspace*{3ex}%
-
-\textbf{Función de Abstracción}
-\Abs[estr]{foo}[e]{p}{bar}
-
-\textbf{Algoritmos}
-\begin{algorithm}[H]
-  \defun{hacerGuia}{\In{A}{guia}, \In{parámetroInútil}{Nat}}{bool}
-  \begin{algorithmic}[1]
-    \State\asignar{i}{0} \Comment{esto es $\Theta$(1)}
-    \State\asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
-    \State\asignar{consultas}{\textsc{diccVacio}}
-    \State\textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
-    \While{$i < n$}
-    \State\textsc{pensarEjercicio(i)}
-    \If{\textsc{tengoConsultas($i$)}}
-      \State\textsc{escribirConsultasEjercicio($i$,$consultas$)}
-    \Else
-      \State\textsc{comerBizochito()}
-    \EndIf
-      \State\textsc{comerBizochito()}
-    \EndWhile
-    \For{miVariable}
-         \State hacer algo
-    \EndFor
-    \State\Return{\textsc{vacio?}($consultas$)}
-  \end{algorithmic}
-\end{algorithm}
+\subsection{Módulo Ocurrencia}
+\subsection{Módulo Notificación}
 
 %%% Local Variables:
 %%% mode: latex

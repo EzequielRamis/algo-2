@@ -1,116 +1,98 @@
 \section{Módulo Juego}
 \begin{interfaz}{\subsection{Interfaz}}
-  \seExplica{Juego}{juego}\\
-  \usa{\falta}
+  \seExplica{Juego}{juego}\\\\
+  \usa{Bool, Nat, Cola, Letra, Ocurrencia, Tablero, Variante}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoJuego}
-    {
-      \In{k}{nat},
-      \In{v}{variante}
-    }{juego}
-    [$k>0$]
-    {$\exists r: \texttt{cola(letra)} \mid res \igobs nuevoJuego(k,v,r)$}
+    {\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego}
+    [$tama\tilde{n}o(r)\geq tama\tilde{n}oTablero(v)*tama\tilde{n}oTablero(v)+k*\#fichas(v)\land k>0$]
+    {$res \igobs nuevoJuego(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
-    [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo juego con el tablero vacío y con un repositorio de fichas acorde.]
-    [\falta]
+    [Dada una cantidad de jugadores, una variante de juego y un repositorio de fichas, se inicia un nuevo juego con el tablero vacío.]
     [\falta]\\
 
     \noindent\InterfazFuncion{jugadaVálida?}
-    {
-      \In{j}{juego},
-      \In{o}{occurrencia}
-    }{bool}
+    {\In{j}{juego}, \In{o}{occurrencia}}{bool}
     [true]
     {$res\igobs jugadaV\acute{a}lida?(j,o)$}
     [$O(L_{\texttt{máx}}^{2})$]
     [Determina si una jugada es válida.]
-    [\falta]
     [\falta]\\
 
     \noindent\InterfazFuncion{ubicar}
-    {
-      \Inout{j}{juego},
-      \In{o}{occurrencia}
-    }{}
+    {\Inout{j}{juego}, \In{o}{occurrencia}}{}
     [$jugadaV\acute{a}lida(j,o) \land j\igobs J_{0} $]
     {$j\igobs ubicar(J_{0},o)$}
     [$O(m)$, donde $m$ es el número de fichas que se ubican.]
     [Ubica un conjunto de fichas en el juego.]
-    [\falta]
     [\falta]\\
 
     \noindent\InterfazFuncion{variante}
-    {
-      \In{j}{juego}
-    }{variante}
+    {\In{j}{juego}}{variante}
     [true]
     {$res\igobs variante(j)$}
     [$O(1)$]
     [Obtiene información sobre la variante del juego.]
-    [\falta]
     [\falta]\\
 
     \noindent\InterfazFuncion{turno}
-    {
-      \In{j}{juego}
-    }{nat}
+    {\In{j}{juego}}{nat}
     [true]
     {$res\igobs turno(j)$}
     [$O(1)$]
     [Obtiene al jugador del turno actual.]
-    [\falta]
     [\falta]\\
 
     \noindent\InterfazFuncion{puntaje}
-    {
-      \In{j}{juego},
-      \In{i}{nat}
-    }{nat}
+    {\In{j}{juego}, \In{i}{nat}}{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs puntaje(j,i)$}
     [$O(1+m\cdot L_{\texttt{máx}})$, donde $m$ es la cantidad de fichas que ubicó el
 jugador desde la última vez que se invocó a esta operación.]
     [Obtiene el puntaje de un jugador.]
-    [\falta]
     [\falta]\\
 
-    \noindent\InterfazFuncion{celda}
-    {
-      \In{J}{juego},
-      \In{i}{nat},
-      \In{j}{nat}
-    }{puntero(letra)}
+    \noindent\InterfazFuncion{celdaOcupada?}
+    {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{bool}
     [$enTablero?(tablero(J),i,j)$]
-    {$res\igobs\IFL{hayLetra?(tablero(J),i,j)}THEN{\&letra(tablero(J),i,j)}ELSE{\NULL}FI$}
+    {$res\igobs hayLetra?(tablero(J),i,j)$}
     [$O(1)$]
-    [Obtiene el contenido del tablero en una coordenada $(i,j)$.]
-    [\falta]
+    [Obtiene si el tablero en una coordenada $(i,j)$ está ocupado.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{celdaContenido}
+    {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{letra}
+    [$enTablero?(tablero(J),i,j)\land_{L} hayLetra?(tablero(J),i,j)$]
+    {$res\igobs letra(tablero(J),i,j)$}
+    [$O(1)$]
+    [Obtiene el contenido del tablero en una coordenada $(i,j)$ asumiendo que está ocupada.]
     [\falta]\\
 
     \noindent\InterfazFuncion{\#letraTieneJugador}
-    {
-      \In{j}{juego},
-      \In{x}{letra},
-      \In{i}{nat}
-    }{nat}
+    {\In{j}{juego}, \In{x}{letra}, \In{i}{nat}}{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs \#(x,fichas(j,i))$}
-    [$O(1)$ \falta $O(F)$]
+    [$O(1)$]
     [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]
-    [\falta]
     [\falta]\\
 
   \end{operaciones}
 \end{interfaz}
 
 \subsection{Implementación}
+
 \subsubsection*{Representación}
 \begin{Estructura}{juego}[juego\_estr]
 \begin{Tupla}[juego\_estr]
 \begin{adjustwidth}{3em}{}\ \
   \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(letra)))}\\
-  \tupItem{jugadores}{array\_dimensionable(tupla(\textrm{$puntaje$:} nat\textrm{, $mazo$:} array\_dimensionable(letra)))}\\
+  \tupItem{jugadores}{array\_dimensionable(tupla(
+    \begin{adjustwidth}{3em}{}\
+        \textrm{$puntaje$:} nat\\
+        \textrm{, $mazo$:} array\_dimensionable(letra)\\
+        \textrm{, $cantFichas$:} array\_dimensionable(nat)
+    \end{adjustwidth}))}\\
   \tupItem{jugadorActual}{nat}\\
   \tupItem{repositorio}{cola(letra)}\\
   \tupItem{variante}{variante}
@@ -149,6 +131,8 @@ jugador desde la última vez que se invocó a esta operación.]
     \State\Return{\textsc{vacio?}($consultas$)}
   \end{algorithmic}
 \end{algorithm}
+
+\subsection{Servicios usados}
 \newpage
 
 %%% Local Variables:
