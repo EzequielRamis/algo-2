@@ -119,12 +119,12 @@
 
 \newcommandx{\Rep}[3][1={estr},2={e}]{%
   \tadOperacion{Rep}{#1}{bool}{}%
-  \tadAxioma{Rep($#2$)}{true \ssi #3}%
+  \tadAxioma{Rep($#2$)}{#3}%
 }%
 
 \newcommandx{\Abs}[5][1={estr},3={e}]{%
   \tadOperacion{Abs}{#1/#3}{#2}{Rep($#3$)}%
-  \settominwidth{\hangindent}{Abs($#3$) \igobs #4: #2 $\mid$ }%
+  \settominwidth{\hangindent}{Abs($#3$) \igobs #4: #2 $\mid\ $ }%
   \addtolength{\hangindent}{\parindent}%
   Abs($#3$) \igobs #4: #2 $\mid$ #5%
 }%

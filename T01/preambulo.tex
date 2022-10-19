@@ -5,14 +5,7 @@ Antes de presentar los módulos, definimos las siguientes variables para las com
     \item $K$ \---- cantidad de jugadores.
     \item $|\Sigma|$ \---- cantidad de letras en el alfabeto.
     \item $F$ \---- cantidad de fichas por jugador.
-    \item $L_{\texttt{máx}}$ \---- longitud de la palabra legítima más larga definida por la variante del juego de la que se trate.
-\end{itemize}
-
-Además, se asume un tipo \texttt{letra} definido con las siguientes operaciones:
-\begin{itemize}
-    \item $\textsc{dom}\quad :\quad\quad\quad \rightarrow\texttt{nat}$ \---- Tamaño del dominio del tipo \texttt{letra}. Corresponde con la variable $A$ de su especificación.
-    \item $\textsc{ord}\quad:\texttt{letra}\rightarrow\texttt{nat}$ \---- Dada una letra, devuelve su correspondiente índice.
-    \item $\textsc{ord}^{-1}: \texttt{nat}\ n\rightarrow\texttt{letra}\ \{n < A\}$ \---- Dado un índice, devuelve su correspondiente letra.
+    \item $\Lmax$ \---- longitud de la palabra legítima más larga definida por la variante del juego de la que se trate.
 \end{itemize}
 
 %%% Local Variables:

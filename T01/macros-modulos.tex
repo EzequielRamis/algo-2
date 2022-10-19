@@ -103,7 +103,7 @@
 
 \newcommandx{\Rep}[3][1={estr},2={e}]{%
   \tadOperacion{Rep}{#1}{bool}{}%
-  \tadAxioma{Rep($#2$)}{true \ssi #3}%
+  \tadAxioma{Rep($#2$)}{#3}%
 }%
 
 \newcommandx{\Abs}[5][1={estr},3={e}]{%
