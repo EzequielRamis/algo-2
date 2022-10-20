@@ -98,7 +98,7 @@ jugador desde la última vez que se invocó a esta operación.]
   \tupItem{jugadores}{array\_dimensionable(tupla(
     \begin{adjustwidth}{3em}{}\
         \textrm{$puntaje$:} nat\\
-        \textrm{, $cantFichas$:} array\_dimensionable(nat)\\
+        \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)\\
         \textrm{, $cantFichasTotal$:} nat
     \end{adjustwidth}))}\\
   \tupItem{jugadorActual}{nat}\\
@@ -110,20 +110,20 @@ jugador desde la última vez que se invocó a esta operación.]
 
 \subsubsection*{Invariante de Representación}
 \Rep[juego\_estr]{$
-  (\forall j:\texttt{jugador}\footnotemark[1])(j\in\footnotemark[2] e.jugadores\implies(
+  (\forall i:\texttt{nat})(i<tam(e.jugadores)\implies(
   $\begin{adjustwidth}{1em}{0em}
     $
-    long(j.cantFichas)=\textsc{fichasPorJugador}(e.variante)\land\\
-    long(j.cantFichas)=\textsc{dom}()\yluego\\
-    \sum_{f\in j.cantFichas}f=j.cantFichasTotal
+    tam(e.jugadores[i].cantFichasPorLetra)=\textsc{fichasPorJugador}(e.variante)\land\\
+    tam(e.jugadores[i].cantFichasPorLetra)=\textsc{dom}()\yluego\\
+    \sum_{f<\textsc{dom}()}f=e.jugadores[i].cantFichasTotal
     $
   \end{adjustwidth}$))\land\\
-  long(e.tablero)=\textsc{tamañoTablero}(e.variante)\land\\
-  e.jugadorActual\leq long(e.jugadores)\land\\
-  (\forall col:\texttt{array\_{dimensionable(puntero(letra))}})(col\in e.tablero\implies long(col)=long(e.tablero))\yluego\\
-  \sum_{j\in e.jugadores}j.puntaje\geq
-  \sum_{i,j<long(e.tablero)}\LIF\ e.tablero[i][j]\neq\textsc{NULL}$
-  \begin{adjustwidth}{20em}{0em}
+  tam(e.tablero)=\textsc{tamañoTablero}(e.variante)\land\\
+  e.jugadorActual\leq tam(e.jugadores)\land\\
+  (\forall i:\texttt{nat})(i<tam(e.tablero)\impluego tam(e.tablero[i])=tam(e.tablero))\yluego\\
+  \sum_{i<tam(e.jugadores)}e.jugadores[i].puntaje\geq\\
+  \sum_{i,j<tam(e.tablero)}\LIF\ e.tablero[i][j]\neq\textsc{NULL}$
+  \begin{adjustwidth}{8em}{0em}
   \begin{adjustwidth}{1em}{0em}
     $\LTHEN\ \textsc{puntajeLetra}(e.variante,*e.tablero[i][j])\\
     \LELSE\ 0$
@@ -132,9 +132,6 @@ jugador desde la última vez que se invocó a esta operación.]
   \end{adjustwidth}
 }
 
-\footnotetext[1]{Es un renombre de $\texttt{tupla}(puntaje:\texttt{nat}, cantFichas:\texttt{array\_{dimensionable(letra)}}, cantFichasTotal:\texttt{nat})$ para simplififcar.}
-\footnotetext[2]{Asumimos que existe la operación pertenece $\in$ del tipo \texttt{array\_dimensionable}.}
-
 \par\vspace*{3ex}%
 
 \subsubsection*{Función de Abstracción}
@@ -142,16 +139,16 @@ jugador desde la última vez que se invocó a esta operación.]
   e.variante\igobs variante(J)\land\\
   e.repositorio\igobs repositorio(J)\land\\
   e.jugadorActual\igobs turno(J)\land\\
-  (long(e.jugadores)\igobs \#jugadores(J)\yluego$
+  (tam(e.jugadores)\igobs \#jugadores(J)\yluego$
   \begin{adjustwidth}{11.4em}{0em}
-  $(\forall i:\texttt{nat})(i<long(e.jugadores)\impluego($
+  $(\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego($
   \begin{adjustwidth}{2em}{0em}
     $
     \textsc{puntaje}(e.jugadores[i])\igobs puntaje(J,i)))\land\\
-    (\forall l:\texttt{letra})(e.cantFichas[\textsc{ord}(l)]=\#(l,fichas(J,i)))
+    (\forall l:\texttt{letra})(e.cantFichasPorLetra[\textsc{ord}(l)]=\#(l,fichas(J,i)))
     $
   \end{adjustwidth}$))\land\\
-  long(e.tablero)\igobs tama\tilde{n}o(tablero(J))\yluego\\
+  tam(e.tablero)\igobs tama\tilde{n}o(tablero(J))\yluego\\
   (\forall i,j:\texttt{nat})(enTablero?(tablero(J),i,j)\impluego($
   \begin{adjustwidth}{2em}{0em}
     $
