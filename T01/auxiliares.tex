@@ -7,7 +7,7 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     \item $\textsc{ord}^{-1}: \texttt{nat}\ n\rightarrow\texttt{letra}\ \{n < A\}$ \---- Dado un índice, devuelve su correspondiente letra.
 \end{itemize}
 
-\subsection{Módulo Variante}
+\subsection{Módulo Variante (Trie)}
 \begin{interfaz}{\subsubsection{Interfaz}}
   \seExplica{Variante}{variante}\\
   \usa{\falta}
@@ -28,6 +28,84 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     [Genera una variante de juego.]
     [\falta]\\
 
+    \noindent\InterfazFuncion{tamañoTablero}
+    {\In{v}{variante}}{nat}
+    [true]
+    {$res\igobs tama\tilde{n}oTablero(v)$}
+    [$O(1)$]
+    [Devuelve el tamaño del tablero.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{fichasPorJugador}
+    {\In{v}{variante}}{nat}
+    [true]
+    {$res\igobs \#fichas(v)$}
+    [$O(1)$]
+    [Devuelve la cantidad de fichas que debe de tener cada jugador.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{puntajeLetra}
+    {\In{v}{variante}, \In{l}{letra}}{nat}
+    [true]
+    {$res\igobs puntajeLetra(v,l)$}
+    [$O(1)$]
+    [Devuelve el puntaje de una letra.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{palabraLegítima?}
+    {\In{v}{variante}, \In{l}{secu(letra)}}{bool}
+    [true]
+    {$res\igobs palabraLeg\acute{\imath}tima(v,l)$}
+    [$O(\Lmax)$]
+    [Determina si una palabra es legítima dentro de la variante de juego.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{longPalabraMásLarga}
+    {\In{v}{variante}}{nat}
+    [true]
+    {
+      \begin{adjustwidth}{2em}{}
+
+      $(\exists p:\texttt{secu(letra)})(res\igobs long(p)\land palabraLeg\acute{\imath}tima?(v,p)\land\\(\forall p_{2}:\texttt{secu(letra)})( palabraLeg\acute{\imath}tima?(v,p_{2})\implies res\geq long(p_{2})))$
+      \end{adjustwidth}
+    }
+    [$O(1)$]
+    [Obtiene la longitud de la palabra legítima más larga de la variante.]
+    [\falta]
+  \end{operaciones}
+\end{interfaz}
+\subsubsection{Implementación}
+
+\subsection{Módulo Tablero}
+\begin{interfaz}{\subsubsection{Interfaz}}
+  \seExplica{Tablero}{tab}\\
+  \usa{\falta}
+  \par\noindent
+  \begin{operaciones}
+    \InterfazFuncion{nuevoTablero}
+    {
+      \In{n}{nat}
+    }{tab}
+    [$n>0$]
+    {$res\igobs nuevoTablero(n)$}
+    [$O(N^{2})$]
+    [Genera un tablero de tamaño $n$.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{ponerLetra}
+    {
+      \In{t}{tab},
+      \In{i}{nat},
+      \In{j}{nat},
+      \In{l}{letra},
+      \In{tm}{nat}
+    }{tab}
+    [$enTablero(t,i,j)\yluego\lnot hayLetra?(t,i,j)$]
+    {$res\igobs nuevoTablero(n)$}
+    [$O(N^{2})$]
+    [Genera un tablero de tamaño $n$.]
+
+    [\falta]\\
     \noindent\InterfazFuncion{tamañoTablero}
     {\In{v}{variante}}{nat}
     [true]

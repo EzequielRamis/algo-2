@@ -5,7 +5,7 @@
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoJuego}
-    {\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego}
+    {\In{k}{nat}, \In{v}{variante}, \In{r}{pila(letra)}}{juego}
     [$tama\tilde{n}o(r)\geq tama\tilde{n}oTablero(v)*tama\tilde{n}oTablero(v)+k*\#fichas(v)\land k>0$]
     {$res \igobs nuevoJuego(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
@@ -88,50 +88,107 @@ jugador desde la última vez que se invocó a esta operación.]
   \end{operaciones}
 \end{interfaz}
 
+\newpage
 \subsection{Implementación}
 
 \subsubsection*{Representación}
 \begin{Estructura}{juego}[juego\_estr]
 \begin{Tupla}[juego\_estr]
 \begin{adjustwidth}{3em}{}\ \
-  \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(letra)))}\\
-  \tupItem{jugadores}{array\_dimensionable(tupla(
-    \begin{adjustwidth}{3em}{}\
-        \textrm{$puntaje$:} nat\\
-        \textrm{$fichasUbicadasUltimamente$:} ocurrencia\\
-        \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)\\
-        \textrm{, $cantFichasTotal$:} nat
-    \end{adjustwidth}))}\\
-  \tupItem{jugadorActual}{nat}\\
-  \tupItem{repositorio}{cola(letra)}\\
+  \tupItem{tablero}{tab}\\
+  \tupItem{jugadores}{array\_dimensionable(jugador)}\\
+  \tupItem{tiempo}{nat}\\
+  \tupItem{repositorio}{pila(letra)}\\
   \tupItem{variante}{variante}
 \end{adjustwidth}\ \ \ \ \ \ \
 \end{Tupla}
+\begin{adjustwidth}{3em}{}\
+\begin{Tupla}[jugador][y]
+    \begin{adjustwidth}{2em}{}\
+      \texttt{
+        \textrm{$puntaje$:} nat\\
+        \textrm{, $historial$:} lista(tupla(\textrm{$ocurrencia$:} ocurrencia\textrm{, $tiempo$:} nat))\\
+        \textrm{, $jugadasSinCalcularPuntaje$:} nat\\
+        \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)\\
+        \textrm{, $cantFichasTotal$:} nat
+        }
+      \end{adjustwidth}
+\end{Tupla}
+    \end{adjustwidth}
 \end{Estructura}
 
 \subsubsection*{Invariante de Representación}
 \Rep[juego\_estr]{$
-  (\forall i:\texttt{nat})(i<tam(e.jugadores)\implies(
+  tama\tilde{n}o(e.tablero)=tama\tilde{n}oTablero(e.variante)\land\\
+  % dentro de mod tablero
+  % (\forall i:\texttt{nat})(i<tama\tilde{n}o(e.tablero)\impluego tam(e.tablero[i])=tam(e.tablero))\yluego\\
+  % formatear con operaciones de interfaz tablero
+  % (\forall i,j:\texttt{nat})((i,j<tam(e.tablero)\yluego e.tablero[i][j]\neq\textsc{NULL})\impluego e.tablero[i][j].tiempo<e.tiempo)\yluego\\
+  (\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego(
   $\begin{adjustwidth}{1em}{0em}
     $
-    tam(e.jugadores[i].cantFichasPorLetra)=\textsc{fichasPorJugador}(e.variante)\land\\
+    tam(e.jugadores[i].cantFichasPorLetra)=\#fichas(e.variante)\land\\
     tam(e.jugadores[i].cantFichasPorLetra)=\textsc{dom}()\yluego\\
-    \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=e.jugadores[i].cantFichasTotal
+    \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=e.jugadores[i].cantFichasTotal\land\\
+    e.jugadores[i].jugadasSinCalcularPuntaje\leq tam(e.jugadores[i].historial)\yluego\\
+    tam(e.jugadores[i].historial)=\lceil e.tiempo/tam(e.jugadores)\rceil\land\\
+    (\forall h:\texttt{nat})(h<long(e.jugadores[i].historial)\impluego
+    $\begin{adjustwidth}{1em}{0em}
+      $
+      % e.jugadores[i].historial[h].tiempo = (long(e.jugadores[i].historial)-1-h)*tam(e.jugadores)+i\land\\
+      e.jugadores[i].historial[h].tiempo = h*tam(e.jugadores)+i\land\\
+      ocurrenciaFormaPalabra?(e.jugadores[i].historial[h].ocurrencia)
+      $
+    \end{adjustwidth}$)
+  $
+\end{adjustwidth}$))\yluego\\
+    ocurrenciasV\acute{a}lidas?(nuevoTablero(tama\tilde{n}o(e.tablero)), historiales(e.jugadores,0))\yluego\\
+    e.tablero\igobs ponerOcurrencias(nuevoTablero(tama\tilde{n}o(e.tablero)), historiales(e))\yluego\\
+  (\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego
+  $\begin{adjustwidth}{1em}{0em}
     $
-  \end{adjustwidth}$))\land\\
-  tam(e.tablero)=\textsc{tamañoTablero}(e.variante)\land\\
-  e.jugadorActual\leq tam(e.jugadores)\land\\
-  (\forall i:\texttt{nat})(i<tam(e.tablero)\impluego tam(e.tablero[i])=tam(e.tablero))\yluego\\
-  \sum_{i<tam(e.jugadores)}e.jugadores[i].puntaje\geq\\
-  \sum_{i,j<tam(e.tablero)}\LIF\ e.tablero[i][j]\neq\textsc{NULL}$
-  \begin{adjustwidth}{8em}{0em}
-  \begin{adjustwidth}{1em}{0em}
-    $\LTHEN\ \textsc{puntajeLetra}(e.variante,*e.tablero[i][j])\\
-    \LELSE\ 0$
+    % e.jugadores[i].puntaje=\sum_{k<e.jugadores[i].jugadasSinCalcularPuntaje} puntajeOcurrencia(e,i,k)
+    e.jugadores[i].puntaje=\sum_{k<tam(e.jugadores[i].historial)-e.jugadores[i].jugadasSinCalcularPuntaje}
+  $\begin{adjustwidth}{13em}{0em}
+$puntajeOcurrencia(e,i,k)$
   \end{adjustwidth}
-    $\LFI$
+  \end{adjustwidth}$)
+  \\\\\textbf{donde}
+  $\begin{adjustwidth}{1em}{0em}
+    $
+    \def\dotminus{\mathbin{\ooalign{\hss\raise0.2ex\hbox{*}\hss\cr\mathsurround=0pt$-$}}}
+    % historialesCalculados: \texttt{juego\_{estr}}\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
+    % historialesCalculados(e')\equiv historiales(e)\dotminus historialesSinCalcular(e)\\\\
+    historiales: \texttt{juego\_estr}\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
+    historiales(e')\equiv historialesDesdeHastaTiempo(e'.jugadores,0,0,e.tiempo)\\
+    $
   \end{adjustwidth}
 }
+  \begin{adjustwidth}{7.5em}{0em}
+    $
+    \def\dotminus{\mathbin{\ooalign{\hss\raise0.2ex\hbox{*}\hss\cr\mathsurround=0pt$-$}}}
+    % historialesCalculados: \texttt{juego\_{estr}}\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
+    % historialesCalculados(e')\equiv historiales(e)\dotminus historialesSinCalcular(e)\\\\
+    historialesDesdeHastaTiempo: \texttt{ad(jugador)}\times\texttt{nat}\times\texttt{nat}\times\texttt{nat}\\\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
+    historialesDesdeHastaTiempo(js,k,i,j)\equiv$\IFL{1em}G{k\geq tam(js)}THEN{\emptyset}ELSE{historialDesdeHastaTiempo(js[k].historial,i,j)\cup\\ historialesDesdeHastaTiempo(js,k+1,i,j)}FI$\\
+    historialDesdeHastaTiempo: \texttt{lista(tupla(ocurrencia,nat))}\times\texttt{nat}\times\texttt{nat}\\\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
+    historialDesdeHastaTiempo(ls,i,j)\equiv$\IFL{1em}G{vac\acute{\imath}a?(ls)}THEN{\emptyset}ELSE{historialDesdeHastaTiempo(fin(ls),i,j)\ \cup
+    $\IFL{1em}G{i\leq\pi_{2}(prim(ls))<j}THEN{{prim(ls)}}ELSE{\emptyset}FI$$$}FI$\\
+    ocurrenciasV\acute{a}lidas?: \texttt{tab}\times\texttt{multiconj(tupla(ocurrencia,nat))}\longrightarrow\texttt{bool}\\
+    ocurrenciasV\acute{a}lidas?(t, os)\equiv$\IFL{1em}G{vac\acute\imath a?(os)}THEN{true}ELSE{celdasLibres?(t, dameUno(\pi_{1}(os)))\yluego \\ocurrenciasV\acute{a}lidas?(ponerLetras(t,dameUno(\pi_{1}(os))),sinUno(os))}FI$\\
+    ponerOcurrencias: \texttt{tab}\times\texttt{multiconj(tupla(ocurrencia,nat))}\longrightarrow\texttt{tab}\\
+    ponerOcurrencias(t, os)\equiv$\IFL{1em}G{vac\acute\imath a?(os)}THEN{t}ELSE{ponerOcurrencias(ponerLetras(t,dameUno(\pi_{1}(os))),sinUno(os))}FI$\\
+    puntajeOcurrencia(e',i',k')\equiv \sum_{}\
+  \sum_{i<tam(e.jugadores)}e.jugadores[i].puntaje=\sum_{t<e.tiempo}
+  $\begin{adjustwidth}{4em}{0em}
+    $\LIF\ e'.tablero[i'][j']\neq\textsc{NULL}$
+    \begin{adjustwidth}{1em}{0em}
+      $\LTHEN\ \textsc{puntajeLetra}(e'.variante,*e'.tablero[i'][j'].letra)\\
+      \LELSE\ 0$
+    \end{adjustwidth}
+      $\LFI$
+  \end{adjustwidth}
+  \end{adjustwidth}
 
 \par\vspace*{3ex}%
 

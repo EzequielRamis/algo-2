@@ -76,10 +76,10 @@
 
 \newboolean{EstructuraHayItems}
 \newlength{\lenTupla}
-\newenvironmentx{Tupla}[1][1={estr}]{%
+\newenvironmentx{Tupla}[2][1={estr},2={donde}]{%
     % \settowidth{\lenTupla}{\hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($}%
     \addtolength{\lenTupla}{\parindent}%
-    \hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($%
+    \hspace*{3mm}#2 \TipoVariable{#1} es \TipoVariable{tupla}$($%
     % \begin{minipage}[t]{\linewidth-\lenTupla}%
     \setboolean{EstructuraHayItems}{false}%
 }{%
