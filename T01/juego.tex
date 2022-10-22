@@ -98,6 +98,7 @@ jugador desde la última vez que se invocó a esta operación.]
   \tupItem{jugadores}{array\_dimensionable(tupla(
     \begin{adjustwidth}{3em}{}\
         \textrm{$puntaje$:} nat\\
+        \textrm{$fichasUbicadasUltimamente$:} ocurrencia\\
         \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)\\
         \textrm{, $cantFichasTotal$:} nat
     \end{adjustwidth}))}\\
@@ -115,7 +116,7 @@ jugador desde la última vez que se invocó a esta operación.]
     $
     tam(e.jugadores[i].cantFichasPorLetra)=\textsc{fichasPorJugador}(e.variante)\land\\
     tam(e.jugadores[i].cantFichasPorLetra)=\textsc{dom}()\yluego\\
-    \sum_{f<\textsc{dom}()}f=e.jugadores[i].cantFichasTotal
+    \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=e.jugadores[i].cantFichasTotal
     $
   \end{adjustwidth}$))\land\\
   tam(e.tablero)=\textsc{tamañoTablero}(e.variante)\land\\

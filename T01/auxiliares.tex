@@ -18,8 +18,8 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
       \begin{adjustwidth}{2em}{}
       \In{n}{nat},\\
       \In{f}{nat},\\
-      \In{puntajes}{dicc\footnote{No se refiere al género del módulo Diccionario Lineal debido a que se necesita que las operaciones de búsqueda sean $O(1)$.}(letra, nat)},\\
-      \In{legítimas}{conj\footnote{No se refiere al género del módulo Conjunto Lineal debido a que se necesita que las operaciones de búsqueda sean $O(\Lmax)$.}(secu(letra))}
+      \In{puntajes}{dicc(letra, nat)},\\
+      \In{legítimas}{conj(secu(letra))}
       \end{adjustwidth}
     }{variante}
     [$n>0\land f>0$]
@@ -77,71 +77,10 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
 \subsubsection{Implementación}
 
 \subsection{Módulo Ocurrencia}
-\begin{interfaz}{\subsubsection{Interfaz}}
-  \seExplica{Ocurrencia}{ocurrencia}\\
-  \usa{\falta}
-  \par\noindent
-  \begin{operaciones}
-    \InterfazFuncion{formaPalabra?}
-    {\In{o}{ocurrencia}}{bool}
-    [true]
-    {$res\igobs ocurrenciaFormaPalabra?(o)$}
-    [$O(\Lmax^{2})$]
-    [Determina si una ocurrencia forma una palabra.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{palabraQueForma}
-    {\In{o}{ocurrencia}}{secu(letra)}
-    [$ocurrenciaFormaPalabra?(o)$]
-    {$res\igobs palabraQueFormaLaOcurrencia(o)$}
-    [$O(\Lmax)$]
-    [Obtiene la palabra formada por una ocurrencia.]
-    [\falta]
-  \end{operaciones}
-\end{interfaz}
-\subsubsection{Implementación}
+es renombre de conj(tupla(nat,nat,letra)) es fichas del jugador a mano, no incluimos las que están alineadas en el tablero
 
 \subsection{Módulo Notificación}
-Se asume una implementación acorde\footnote{Una buena opción es usar un \href{https://en.wikipedia.org/wiki/Enumerated_type}{Enumerado}.} al módulo \textsc{TipoNotificación} de género \texttt{tipoNotif} para usarse en este módulo.
-\begin{interfaz}{\subsubsection{Interfaz}}
-  \seExplica{Notificación}{notif}\\
-  \usa{\falta}
-  \par\noindent
-  \begin{operaciones}
-    \InterfazFuncion{IdCliente}
-    {\In{cid}{nat}}{notif}
-    [true]
-    {$res\igobs\textsc{\color{blue}IdCliente}(cid)$}
-    [$O(1)$]
-    [Genera una notificación de tipo \textsc{\color{teal}IdCliente}.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{Empezar}
-    {\In{n}{nat}}{notif}
-    [true]
-    {$res\igobs\textsc{\color{blue}Empezar}(n)$}
-    [$O(1)$]
-    [Genera una notificación de tipo \textsc{\color{teal}Empezar}.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{TurnoDe}
-    {\In{cid}{nat}}{notif}
-    [true]
-    {$res\igobs\textsc{\color{blue}TurnoDe}(cid)$}
-    [$O(1)$]
-    [Genera una notificación de tipo \textsc{\color{teal}TurnoDe}.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{Ubicar}
-    {\In{cid}{nat}, \In{o}{ocurrencia}}{notif}
-    [true]
-    {$res\igobs\textsc{\color{blue}Ubicar}(cid,o)$}
-    [$O(1)$]
-    [Genera una notificación de tipo \textsc{\color{teal}Ubicar}.]
-    [\falta]\\
-  \end{operaciones}
-\end{interfaz}
-\subsubsection{Implementación}
+asumimos que existe el tipo notif
 
 %%% Local Variables:
 %%% mode: latex
