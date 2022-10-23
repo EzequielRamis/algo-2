@@ -168,7 +168,7 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
     $
     \def\dotminus{\mathbin{\ooalign{\hss\raise0.2ex\hbox{*}\hss\cr\mathsurround=0pt$-$}}}
     historialesHastaTiempo: \texttt{ad(jugador)}\times\texttt{nat}\times\texttt{nat}\\\longrightarrow\texttt{multiconj(ocurrencia)}\\
-    historialesHastaTiempo(js,k,t)\equiv$\IFL{1em}G{k\geq tam(js)}THEN{\emptyset}ELSE{historialHastaTiempo(js,k,t)\cup\\ historialesHastaTiempo(js,k+1,t)}FI$\\
+    historialesHastaTiempo(js,k,t)\equiv$\IFL{1em}G{k\geq tam(js)}THEN{\emptyset}ELSE{historialHastaTiempo(js,k,t)\\\cup historialesHastaTiempo(js,k+1,t)}FI$\\
     historialHastaTiempo: \texttt{ad(jugador)}\times\texttt{nat}\times\texttt{nat}\\\longrightarrow\texttt{multiconj(ocurrencia)}\\
     historialHastaTiempo(js,k,t)\equiv historialHastaTiempo'(js[k].historial,t)\\\\
     historialHastaTiempo': \texttt{lista(tupla(ocurrencia,nat))}\times\texttt{nat}\\\longrightarrow\texttt{multiconj(ocurrencia)}\\
@@ -208,22 +208,15 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
 \Abs[juego\_estr]{juego}[e]{J}{$
   e.variante\igobs variante(J)\land\\
   e.repositorio\igobs repositorio(J)\land\\
-  e.jugadorActual\igobs turno(J)\land\\
+  e.tiempo\equiv turno(J)\ (mod\ \#jugadores(J))\land\\
+  e.tablero\igobs tablero(J)\land\\
   (tam(e.jugadores)\igobs \#jugadores(J)\yluego$
   \begin{adjustwidth}{11.4em}{0em}
   $(\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego($
   \begin{adjustwidth}{2em}{0em}
     $
-    \textsc{puntaje}(e.jugadores[i])\igobs puntaje(J,i)))\land\\
+    e.jugadores[i].puntaje\igobs puntaje(J,i)\land\\
     (\forall l:\texttt{letra})(e.cantFichasPorLetra[\textsc{ord}(l)]=\#(l,fichas(J,i)))
-    $
-  \end{adjustwidth}$))\land\\
-  tam(e.tablero)\igobs tama\tilde{n}o(tablero(J))\yluego\\
-  (\forall i,j:\texttt{nat})(enTablero?(tablero(J),i,j)\impluego($
-  \begin{adjustwidth}{2em}{0em}
-    $
-      hayLetra?(tablero(J),i,j)\iff e.tablero[i][j]\neq\textsc{NULL}\land\\
-      hayLetra?(tablero(J),i,j)\impluego letra(tablero(J),i,j)\igobs *e.tablero[i][j]
     $
   \end{adjustwidth}$))$
   \end{adjustwidth}
