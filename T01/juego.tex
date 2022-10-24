@@ -109,8 +109,7 @@ jugador desde la última vez que se invocó a esta operación.]
         \textrm{$puntaje$:} nat\\
         \textrm{, $historial$:} lista(tupla(\textrm{$ocurrencia$:} ocurrencia\textrm{, $tiempo$:} nat))\\
         \textrm{, $jugadasSinCalcularPuntaje$:} nat\\
-        \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)\\
-        \textrm{, $cantFichasTotal$:} nat
+        \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)
         }
       \end{adjustwidth}
 \end{Tupla}
@@ -127,9 +126,8 @@ jugador desde la última vez que se invocó a esta operación.]
   (\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego(
   $\begin{adjustwidth}{1em}{0em}
     $
-    tam(e.jugadores[i].cantFichasPorLetra)=\#fichas(e.variante)\land\\
     tam(e.jugadores[i].cantFichasPorLetra)=\textsc{dom}()\yluego\\
-    \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=e.jugadores[i].cantFichasTotal\land\\
+    \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=\#fichas(e.variante)\land\\
     e.jugadores[i].jugadasSinCalcularPuntaje\leq tam(e.jugadores[i].historial)\yluego\\
     tam(e.jugadores[i].historial)=\lceil e.tiempo/tam(e.jugadores)\rceil\land\\
     (\forall h:\texttt{nat})(h<long(e.jugadores[i].historial)\impluego
@@ -137,7 +135,10 @@ jugador desde la última vez que se invocó a esta operación.]
       $
       % e.jugadores[i].historial[h].tiempo = (long(e.jugadores[i].historial)-1-h)*tam(e.jugadores)+i\land\\
       e.jugadores[i].historial[h].tiempo = h*tam(e.jugadores)+i\land\\
-      ocurrenciaFormaPalabra?(e.jugadores[i].historial[h].ocurrencia)
+      (\forall p,q:\texttt{nat})(\forall l,l':\texttt{letra})(
+    $\begin{adjustwidth}{1em}{0em}$
+      \{<p,q,l>,<p,q,l'>\}\subseteq e.jugadores[i].historial[h].ocurrencia\implies l=l'
+    $\end{adjustwidth}$)
       $
     \end{adjustwidth}$)
   $
@@ -237,14 +238,12 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
         \State\asignar{jugador.jugadasSinCalcularPuntaje}{0}
         \State // Por cada jugador le damos su primer mazo de fichas del repositorio
         \State\asignar{jugador.cantFichasPorLetra}{\textsc{CrearArreglo}(\textsc{dom}())}
-        \State\asignar{jugador.cantFichasTotal}{0}
         \For{$cant\in jugador.cantFichasPorLetra$}\Comment{$O(|\Sigma|)$}
             \State\asignar{cant}{0}
         \EndFor
         \For{$1\dots\textsc{fichasPorJugador}(v)$}\Comment{$O(F)$}
             \State\asignar{ficha}{\textsc{Desapilar}(res.repositorio)}
             \State$jugador.cantFichasPorLetra[\textsc{ord}(ficha)]++$
-            \State$jugador.cantFichasTotal++$
         \EndFor
     \EndFor
     \State\Return{res}
@@ -265,59 +264,63 @@ Justificación de complejidad:
     \If{$\textsc{Cardinal}(o)>\textsc{longPalabraMásLarga}(j.variante)$}\Comment{Con este if evitamos acotar por $m$}
     \State\Return false
     \EndIf
-    \State\asignar{oIt}{\textsc{CrearIt}(o)}
-    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
         \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
         \If{$\lnot\textsc{enTablero?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))\oluego\textsc{hayLetra?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$}
         \State\Return false
         \EndIf
         \State // Chequeamos que no hayan 2 fichas de la ocurrencia en la misma posición
-        \State\asignar{oItSig}{\textsc{Avanzar}(copy(oIt))}
-        \While{$\textsc{HaySiguiente}(oItSig)$}\Comment{$O(\Lmax)$}
+        \For{$ $\asignar{oItSig}{\textsc{Avanzar}(copy(oIt))}$;\ \textsc{HaySiguiente}(oItSig);\ \textsc{Avanzar}(oItSig)$}\Comment{$O(\Lmax)$}
           \State\asignar{ficha'}{\textsc{Siguiente}(oItSig)}
           \If{$\pi_{1}(ficha)=\pi_{1}(fichaSig)\land\pi_{2}(ficha)=\pi_{2}(fichaSig)$}
           \State\Return false
           \EndIf
-          \State$\textsc{Avanzar}(oItSig)$
-        \EndWhile
-        \State$\textsc{Avanzar}(oIt)$
-    \EndWhile
+        \EndFor
+    \EndFor
     \State // Chequeamos que la ocurrencia sea horizontal o vertical
     \State\asignar{filas}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
     \State\asignar{colns}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
-    \State\asignar{oIt}{\textsc{CrearIt}(o)}
-    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
       \State$\textsc{Agregar}(filas,\pi_{1}(ficha)))$\Comment{$O(\Lmax)$}
       \State$\textsc{Agregar}(colns,\pi_{2}(ficha)))$\Comment{$O(\Lmax)$}
-      \State$\textsc{Avanzar}(oIt)$
-    \EndWhile
+    \EndFor
     \State\asignar{esHorizontal}{\textsc{Cardinal}(colns)=1}
     \State\asignar{esVertical}{\textsc{Cardinal}(filas)=1}
     \If{$\lnot(esHorizontal\lor esVertical)$}
     \State\Return false
     \EndIf
     \State // Ponemos las fichas de la ocurrencia para validar
-    \State\asignar{oIt}{\textsc{CrearIt}(o)}
-    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
       \State$\textsc{ponerLetra}(e.tablero,ficha)$\Comment{$O(1)$}
-      \State$\textsc{Avanzar}(oIt)$
-    \EndWhile
+    \EndFor
     \State // Sacamos las fichas de la ocurrencia para no modificar el tablero
-    \State\asignar{oIt}{\textsc{CrearIt}(o)}
-    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+    \State\falta
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
       \State$\textsc{sacarLetra}(e.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$\Comment{$O(1)$}
-      \State$\textsc{Avanzar}(oIt)$
-    \EndWhile
+    \EndFor
     \State\Return true
-    \falta
   \end{algorithmic}
 \end{algorithm}
 Justificación de complejidad:
 \begin{align*}
 \end{align*}
+
+\begin{algorithm}[H]
+  \defunv{iUbicar}{\Inout{j}{estr\_juego}, \In{o}{ocurrencia}}
+  \begin{algorithmic}[1]
+    \State\asignar{jugador}{j.jugadores[\textsc{turno}(j)]}
+    \State$j.tiempo++$
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(m)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State$\textsc{ponerLetra}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha),\pi_{3}(ficha),\pi_{4}(ficha))$\Comment{$O(1)$}
+      \State$jugador.cantFichasPorLetra[\textsc{ord}(\pi_{3}(ficha))]--$
+      \State$jugador.cantFichasPorLetra[\textsc{ord}(\textsc{Desapilar}(j.repositorio))]++$\Comment{$O(1)$}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
 
 \begin{algorithm}[H]
   \defun{iVariante}{\In{j}{estr\_juego}}{variante}
@@ -336,7 +339,7 @@ Justificación de complejidad:
 \begin{algorithm}[H]
   \defun{iPuntaje}{\In{j}{estr\_juego}, \In{i}{nat}}{nat}
   \begin{algorithmic}[1]
-    \falta
+    \State\falta
   \end{algorithmic}
 \end{algorithm}
 
