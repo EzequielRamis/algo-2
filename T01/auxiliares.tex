@@ -101,64 +101,63 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
       \In{tm}{nat}
     }{tab}
     [$enTablero(t,i,j)\yluego\lnot hayLetra?(t,i,j)$]
-    {$res\igobs nuevoTablero(n)$}
-    [$O(N^{2})$]
-    [Genera un tablero de tamaño $n$.]
-
-    [\falta]\\
-    \noindent\InterfazFuncion{tamañoTablero}
-    {\In{v}{variante}}{nat}
-    [true]
-    {$res\igobs tama\tilde{n}oTablero(v)$}
+    {$res\igobs ponerLetra(t,i,j,l)$}
     [$O(1)$]
-    [Devuelve el tamaño del tablero.]
+    [Pone una letra en la coordenada $(i,j)$.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{fichasPorJugador}
-    {\In{v}{variante}}{nat}
-    [true]
-    {$res\igobs \#fichas(v)$}
-    [$O(1)$]
-    [Devuelve la cantidad de fichas que debe de tener cada jugador.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{puntajeLetra}
-    {\In{v}{variante}, \In{l}{letra}}{nat}
-    [true]
-    {$res\igobs puntajeLetra(v,l)$}
-    [$O(1)$]
-    [Devuelve el puntaje de una letra.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{palabraLegítima?}
-    {\In{v}{variante}, \In{l}{secu(letra)}}{bool}
-    [true]
-    {$res\igobs palabraLeg\acute{\imath}tima(v,l)$}
-    [$O(\Lmax)$]
-    [Determina si una palabra es legítima dentro de la variante de juego.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{longPalabraMásLarga}
-    {\In{v}{variante}}{nat}
-    [true]
+    \noindent\InterfazFuncion{sacarLetra}
     {
-      \begin{adjustwidth}{2em}{}
-
-      $(\exists p:\texttt{secu(letra)})(res\igobs long(p)\land palabraLeg\acute{\imath}tima?(v,p)\land\\(\forall p_{2}:\texttt{secu(letra)})( palabraLeg\acute{\imath}tima?(v,p_{2})\implies res\geq long(p_{2})))$
-      \end{adjustwidth}
-    }
+      \In{t}{tab},
+      \In{i}{nat},
+      \In{j}{nat}
+    }{tab}
+    [$enTablero(t,i,j)\yluego hayLetra?(t,i,j)$]
+    {$res$ es igual al tablero antes de haber puesto una letra en la coordenada $(i,j)$}
     [$O(1)$]
-    [Obtiene la longitud de la palabra legítima más larga de la variante.]
-    [\falta]
+    [Saca una letra en la coordenada $(i,j)$.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{enTablero?}
+    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{bool}
+    [true]
+    {$res\igobs enTablero?(t,i,j)$}
+    [$O(1)$]
+    [Determina si una coordenada $(i,j)$ está en el rango del tablero.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{hayLetra?}
+    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{bool}
+    [$enTablero?(t,i,j)$]
+    {$res\igobs hayLetra?(t,i,j)$}
+    [$O(1)$]
+    [Determina si una celda del tablero dada una coordenada $(i,j)$ está ocupada por una letra.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{letra}
+    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{letra}
+    [$enTablero?(t,i,j)\yluego hayLetra?(t,i,j)$]
+    {$res\igobs letra(t,i,j)$}
+    [$O(1)$]
+    [Obtiene el contenido de una celda del tablero dada una coordenada $(i,j)$.]
+    [\falta]\\
+
+    % \noindent\InterfazFuncion{tamaño}
+    % {\In{t}{tab}}{nat}
+    % [true]
+    % {$res\igobs tama\tilde{n}o(t)$}
+    % [$O(1)$]
+    % [Devuelve el tamaño del tablero.]
+    % [\falta]\\
   \end{operaciones}
 \end{interfaz}
 \subsubsection{Implementación}
 
 \subsection{Módulo Ocurrencia}
-es renombre de conj(tupla(nat,nat,letra)) es fichas del jugador a mano, no incluimos las que están alineadas en el tablero
+Es renombre de \texttt{conj(tupla(nat,nat,letra))}.
 
 \subsection{Módulo Notificación}
-asumimos que existe el tipo notif
+Asumimos que existe el tipo notif
 
 %%% Local Variables:
 %%% mode: latex

@@ -224,25 +224,147 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
 
 \subsubsection*{Algoritmos}
 \begin{algorithm}[H]
-  \defun{hacerGuia}{\In{A}{guia}, \In{parámetroInútil}{Nat}}{bool}
+  \defun{iNuevoJuego}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego}
   \begin{algorithmic}[1]
-    \State\asignar{i}{0} \Comment{esto es $\Theta$(1)}
-    \State\asignar{n}{guia.\text{cantEjercicios()}} \Comment{$\bigO$(1)}
-    \State\asignar{consultas}{\textsc{diccVacio}}
-    \State\textsc{prepararMate()} \Comment{$\Omega$($n^n$)}
-    \While{$i < n$}
-    \State\textsc{pensarEjercicio(i)}
-    \If{\textsc{tengoConsultas($i$)}}
-      \State\textsc{escribirConsultasEjercicio($i$,$consultas$)}
-    \Else
-      \State\textsc{comerBizochito()}
-    \EndIf
-      \State\textsc{comerBizochito()}
-    \EndWhile
-    \For{miVariable}
-         \State hacer algo
+    \State\asignar{res.variante}{v}
+    \State\asignar{res.repositorio}{r}
+    \State\asignar{res.tiempo}{0}
+    \State\asignar{res.tablero}{\textsc{nuevoTablero}(\textsc{tamañoTablero}(v))}\Comment{$O(N^2)$}
+    \State\asignar{res.jugadores}{\textsc{CrearArreglo}(k)}
+    \For{$jugador\in res.jugadores$}\Comment{$O(K)$}
+        \State\asignar{jugador.puntaje}{0}
+        \State\asignar{jugador.historial}{\textsc{Vacía()}}
+        \State\asignar{jugador.jugadasSinCalcularPuntaje}{0}
+        \State // Por cada jugador le damos su primer mazo de fichas del repositorio
+        \State\asignar{jugador.cantFichasPorLetra}{\textsc{CrearArreglo}(\textsc{dom}())}
+        \State\asignar{jugador.cantFichasTotal}{0}
+        \For{$cant\in jugador.cantFichasPorLetra$}\Comment{$O(|\Sigma|)$}
+            \State\asignar{cant}{0}
+        \EndFor
+        \For{$1\dots\textsc{fichasPorJugador}(v)$}\Comment{$O(F)$}
+            \State\asignar{ficha}{\textsc{Desapilar}(res.repositorio)}
+            \State$jugador.cantFichasPorLetra[\textsc{ord}(ficha)]++$
+            \State$jugador.cantFichasTotal++$
+        \EndFor
     \EndFor
-    \State\Return{\textsc{vacio?}($consultas$)}
+    \State\Return{res}
+  \end{algorithmic}
+\end{algorithm}
+Justificación de complejidad:
+\begin{align*}
+  O(N^{2})+O(K)*(O(|\Sigma|)+O(F))
+    & = O(N^{2})+O(K)*O(|\Sigma|+F)\\
+    & = O(N^{2})+O(K*(|\Sigma|+F))\\
+    & = O(N^{2})+O(|\Sigma|K+FK)\\
+    & = O(N^{2}+|\Sigma|K+FK)\\
+\end{align*}
+
+\begin{algorithm}[H]
+  \defun{iJugadaVálida?}{\In{j}{estr\_juego}, \In{o}{ocurrencia}}{bool}
+  \begin{algorithmic}[1]
+    \If{$\textsc{Cardinal}(o)>\textsc{longPalabraMásLarga}(j.variante)$}\Comment{Con este if evitamos acotar por $m$}
+    \State\Return false
+    \EndIf
+    \State\asignar{oIt}{\textsc{CrearIt}(o)}
+    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+        \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+        \If{$\lnot\textsc{enTablero?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))\oluego\textsc{hayLetra?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$}
+        \State\Return false
+        \EndIf
+        \State // Chequeamos que no hayan 2 fichas de la ocurrencia en la misma posición
+        \State\asignar{oItSig}{\textsc{Avanzar}(copy(oIt))}
+        \While{$\textsc{HaySiguiente}(oItSig)$}\Comment{$O(\Lmax)$}
+          \State\asignar{ficha'}{\textsc{Siguiente}(oItSig)}
+          \If{$\pi_{1}(ficha)=\pi_{1}(fichaSig)\land\pi_{2}(ficha)=\pi_{2}(fichaSig)$}
+          \State\Return false
+          \EndIf
+          \State$\textsc{Avanzar}(oItSig)$
+        \EndWhile
+        \State$\textsc{Avanzar}(oIt)$
+    \EndWhile
+    \State // Chequeamos que la ocurrencia sea horizontal o vertical
+    \State\asignar{filas}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
+    \State\asignar{colns}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
+    \State\asignar{oIt}{\textsc{CrearIt}(o)}
+    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State$\textsc{Agregar}(filas,\pi_{1}(ficha)))$\Comment{$O(\Lmax)$}
+      \State$\textsc{Agregar}(colns,\pi_{2}(ficha)))$\Comment{$O(\Lmax)$}
+      \State$\textsc{Avanzar}(oIt)$
+    \EndWhile
+    \State\asignar{esHorizontal}{\textsc{Cardinal}(colns)=1}
+    \State\asignar{esVertical}{\textsc{Cardinal}(filas)=1}
+    \If{$\lnot(esHorizontal\lor esVertical)$}
+    \State\Return false
+    \EndIf
+    \State // Ponemos las fichas de la ocurrencia para validar
+    \State\asignar{oIt}{\textsc{CrearIt}(o)}
+    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State$\textsc{ponerLetra}(e.tablero,ficha)$\Comment{$O(1)$}
+      \State$\textsc{Avanzar}(oIt)$
+    \EndWhile
+    \State // Sacamos las fichas de la ocurrencia para no modificar el tablero
+    \State\asignar{oIt}{\textsc{CrearIt}(o)}
+    \While{$\textsc{HaySiguiente}(oIt)$}\Comment{$O(\Lmax)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State$\textsc{sacarLetra}(e.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$\Comment{$O(1)$}
+      \State$\textsc{Avanzar}(oIt)$
+    \EndWhile
+    \State\Return true
+    \falta
+  \end{algorithmic}
+\end{algorithm}
+Justificación de complejidad:
+\begin{align*}
+\end{align*}
+
+\begin{algorithm}[H]
+  \defun{iVariante}{\In{j}{estr\_juego}}{variante}
+  \begin{algorithmic}[1]
+    \State\Return{j.variante}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iTurno}{\In{j}{estr\_juego}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return{$j.tiempo\ \%\ tam(j.jugadores)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iPuntaje}{\In{j}{estr\_juego}, \In{i}{nat}}{nat}
+  \begin{algorithmic}[1]
+    \falta
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iEnTablero?}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{bool}
+  \begin{algorithmic}[1]
+    \State\Return{$\textsc{enTablero?}(j.tablero,i,j)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iHayLetra?}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{bool}
+  \begin{algorithmic}[1]
+    \State\Return{$\textsc{hayLetra?}(j.tablero,i,j)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iLetra}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{letra}
+  \begin{algorithmic}[1]
+    \State\Return{$\textsc{letra}(j.tablero,i,j)$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{i\#letraTieneJugador}{\In{j}{estr\_juego}, \In{l}{letra}, \In{i}{nat}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return{$j.jugadores[i].cantFichasPorLetra[\textsc{ord}(l)]$}
   \end{algorithmic}
 \end{algorithm}
 
