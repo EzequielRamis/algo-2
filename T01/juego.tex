@@ -137,7 +137,7 @@ jugador desde la última vez que se invocó a esta operación.]
       e.jugadores[i].historial[h].tiempo = h*tam(e.jugadores)+i\land\\
       (\forall p,q:\texttt{nat})(\forall l,l':\texttt{letra})(
     $\begin{adjustwidth}{1em}{0em}$
-      \{<p,q,l>,<p,q,l'>\}\subseteq e.jugadores[i].historial[h].ocurrencia\implies l=l'
+      \{\langle p,q,l\rangle,\langle p,q,l'\rangle\}\subseteq e.jugadores[i].historial[h].ocurrencia\implies l=l'
     $\end{adjustwidth}$)
       $
     \end{adjustwidth}$)
@@ -225,7 +225,7 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
 
 \subsubsection*{Algoritmos}
 \begin{algorithm}[H]
-  \defun{iNuevoJuego}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego}
+  \defun{iNuevoJuego}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego\_estr}
   \begin{algorithmic}[1]
     \State\asignar{res.variante}{v}
     \State\asignar{res.repositorio}{r}
@@ -269,25 +269,8 @@ Justificación de complejidad:
         \If{$\lnot\textsc{enTablero?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))\oluego\textsc{hayLetra?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$}
         \State\Return false
         \EndIf
-        \State // Chequeamos que no hayan 2 fichas de la ocurrencia en la misma posición
-        \For{$ $\asignar{oItSig}{\textsc{Avanzar}(copy(oIt))}$;\ \textsc{HaySiguiente}(oItSig);\ \textsc{Avanzar}(oItSig)$}\Comment{$O(\Lmax)$}
-          \State\asignar{ficha'}{\textsc{Siguiente}(oItSig)}
-          \If{$\pi_{1}(ficha)=\pi_{1}(fichaSig)\land\pi_{2}(ficha)=\pi_{2}(fichaSig)$}
-          \State\Return false
-          \EndIf
-        \EndFor
     \EndFor
-    \State // Chequeamos que la ocurrencia sea horizontal o vertical
-    \State\asignar{filas}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
-    \State\asignar{colns}{\textsc{Vacío}()}\Comment{Conjunto Lineal}
-    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
-      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
-      \State$\textsc{Agregar}(filas,\pi_{1}(ficha)))$\Comment{$O(\Lmax)$}
-      \State$\textsc{Agregar}(colns,\pi_{2}(ficha)))$\Comment{$O(\Lmax)$}
-    \EndFor
-    \State\asignar{esHorizontal}{\textsc{Cardinal}(colns)=1}
-    \State\asignar{esVertical}{\textsc{Cardinal}(filas)=1}
-    \If{$\lnot(esHorizontal\lor esVertical)$}
+    \If{$\textsc{haySuperpuestas?}(o)\lor\lnot(\textsc{esHorizontal?}(o)\lor\textsc{esVertical?}(o))$}\Comment{$O(\Lmax^2)$}
     \State\Return false
     \EndIf
     \State // Ponemos las fichas de la ocurrencia para validar
@@ -295,8 +278,8 @@ Justificación de complejidad:
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
       \State$\textsc{ponerLetra}(e.tablero,ficha)$\Comment{$O(1)$}
     \EndFor
-    \State // Sacamos las fichas de la ocurrencia para no modificar el tablero
     \State\falta
+    \State // Sacamos las fichas de la ocurrencia para no modificar el tablero
     \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
       \State$\textsc{sacarLetra}(e.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$\Comment{$O(1)$}
