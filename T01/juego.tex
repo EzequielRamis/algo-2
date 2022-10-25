@@ -412,9 +412,88 @@ Justificación de complejidad:
 \end{algorithm}
 
 \begin{algorithm}[H]
-  \defun{iPuntaje}{\In{j}{estr\_juego}, \In{i}{nat}}{nat}
+  \defun{iPuntaje}{\In{e}{estr\_juego}, \In{i}{nat}}{nat}
   \begin{algorithmic}[1]
-    \State\falta
+    \State\asignar{k}{\&e.jugadores[i].jugadasSinCalcularPuntaje}
+    \State\asignar{jugador}{e.jugadores[i]}
+    \State // Usamos el historial sin ocurrencias vacías para evitar acotar por su cantidad con vacías
+    \State\asignar{histIt}{\textsc{CrearItUlt}(jugador.historialSinVac\acute{\imath}as)}
+    \While{$*k>0$}\Comment{Todo el ciclo está acotado por $O(m\cdot\Lmax)$ porque usamos ni mas ni menos que las $m$ fichas}
+      \State\asignar{jugada}{\textsc{Anterior}(histIt)}
+      \State\asignar{ocIt}{\textsc{CrearIt}(jugada.ocurrencia)}
+      \State\asignar{esHorizontal}{true}
+      \State\asignar{ficha}{\textsc{Siguiente}(ocIt)}
+      \If{\textsc{HaySiguiente?}(\textsc{Avanzar}(ocIt))}
+        \State\asignar{esHorizontal}{\pi_{1}(ficha)=\pi_{1}(\textsc{Siguiente}(ocIt))}
+      \EndIf
+      \If{$esHorizontal$}
+        \State // Sumamos las fichas de la palabra alineada horizontalmente en $O(\Lmax)$
+        \State\asignar{fila}{\pi_{1}(ficha)}
+        \State\asignar{i}{\pi_{2}(ficha)}
+        \State\asignar{j}{\pi_{2}(ficha)+1}
+        \While{$\textsc{enTablero?}(e,fila,i)\yluego\textsc{hayLetra?}(e,fila,i)\yluego\textsc{fichaTiempo}(e,fila,i)\leq jugada.tiempo$}
+          \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,fila,i))$
+          \State$i--$
+        \EndWhile
+        \While{$\textsc{enTablero?}(e,fila,j)\yluego\textsc{hayLetra?}(e,fila,j)\yluego\textsc{fichaTiempo}(e,fila,j)\leq jugada.tiempo$}
+          \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,fila,j))$
+          \State$j++$
+        \EndWhile
+
+        \State // Sumamos el resto de las fichas de las palabras cruzadas verticalmente en $O(\#jugada.ocurrencia\cdot\Lmax)$
+        \For{$ $\asignar{ocIt}{\textsc{CrearIt}(jugada.ocurrencia)}$;\ \textsc{HaySiguiente}(ocIt);\ \textsc{Avanzar}(ocIt)$}
+          \State\asignar{col}{\pi_{2}(ficha)}
+          \State\asignar{i}{\pi_{1}(ficha)-1}\Comment{Así evitamos sumar de vuelta la ficha}
+          \State\asignar{j}{\pi_{1}(ficha)+1}
+
+          \While{$\textsc{enTablero?}(e,i,col)\yluego\textsc{hayLetra?}(e,i,col)\yluego\textsc{fichaTiempo}(e,i,col)\leq jugada.tiempo$}
+            \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,i,col))$
+            \State$i--$
+          \EndWhile
+          \While{$\textsc{enTablero?}(e,j,col)\yluego\textsc{hayLetra?}(e,j,col)\yluego\textsc{fichaTiempo}(e,j,col)\leq jugada.tiempo$}
+            \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,j,col))$
+            \State$j++$
+          \EndWhile
+        \EndFor
+
+      \Else
+
+        \State // Lo mismo que el branch true pero verticalmente
+        \State\asignar{col}{\pi_{2}(ficha)}
+        \State\asignar{i}{\pi_{1}(ficha)}
+        \State\asignar{j}{\pi_{1}(ficha)+1}
+        \While{$\textsc{enTablero?}(e,i,col)\yluego\textsc{hayLetra?}(e,i,col)\yluego\textsc{fichaTiempo}(e,i,col)\leq jugada.tiempo$}
+          \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,i,col))$
+          \State$i--$
+        \EndWhile
+        \While{$\textsc{enTablero?}(e,j,col)\yluego\textsc{hayLetra?}(e,j,col)\yluego\textsc{fichaTiempo}(e,j,col)\leq jugada.tiempo$}
+          \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,j,col))$
+          \State$j++$
+        \EndWhile
+
+        \For{$ $\asignar{ocIt}{\textsc{CrearIt}(jugada.ocurrencia)}$;\ \textsc{HaySiguiente}(ocIt);\ \textsc{Avanzar}(ocIt)$}
+          \State\asignar{fil}{\pi_{1}(ficha)}
+          \State\asignar{i}{\pi_{2}(ficha)-1}\Comment{Así evitamos sumar de vuelta la ficha}
+          \State\asignar{j}{\pi_{2}(ficha)+1}
+
+          \While{$\textsc{enTablero?}(e,fil,i)\yluego\textsc{hayLetra?}(e,fil,i)\yluego\textsc{fichaTiempo}(e,fil,i)\leq jugada.tiempo$}
+            \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,fil,i))$
+            \State$i--$
+          \EndWhile
+          \While{$\textsc{enTablero?}(e,fil,j)\yluego\textsc{hayLetra?}(e,fil,j)\yluego\textsc{fichaTiempo}(e,fil,j)\leq jugada.tiempo$}
+            \State$jugador.puntaje\ +=\ \textsc{puntajeLetra}(e.variante,\textsc{ficha}(e,fil,j))$
+            \State$j++$
+          \EndWhile
+        \EndFor
+
+
+      \EndIf
+
+
+      \State$\textsc{Retroceder}(histIt)$
+      \State$*k--$\Comment{$jugadasSinCalcularPuntaje$ se va a cero, como se espera}
+    \EndWhile
+    \State\Return{$e.jugadores[i].puntaje$}
   \end{algorithmic}
 \end{algorithm}
 
