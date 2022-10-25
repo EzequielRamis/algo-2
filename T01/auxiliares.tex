@@ -76,178 +76,9 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
 \end{interfaz}
 \subsubsection{Implementación}
 
-\subsection{Módulo Tablero}
-\begin{interfaz}{\subsubsection{Interfaz}}
-  \seExplica{Tablero}{tab}\\
-  \usa{\falta}
-  \par\noindent
-  \begin{operaciones}
-    \InterfazFuncion{nuevoTablero}
-    {
-      \In{n}{nat}
-    }{tab}
-    [$n>0$]
-    {$res\igobs nuevoTablero(n)$}
-    [$O(N^{2})$]
-    [Genera un tablero de tamaño $n$.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{tamaño}
-    {
-      \In{t}{tab}
-    }{nat}
-    [true]
-    {$res\igobs tama\tilde{n}o(t)$}
-    [$O(1)$]
-    [Devuelve tamaño del tablero.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{ponerLetra}
-    {
-      \In{t}{tab},
-      \In{i}{nat},
-      \In{j}{nat},
-      \In{l}{letra},
-      \In{tm}{nat}
-    }{tab}
-    [$enTablero(t,i,j)\yluego\lnot hayLetra?(t,i,j)$]
-    {$res\igobs ponerLetra(t,i,j,l)$}
-    [$O(1)$]
-    [Pone una letra en la coordenada $(i,j)$.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{sacarLetra}
-    {
-      \In{t}{tab},
-      \In{i}{nat},
-      \In{j}{nat}
-    }{tab}
-    [$enTablero(t,i,j)\yluego hayLetra?(t,i,j)$]
-    {$res$ es igual al tablero antes de haber puesto una letra en la coordenada $(i,j)$}
-    [$O(1)$]
-    [Saca una letra en la coordenada $(i,j)$.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{enTablero?}
-    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{bool}
-    [true]
-    {$res\igobs enTablero?(t,i,j)$}
-    [$O(1)$]
-    [Determina si una coordenada $(i,j)$ está en el rango del tablero.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{hayLetra?}
-    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{bool}
-    [$enTablero?(t,i,j)$]
-    {$res\igobs hayLetra?(t,i,j)$}
-    [$O(1)$]
-    [Determina si una celda del tablero dada una coordenada $(i,j)$ está ocupada por una letra.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{letra}
-    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{letra}
-    [$enTablero?(t,i,j)\yluego hayLetra?(t,i,j)$]
-    {$res\igobs letra(t,i,j)$}
-    [$O(1)$]
-    [Obtiene la letra de una ficha del tablero dada una coordenada $(i,j)$.]
-    [\falta]\\
-
-    \noindent\InterfazFuncion{tiempo}
-    {\In{t}{tab}, \In{i}{nat}, \In{j}{nat}}{nat}
-    [$enTablero?(t,i,j)\yluego hayLetra?(t,i,j)$]
-    {$res\igobs letra(t,i,j)$}
-    [$O(1)$]
-    [Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada $(i,j)$.]
-    [\falta]
-  \end{operaciones}
-\end{interfaz}
-\subsubsection{Implementación}
-\subsubsection*{Representación}
-\begin{Estructura}{tab}[tab\_estr]
-  \textbf{donde} \texttt{tab\_estr} es \texttt{array\_dimensionable(array\_dimensionable(puntero(tupla(letra,nat))))}
-\end{Estructura}
-\subsubsection*{Invariante de Representación}
-\Rep[tab\_estr]{$
-  (\forall i:\texttt{nat})(i<tam(tab\_estr)\impluego tam(tab\_estr[i])=tam(tab\_estr))
-$}
-
-\subsubsection*{Función de Abstracción}
-\Abs[tab\_estr]{tab}[e]{T}{
-  $
-  tam(e)\igobs tama\tilde{n}o(T)\yluego\\
-  (\forall i,j:\texttt{nat})((enTablero?(T,i,j)\yluego hayLetra?(T,i,j))\impluego
-  $\begin{adjustwidth}{12em}{0em}$
-  (e[i][j]\neq NULL\yluego letra(T,i,j)\igobs\pi_{1}(*e[i][j])))
-  $\end{adjustwidth}$
-  $
-}
-
-\subsubsection*{Algoritmos}
-\begin{algorithm}[H]
-  \defun{iNuevoTablero}{\In{n}{nat}}{tab\_estr}
-  \begin{algorithmic}[1]
-    \State\asignar{filas}{\textsc{CrearArreglo}(n)}
-    \For{$columnas\in filas$}\Comment{$O(N)$}
-        \State\asignar{columnas}{\textsc{CrearArreglo}(n)}
-        \For{$celda\in columnas$}\Comment{$O(N)$}
-          \State\asignar{celda}{\textsc{NULL}}
-        \EndFor
-    \EndFor
-    \State\Return{res}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defun{iTamaño}{\In{t}{tab\_estr}}{nat}
-  \begin{algorithmic}[1]
-    \State\Return{$tam(t)$}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defunv{iPonerLetra}{\Inout{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}, \In{l}{letra}, \In{tm}{nat}}
-  \begin{algorithmic}[1]
-    \State\asignar{t[i][j]}{\&\langle l,tm\rangle}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defunv{iSacarLetra}{\Inout{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}}
-  \begin{algorithmic}[1]
-    \State\asignar{t[i][j]}{\textsc{NULL}}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defun{iEnTablero}{\In{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}}{bool}
-  \begin{algorithmic}[1]
-    \State\Return{$i<tam(t)\land j<tam(t)$}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defun{iHayLetra}{\In{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}}{bool}
-  \begin{algorithmic}[1]
-    \State\Return{$t[i][j]\neq\textsc{NULL}$}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defun{iLetra}{\In{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}}{letra}
-  \begin{algorithmic}[1]
-    \State\Return{$\pi_{1}(*t[i][j])$}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \defun{iTiempo}{\In{t}{tab\_estr}, \In{i}{nat}, \In{j}{nat}}{nat}
-  \begin{algorithmic}[1]
-    \State\Return{$\pi_{2}(*t[i][j])$}
-  \end{algorithmic}
-\end{algorithm}
-
 \subsection{Módulo Ocurrencia}
-Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operaciones auxiliares.\\\\
+Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operaciones auxiliares.\\
+\begin{adjustwidth}{3em}{0em}
 \begin{operaciones}
   \InterfazFuncion{esHorizontal?}
   {
@@ -281,6 +112,7 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
   [Determina si existen fichas distintas en una misma coordenada.]
   [\falta]
 \end{operaciones}
+\end{adjustwidth}
 
 \subsubsection*{Algoritmos}
 \begin{algorithm}[H]
@@ -324,7 +156,7 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
 \end{algorithm}
 
 \subsection{Módulo Notificación}
-Asumimos que existe el tipo notif
+Asumimos que existe el tipo \texttt{notif}.
 
 %%% Local Variables:
 %%% mode: latex

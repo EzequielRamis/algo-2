@@ -44,6 +44,14 @@
     [Obtiene al jugador del turno actual.]
     [\falta]\\
 
+    \noindent\InterfazFuncion{tiempo}
+    {\In{j}{juego}}{nat}
+    [true]
+    {$res$ es igual a la cantidad de generadores ``ubicar'' de $j$}
+    [$O(1)$]
+    [Obtiene la cantidad de jugadas totales que se hicieron desde que empezó el juego.]
+    [\falta]\\
+
     \noindent\InterfazFuncion{puntaje}
     {\In{j}{juego}, \In{i}{nat}}{nat}
     [$i < \#jugadores(j)$]
@@ -61,7 +69,7 @@ jugador desde la última vez que se invocó a esta operación.]
     [Determina si una coordenada $(i,j)$ está en el rango del tablero.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{hayLetra?}
+    \noindent\InterfazFuncion{hayFicha?}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{bool}
     [$enTablero?(tablero(J),i,j)$]
     {$res\igobs hayLetra?(tablero(J),i,j)$}
@@ -69,12 +77,20 @@ jugador desde la última vez que se invocó a esta operación.]
     [Determina si una celda del tablero dada una coordenada $(i,j)$ está ocupada por una letra.]
     [\falta]\\
 
-    \noindent\InterfazFuncion{letra}
+    \noindent\InterfazFuncion{ficha}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{letra}
     [$enTablero?(tablero(J),i,j)\yluego hayLetra?(tablero(J),i,j)$]
     {$res\igobs letra(tablero(J),i,j)$}
     [$O(1)$]
     [Obtiene el contenido de una celda del tablero dada una coordenada $(i,j)$.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{tiempoFicha}
+    {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{nat}
+    [$enTablero?(tablero(J),i,j)\yluego hayLetra?(tablero(J),i,j)$]
+    {$res$ es igual a la cantidad de generadores ``ubicar'' de j desde que empezó el juego hasta que hubo un ``ubicar'' con una ocurrencia que contenía esa coordenada.}
+    [$O(1)$]
+    [Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada $(i,j)$.]
     [\falta]\\
 
     \noindent\InterfazFuncion{\#letraTieneJugador}
@@ -95,7 +111,7 @@ jugador desde la última vez que se invocó a esta operación.]
 \begin{Estructura}{juego}[juego\_estr]
 \begin{Tupla}[juego\_estr]
 \begin{adjustwidth}{3em}{}\ \
-  \tupItem{tablero}{tab}\\
+  \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(tupla(letra,nat))))}\\
   \tupItem{jugadores}{array\_dimensionable(jugador)}\\
   \tupItem{tiempo}{nat}\\
   \tupItem{repositorio}{pila(letra)}\\
@@ -108,6 +124,7 @@ jugador desde la última vez que se invocó a esta operación.]
       \texttt{
         \textrm{$puntaje$:} nat\\
         \textrm{, $historial$:} lista(tupla(\textrm{$ocurrencia$:} ocurrencia\textrm{, $tiempo$:} nat))\\
+        \textrm{, $historialSinVacias$:} lista(tupla(\textrm{$ocurrencia$:} ocurrencia\textrm{, $tiempo$:} nat))\\
         \textrm{, $jugadasSinCalcularPuntaje$:} nat\\
         \textrm{, $cantFichasPorLetra$:} array\_dimensionable(nat)
         }
@@ -118,27 +135,28 @@ jugador desde la última vez que se invocó a esta operación.]
 
 \subsubsection*{Invariante de Representación}
 \Rep[juego\_estr]{$
-  tama\tilde{n}o(e.tablero)=tama\tilde{n}oTablero(e.variante)\land\\
-  % dentro de mod tablero
-  % (\forall i:\texttt{nat})(i<tama\tilde{n}o(e.tablero)\impluego tam(e.tablero[i])=tam(e.tablero))\yluego\\
+  tam(e.tablero)=tama\tilde{n}oTablero(e.variante)\land\\
+  % dentro de mod tablero?
+  (\forall i:\texttt{nat})(i<tam(e.tablero)\impluego tam(e.tablero[i])=tam(e.tablero))\yluego\\
   % formatear con operaciones de interfaz tablero
-  % (\forall i,j:\texttt{nat})((i,j<tam(e.tablero)\yluego e.tablero[i][j]\neq\textsc{NULL})\impluego e.tablero[i][j].tiempo<e.tiempo)\yluego\\
+  (\forall i,j:\texttt{nat})((i,j<tam(e.tablero)\yluego e.tablero[i][j]\neq\textsc{NULL})\impluego e.tablero[i][j].tiempo<e.tiempo)\yluego\\
   (\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego(
   $\begin{adjustwidth}{1em}{0em}
     $
     tam(e.jugadores[i].cantFichasPorLetra)=\textsc{dom}()\yluego\\
     \sum_{f<\textsc{dom}()}e.jugadores[i].cantFichasPorLetra[f]=\#fichas(e.variante)\land\\
-    e.jugadores[i].jugadasSinCalcularPuntaje\leq tam(e.jugadores[i].historial)\yluego\\
     tam(e.jugadores[i].historial)=\lceil e.tiempo/tam(e.jugadores)\rceil\land\\
     (\forall h:\texttt{nat})(h<long(e.jugadores[i].historial)\impluego
     $\begin{adjustwidth}{1em}{0em}
       $
       % e.jugadores[i].historial[h].tiempo = (long(e.jugadores[i].historial)-1-h)*tam(e.jugadores)+i\land\\
-      e.jugadores[i].historial[h].tiempo = h*tam(e.jugadores)+i\land\\
+      e.jugadores[i].historial[h].tiempo=h*tam(e.jugadores)+i\land\\
       (\forall p,q:\texttt{nat})(\forall l,l':\texttt{letra})(
     $\begin{adjustwidth}{1em}{0em}$
       \{\langle p,q,l\rangle,\langle p,q,l'\rangle\}\subseteq e.jugadores[i].historial[h].ocurrencia\implies l=l'
-    $\end{adjustwidth}$)
+      $\end{adjustwidth}$)\yluego\\
+      e.jugadores[i].historialSinVacias\igobs historialSinVac\acute{\imath}as(e.jugadores[i].historial,<>)\land\\
+      e.jugadores[i].jugadasSinCalcularPuntaje\leq tam(e.jugadores[i].historialSinVac\acute{\imath}as)
       $
     \end{adjustwidth}$)
   $
@@ -160,6 +178,10 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
     \def\dotminus{\mathbin{\ooalign{\hss\raise0.2ex\hbox{*}\hss\cr\mathsurround=0pt$-$}}}
     % historialesCalculados: \texttt{juego\_{estr}}\longrightarrow\texttt{multiconj(tupla(ocurrencia,nat))}\\
     % historialesCalculados(e')\equiv historiales(e)\dotminus historialesSinCalcular(e)\\\\
+    historialSinVac\acute{\imath}as: \texttt{lista(tupla(ocurrencia,nat))}\longrightarrow\texttt{lista(tupla(ocurrencia,nat))}\\
+    historialSinVac\acute{\imath}as(hcv,hsv)\equiv$\IFL{1em}G{vac\acute{\imath}a?(hcv)}THEN{hsv}ELSE{
+      $\IFL{1em}G{vac\acute{\imath}o?(\pi_{1}(prim(hcv)))}THEN{historialSinVac\acute{\imath}as(fin(hcv),hsv)}ELSE{historialSinVac\acute{\imath}as(fin(hcv),prim(hcv)\puntito hsv)}FI$
+    }FI$\\\\
     historiales: \texttt{juego\_estr}\longrightarrow\texttt{multiconj(ocurrencia)}\\
     historiales(e')\equiv historialesHastaTiempo(e'.jugadores,0,e.tiempo)\\
     $
@@ -210,7 +232,11 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
   e.variante\igobs variante(J)\land\\
   e.repositorio\igobs repositorio(J)\land\\
   e.tiempo\equiv turno(J)\ (mod\ \#jugadores(J))\land\\
-  e.tablero\igobs tablero(J)\land\\
+  tam(e.tablero)\igobs tama\tilde{n}o(T)\yluego\\
+  (\forall i,j:\texttt{nat})((enTablero?(T,i,j)\yluego hayLetra?(T,i,j))\impluego
+  $\begin{adjustwidth}{12em}{0em}$
+  (e.tablero[i][j]\neq NULL\yluego letra(T,i,j)\igobs\pi_{1}(*e.tablero[i][j])))\land
+  $\end{adjustwidth}$\\
   (tam(e.jugadores)\igobs \#jugadores(J)\yluego$
   \begin{adjustwidth}{11.4em}{0em}
   $(\forall i:\texttt{nat})(i<tam(e.jugadores)\impluego($
@@ -230,11 +256,18 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
     \State\asignar{res.variante}{v}
     \State\asignar{res.repositorio}{r}
     \State\asignar{res.tiempo}{0}
-    \State\asignar{res.tablero}{\textsc{nuevoTablero}(\textsc{tamañoTablero}(v))}\Comment{$O(N^2)$}
+    \State\asignar{filas}{\textsc{CrearArreglo}(n)}
+    \For{$columnas\in filas$}\Comment{$O(N)$}
+        \State\asignar{columnas}{\textsc{CrearArreglo}(n)}
+        \For{$celda\in columnas$}\Comment{$O(N)$}
+          \State\asignar{celda}{\textsc{NULL}}
+        \EndFor
+    \EndFor
     \State\asignar{res.jugadores}{\textsc{CrearArreglo}(k)}
     \For{$jugador\in res.jugadores$}\Comment{$O(K)$}
         \State\asignar{jugador.puntaje}{0}
         \State\asignar{jugador.historial}{\textsc{Vacía()}}
+        \State\asignar{jugador.tiemposDeJugadasVacias}{\textsc{Vacía()}}
         \State\asignar{jugador.jugadasSinCalcularPuntaje}{0}
         \State // Por cada jugador le damos su primer mazo de fichas del repositorio
         \State\asignar{jugador.cantFichasPorLetra}{\textsc{CrearArreglo}(\textsc{dom}())}
@@ -259,14 +292,14 @@ Justificación de complejidad:
 \end{align*}
 
 \begin{algorithm}[H]
-  \defun{iJugadaVálida?}{\In{j}{estr\_juego}, \In{o}{ocurrencia}}{bool}
+  \defun{iJugadaVálida?}{\In{e}{estr\_juego}, \In{o}{ocurrencia}}{bool}
   \begin{algorithmic}[1]
-    \If{$\textsc{Cardinal}(o)>\textsc{longPalabraMásLarga}(j.variante)$}\Comment{Con este if evitamos acotar por $m$}
+    \If{$\textsc{Cardinal}(o)>\textsc{longPalabraMásLarga}(e.variante)$}\Comment{Con este if evitamos acotar por $m$}
     \State\Return false
     \EndIf
     \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
         \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
-        \If{$\lnot\textsc{enTablero?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))\oluego\textsc{hayLetra?}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$}
+        \If{$\lnot\textsc{enTablero?}(j,\pi_{1}(ficha),\pi_{2}(ficha))\oluego\textsc{hayLetra?}(e,\pi_{1}(ficha),\pi_{2}(ficha))$}
         \State\Return false
         \EndIf
     \EndFor
@@ -274,34 +307,86 @@ Justificación de complejidad:
     \State\Return false
     \EndIf
     \State // Ponemos las fichas de la ocurrencia para validar
-    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
-      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
-      \State$\textsc{ponerLetra}(e.tablero,ficha)$\Comment{$O(1)$}
-    \EndFor
-    \State\falta
+    \State$\textsc{ponerLetras}(e,o)$
+    \If{$\textsc{esHorizontal?}(o)$}
+      \State // Elegimos cualquier ficha y expandimos para atrás con i y para adelante con j para obtener toda la palabra horizontal
+      \State\asignar{cualquierFicha}{\textsc{Siguiente}(\textsc{CrearIt}(o))}
+      \State\asignar{rango}{rangoDePalabraHorizontal(e,cualquierFicha)}
+      \State // Ver que todas las fichas de la ocurrencia estén incluidas en el rango, sino sacamos las letras del tablero y devolvemos false
+      \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
+          \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+          \If{$\lnot(\pi_{1}(rango)\leq\pi_{2}(ficha)\leq\pi_{2}(rango))$}
+            \State$\textsc{sacarLetras}(e,o)$
+            \State\Return false
+          \EndIf
+      \EndFor
+      \If{$\lnot\textsc{formaPalabraLegítima?}(e,rango,true,\pi_{1}(cualquierFicha))$}\Comment$O(\Lmax)$
+        \State$\textsc{sacarLetras}(e,o)$
+        \State\Return false
+      \EndIf
+      \State // Vemos las palabras que se forman en las columnas
+      \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
+        \State\asignar{ficha}{\textsc{Siguiente}(\textsc{CrearIt}(o))}
+        \State\asignar{rango}{rangoDePalabraVertical(e,ficha)}
+        \State // Si se forman nuevas palabras en las columnas ver que sean legítimas
+        \If{$\pi_{1}(rango)\neq\pi_{2}(rango)\yluego\lnot\textsc{formaPalabraLegítima?}(e,rango,false,\pi_{2}(ficha))$}\Comment$O(\Lmax)$
+          \State$\textsc{sacarLetras}(e,o)$
+          \State\Return false
+        \EndIf
+      \EndFor
+
+    \Else
+
+      \State // Es el mismo código del branch true pero ahora la ocurencia es vertical
+      \State\asignar{cualquierFicha}{\textsc{Siguiente}(\textsc{CrearIt}(o))}
+      \State\asignar{rango}{rangoDePalabraVertical(e,cualquierFicha)}
+      \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
+          \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+          \If{$\lnot(\pi_{1}(rango)\leq\pi_{1}(ficha)\leq\pi_{2}(rango))$}
+            \State$\textsc{sacarLetras}(e,o)$
+            \State\Return false
+          \EndIf
+      \EndFor
+      \If{$\lnot\textsc{formaPalabraLegítima?}(e,rango,false,\pi_{2}(cualquierFicha))$}\Comment$O(\Lmax)$
+        \State$\textsc{sacarLetras}(e,o)$
+        \State\Return false
+      \EndIf
+      \State // Vemos las palabras que se forman en las filas
+      \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
+        \State\asignar{ficha}{\textsc{Siguiente}(\textsc{CrearIt}(o))}
+        \State\asignar{rango}{rangoDePalabraHorizontal(e,ficha)}
+        \State // Si se forman nuevas palabras en las filas ver que sean legítimas
+        \If{$\pi_{1}(rango)\neq\pi_{2}(rango)\yluego\lnot\textsc{formaPalabraLegítima?}(e,rango,true,\pi_{1}(ficha))$}\Comment$O(\Lmax)$
+          \State$\textsc{sacarLetras}(e,o)$
+          \State\Return false
+        \EndIf
+      \EndFor
+
+
+    \EndIf
+
     \State // Sacamos las fichas de la ocurrencia para no modificar el tablero
-    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\Lmax)$}
-      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
-      \State$\textsc{sacarLetra}(e.tablero,\pi_{1}(ficha),\pi_{2}(ficha))$\Comment{$O(1)$}
-    \EndFor
+    \State$\textsc{sacarLetras}(j,o)$
     \State\Return true
   \end{algorithmic}
 \end{algorithm}
-Justificación de complejidad:
-\begin{align*}
-\end{align*}
 
 \begin{algorithm}[H]
   \defunv{iUbicar}{\Inout{j}{estr\_juego}, \In{o}{ocurrencia}}
   \begin{algorithmic}[1]
     \State\asignar{jugador}{j.jugadores[\textsc{turno}(j)]}
-    \State$j.tiempo++$
     \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(m)$}
       \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
-      \State$\textsc{ponerLetra}(j.tablero,\pi_{1}(ficha),\pi_{2}(ficha),\pi_{3}(ficha),\pi_{4}(ficha))$\Comment{$O(1)$}
+      \State\asignar{e.tablero[\pi_{1}(ficha)][\pi_{2}(ficha)]}{\&\langle\pi_{3}(ficha),e.tiempo\rangle}
       \State$jugador.cantFichasPorLetra[\textsc{ord}(\pi_{3}(ficha))]--$
       \State$jugador.cantFichasPorLetra[\textsc{ord}(\textsc{Desapilar}(j.repositorio))]++$\Comment{$O(1)$}
     \EndFor
+    \If{$\textsc{Cardinal}(o)\neq 0$}
+      \State$\textsc{AgregarAtras}(jugador.historialSinVac\acute{\imath}a,\langle o, j.tiempo\rangle)$
+      \State$jugador.jugadasSinCalcularPuntaje++$
+    \EndIf
+    \State$\textsc{AgregarAtras}(jugador.historial,\langle o, j.tiempo\rangle)$
+    \State$j.tiempo++$
   \end{algorithmic}
 \end{algorithm}
 
@@ -320,6 +405,13 @@ Justificación de complejidad:
 \end{algorithm}
 
 \begin{algorithm}[H]
+  \defun{iTiempo}{\In{j}{estr\_juego}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return{$j.tiempo$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
   \defun{iPuntaje}{\In{j}{estr\_juego}, \In{i}{nat}}{nat}
   \begin{algorithmic}[1]
     \State\falta
@@ -329,20 +421,28 @@ Justificación de complejidad:
 \begin{algorithm}[H]
   \defun{iEnTablero?}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{bool}
   \begin{algorithmic}[1]
-    \State\Return{$\textsc{enTablero?}(j.tablero,i,j)$}
+    \State\Return{$i<tam(t)\land j<tam(t)$}
   \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}[H]
   \defun{iHayLetra?}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{bool}
   \begin{algorithmic}[1]
-    \State\Return{$\textsc{hayLetra?}(j.tablero,i,j)$}
+    \State\Return{$t[i][j]\neq\textsc{NULL}$}
   \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}[H]
-  \defun{iLetra}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{letra}
+  \defun{iFicha}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{letra}
   \begin{algorithmic}[1]
+    \State\Return{$\pi_{1}(*t[i][j])$}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \defun{iFichaTiempo}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return{$\pi_{2}(*t[i][j])$}
     \State\Return{$\textsc{letra}(j.tablero,i,j)$}
   \end{algorithmic}
 \end{algorithm}
@@ -354,6 +454,77 @@ Justificación de complejidad:
   \end{algorithmic}
 \end{algorithm}
 
+\subsection{Algoritmos Auxiliares}
+\begin{algorithm}[H]
+  \defunv{ponerLetras}{\Inout{j}{estr\_juego}, \In{o}{ocurrencia}}
+  \begin{algorithmic}[1]
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\#o)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State\asignar{e.tablero[\pi_{1}(ficha)][\pi_{2}(ficha)]}{\&\langle\pi_{3}(ficha),e.tiempo\rangle}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defunv{sacarLetras}{\Inout{j}{estr\_juego}, \In{o}{ocurrencia}}
+  \begin{algorithmic}[1]
+    \For{$ $\asignar{oIt}{\textsc{CrearIt}(o)}$;\ \textsc{HaySiguiente}(oIt);\ \textsc{Avanzar}(oIt)$}\Comment{$O(\#o)$}
+      \State\asignar{ficha}{\textsc{Siguiente}(oIt)}
+      \State\asignar{e.tablero[\pi_{1}(ficha)][\pi_{2}(ficha)]}{\textsc{NULL}}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{rangoDePalabraHorizontal}{\In{e}{estr\_juego}, \In{ficha}{tupla(nat,nat,letra)}}{tupla(nat,nat)}
+  \begin{algorithmic}[1]
+    \State\asignar{fila}{\pi_{1}(ficha)}
+    \State\asignar{i}{\pi_{2}(ficha)}
+    \State\asignar{j}{\pi_{2}(ficha)}
+    \While{$\textsc{enTablero?}(e,fila,i)\yluego\textsc{hayFicha?}(e,fila,i)$}
+      \State$i--$
+    \EndWhile
+    \While{$\textsc{enTablero?}(e,fila,j)\yluego\textsc{hayFicha?}(e,fila,j)$}
+      \State$j++$
+    \EndWhile
+    \State\Return$\langle i,j\rangle$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{rangoDePalabraVertical}{\In{e}{estr\_juego}, \In{ficha}{tupla(nat,nat,letra)}}{tupla(nat,nat)}
+  \begin{algorithmic}[1]
+    \State\asignar{columna}{\pi_{2}(ficha)}
+    \State\asignar{i}{\pi_{1}(ficha)}
+    \State\asignar{j}{\pi_{1}(ficha)}
+    \While{$\textsc{enTablero?}(e,i,columna)\yluego\textsc{hayFicha?}(e,i,columna)$}
+      \State$i--$
+    \EndWhile
+    \While{$\textsc{enTablero?}(e,j,columna)\yluego\textsc{hayFicha?}(e,j,columna)$}
+      \State$j++$
+    \EndWhile
+    \State\Return$\langle i,j\rangle$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{formaPalabraLegítima?}{\In{e}{estr\_juego}, \In{r}{tupla(nat,nat)}, \In{horizontal}{bool}, \In{padding}{nat}}{bool}
+  \begin{algorithmic}[1]
+    \State // Hacemos un pseudo counting sort para tener la palabra en $O(\#o)$
+    \State\asignar{\langle i,j\rangle}{r}
+    \State\asignar{palabra}{\textsc{CrearArreglo}(j-i)}\Comment Es \texttt{arreglo\_dimensionable(letra)}
+    \If{$horizontal$}
+      \For{$i\leq k\leq j$}
+        \State\asignar{palabra[k-i]}{\textsc{ficha}(e,padding,k)}
+      \EndFor
+    \Else
+      \For{$i\leq k\leq j$}
+        \State\asignar{palabra[k-i]}{\textsc{ficha}(e,k,padding)}
+      \EndFor
+    \EndIf
+    \State\asignar{palabra'}{\textsc{Vacía}()}\Comment Lista Enlazada
+    \For{$0\leq k<tam(palabra)$}
+      \State$\textsc{AgregarAtras}(palabra',palabra[k])$
+    \EndFor
+    \State\Return{$\textsc{palabraLegítima?}(e.variante,palabra')$}\Comment$O(\Lmax)$
+  \end{algorithmic}
+\end{algorithm}
 \subsection{Servicios usados}
 \newpage
 
