@@ -107,7 +107,7 @@ jugador desde la última vez que se invocó a esta operación.]
 \newpage
 \subsection{Implementación}
 
-\subsubsection*{Representación}
+\subsubsection{Representación}
 \begin{Estructura}{juego}[juego\_estr]
 \begin{Tupla}[juego\_estr]
 \begin{adjustwidth}{3em}{}\ \
@@ -133,7 +133,8 @@ jugador desde la última vez que se invocó a esta operación.]
     \end{adjustwidth}
 \end{Estructura}
 
-\subsubsection*{Invariante de Representación}
+\newpage
+\subsubsection{Invariante de Representación}
 \Rep[juego\_estr]{$
   tam(e.tablero)=tama\tilde{n}oTablero(e.variante)\land\\
   % dentro de mod tablero?
@@ -227,7 +228,7 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
   \end{adjustwidth}
 \par\vspace*{3ex}%
 
-\subsubsection*{Función de Abstracción}
+\subsubsection{Función de Abstracción}
 \Abs[juego\_estr]{juego}[e]{J}{$
   e.variante\igobs variante(J)\land\\
   e.repositorio\igobs repositorio(J)\land\\
@@ -249,7 +250,7 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
   \end{adjustwidth}
 }
 
-\subsubsection*{Algoritmos}
+\subsubsection{Algoritmos}
 \begin{algorithm}[H]
   \defun{iNuevoJuego}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego\_estr}
   \begin{algorithmic}[1]
@@ -533,7 +534,7 @@ Justificación de complejidad:
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Algoritmos Auxiliares}
+\subsubsection{Algoritmos Auxiliares}
 \begin{algorithm}[H]
   \defunv{ponerLetras}{\Inout{j}{estr\_juego}, \In{o}{ocurrencia}}
   \begin{algorithmic}[1]
