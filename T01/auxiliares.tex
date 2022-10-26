@@ -260,7 +260,7 @@ Asumimos que existe el tipo \texttt{notif}.
     {\Inout{t}{triePalabra}, \In{p}{lista(letra)}}{}
     [$p\notin t$]
     {$p\in t$}
-    [$O(\#p)$]
+    [$O(\Lmax)$]
     [Define una palabra en el trie.]
     [\falta]\\
 
@@ -268,7 +268,7 @@ Asumimos que existe el tipo \texttt{notif}.
     {\In{t}{triePalabra}, \In{p}{lista(letra)}}{bool}
     [true]
     {$res\igobs p\in t$}
-    [$O(\#p)$]
+    [$O(\Lmax)$]
     [Determina si una palabra está definida en el trie.]
     [\falta]
   \end{operaciones}

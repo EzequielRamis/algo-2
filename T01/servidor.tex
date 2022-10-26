@@ -1,12 +1,12 @@
 \section{Módulo Servidor}
 \begin{interfaz}{\subsection{Interfaz}}
   \seExplica{Servidor}{servidor}\\\\
-  \usa{Nat, Juego, Ocurrencia, Variante}\par\noindent
+  \usa{\falta}\par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoServidor}
-    {\In{k}{nat}, \In{v}{variante}}{servidor}
-    [true]
-    {$\exists r: \texttt{cola(letra)} \mid res \igobs nuevoServidor(k,v,r)$}
+    {\In{k}{nat}, \In{v}{variante}, \In{r}{pila(letra)}}{servidor}
+    [$tama\tilde{n}o(r)\geq tama\tilde{n}oTablero(v)*tama\tilde{n}oTablero(v)+k*\#fichas(v)$]
+    {$res \igobs nuevoServidor(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
     [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo servidor y una nueva partida de juego.]
     [\falta]\\
