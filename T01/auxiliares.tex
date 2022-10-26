@@ -7,7 +7,7 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     \item $\textsc{ord}^{-1}: \texttt{nat}\ n\rightarrow\texttt{letra}\ \{n < A\}$ \---- Dado un índice, devuelve su correspondiente letra.
 \end{itemize}
 
-\subsection{Módulo Variante (Trie)}
+\subsection{Módulo Variante}
 \begin{interfaz}{\subsubsection{Interfaz}}
   \seExplica{Variante}{variante}\\
   \usa{\falta}
@@ -19,12 +19,12 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
       \In{n}{nat},\\
       \In{f}{nat},\\
       \In{puntajes}{dicc(letra, nat)},\\
-      \In{legítimas}{conj(secu(letra))}
+      \In{legítimas}{conj(lista(letra))}
       \end{adjustwidth}
     }{variante}
     [$n>0\land f>0$]
     {$res\igobs nuevaVariante(n,f,puntajes,leg\acute{\imath}timas)$}
-    [$O(\#leg\acute{\imath}timas\cdot\Lmax)$]
+    [$O(|\Sigma|+\#leg\acute{\imath}timas\cdot\Lmax)$]
     [Genera una variante de juego.]
     [\falta]\\
 
@@ -53,9 +53,9 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     [\falta]\\
 
     \noindent\InterfazFuncion{palabraLegítima?}
-    {\In{v}{variante}, \In{l}{secu(letra)}}{bool}
+    {\In{v}{variante}, \In{p}{lista(letra)}}{bool}
     [true]
-    {$res\igobs palabraLeg\acute{\imath}tima(v,l)$}
+    {$res\igobs palabraLeg\acute{\imath}tima(v,p)$}
     [$O(\Lmax)$]
     [Determina si una palabra es legítima dentro de la variante de juego.]
     [\falta]\\
@@ -75,6 +75,90 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
   \end{operaciones}
 \end{interfaz}
 \subsubsection{Implementación}
+\subsubsection*{Representación}
+\begin{Estructura}{variante}[variante\_estr]
+\begin{Tupla}[variante\_estr]
+\begin{adjustwidth}{3em}{}\ \
+  \tupItem{tablero}{nat}\\
+  \tupItem{fichas}{nat}\\
+  \tupItem{puntaje}{array\_dimensionable(nat)}\\
+  \tupItem{palabras}{triePalabra}\\
+  \tupItem{\#palabraMásLarga}{triePalabra}
+\end{adjustwidth}
+\end{Tupla}
+\end{Estructura}
+
+\subsubsection*{Invariante de Representación}
+\Rep[variante\_estr]{$
+  e.tablero>0\land e.fichas>0\land\\
+  tam(e.puntaje)=\textsc{dom}()\yluego(\forall l:\texttt{letra})(e.puntaje[\textsc{ord}(l)]>0)\land\\
+  \lnot(\exists p:\texttt{lista(letra)})(\textsc{Definida?}(e.palabras,p)\implies \textsc{Longitud}(p)>e.\#palabraM\acute{a}sLarga)
+$}
+
+\subsubsection*{Función de Abstracción}
+\Abs[variante\_estr]{variante}[e]{V}{$
+  e.tablero\igobs tama\tilde{n}oTablero(V)\land\\
+  e.fichas\igobs \#fichas(V)\land\\
+  (\forall l:\texttt{letra})(e.puntaje[\textsc{ord}(l)]\igobs puntajeLetra(V,l))\land\\
+  (\forall p:\texttt{secu(letra)})(p\in e.palabras\igobs palabraLeg\acute{\imath}tima?(V,l))
+$}
+
+\subsubsection{Algoritmos}
+\begin{algorithm}[H]
+  \defun{iNuevaVariante}{\In{n}{nat}, \In{f}{nat}, \In{puntajes}{dicc(letra,nat)}, \In{legítimas}{conj(secu(letra))}}{variante\_estr}
+  \begin{algorithmic}[1]
+    \State\asignar{res.tablero}{n}
+    \State\asignar{res.fichas}{f}
+    \State\asignar{res.puntaje}{\textsc{CrearArreglo}(\textsc{dom}())}
+    \For{$0\leq i<tam(res.puntaje)$}\Comment$O(|\Sigma|)$
+      \If{$\textsc{Definido?}(puntajes,\textsc{ord}^{-1}(i))$}
+        \State\asignar{res.puntaje[i]}{\textsc{Significado}(puntajes,\textsc{ord}^{-1}(i))}
+      \Else
+        \State\asignar{res.puntaje[i]}{1}
+      \EndIf
+    \EndFor
+    \State\asignar{res.palabras}{\textsc{Vacía}()}
+    \State\asignar{res.\#palabraM\acute{a}sLarga}{0}
+    \For{$ $\asignar{lgIt}{\textsc{CrearIt}(lg)}$;\ \textsc{HaySiguiente}(lgIt);\ \textsc{Avanzar}(lgIt)$}\Comment{$O(\#leg\acute{\imath}timas)$}
+      \State\asignar{palabra}{\textsc{Siguiente}(lgIt)}
+      \State$\textsc{Definir}(res.palabras,palabra)$\Comment$O(\Lmax)$
+      \If{$\textsc{Longitud}(palabra)>res.\#palabraM\acute{a}sLarga$}\Comment$O(1)$
+        \State\asignar{res.\#palabraM\acute{a}sLarga}{\textsc{Longitud}(palabra)}
+      \EndIf
+    \EndFor
+    \State\Return$res$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iTamañoTablero}{\In{v}{variante\_estr}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return$v.tablero$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iFichasPorJugador}{\In{v}{variante\_estr}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return$v.fichas$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iPuntajeLetra}{\In{v}{variante\_estr}, \In{l}{letra}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return$v.puntaje[\textsc{ord}(l)]$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iPalabraLegítima?}{\In{v}{variante\_estr}, \In{p}{secu(letra)}}{bool}
+  \begin{algorithmic}[1]
+    \State\Return$\textsc{Definida?}(v.palabras,p)$\Comment$O(\Lmax)$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iLongPalabraMásLarga}{\In{v}{variante\_estr}}{nat}
+  \begin{algorithmic}[1]
+    \State\Return$v.\#palabraM\acute{a}sLarga$
+  \end{algorithmic}
+\end{algorithm}
 
 \subsection{Módulo Ocurrencia}
 Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operaciones auxiliares.\\
@@ -157,6 +241,151 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
 
 \subsection{Módulo Notificación}
 Asumimos que existe el tipo \texttt{notif}.
+
+\subsection{Módulo Trie de Palabras}
+\begin{interfaz}{\subsubsection{Interfaz}}
+  \seExplica{Conjunto(Secuencia(Letra))}{triePalabra}\\
+  \usa{\falta}
+  \par\noindent
+  \begin{operaciones}
+    \InterfazFuncion{Vacío}
+    {}{triePalabra}
+    [true]
+    {$res\igobs\emptyset$}
+    [$O(1)$]
+    [Genera un trie de palabras.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{Definir}
+    {\Inout{t}{triePalabra}, \In{p}{lista(letra)}}{}
+    [$p\notin t$]
+    {$p\in t$}
+    [$O(\#p)$]
+    [Define una palabra en el trie.]
+    [\falta]\\
+
+    \noindent\InterfazFuncion{Definida?}
+    {\In{t}{triePalabra}, \In{p}{lista(letra)}}{bool}
+    [true]
+    {$res\igobs p\in t$}
+    [$O(\#p)$]
+    [Determina si una palabra está definida en el trie.]
+    [\falta]
+  \end{operaciones}
+\end{interfaz}
+\subsubsection{Implementación}
+\subsubsection*{Representación}
+\begin{Estructura}{triePalabra}[trie\_estr]
+\begin{Tupla}[trie\_estr]
+\begin{adjustwidth}{3em}{}\ \
+  \tupItem{hijos}{array\_dimensionable(puntero(trie\_estr))}\\
+  \tupItem{fin?}{bool}
+\end{adjustwidth}
+\end{Tupla}
+\end{Estructura}
+
+\subsubsection*{Invariante de Representación}
+\Rep[trie\_estr]{$
+  tam(e.hijos)=\textsc{dom}()\yluego\\
+  (\forall h:\texttt{nat})(h<tam(e.hijos)\impluego definido?(e.hijos[h])\land\\
+  (\forall h:\texttt{nat})(h<tam(e.hijos)\impluego e.hijos[h]=\textsc{NULL})\implies e.fin?=true
+$}
+
+\subsubsection*{Función de Abstracción}
+\Abs[trie\_estr]{conj(secu(letra))}[t]{C}{$
+  <>\in C\implies C\igobs palabrasDeTrie(t)\oluego\\
+  C\igobs palabrasDeTrie(t)-\{<>\}
+$}
+
+\begin{adjustwidth}{12em}{}$
+  \textbf{donde}\\
+  % tama\tilde{n}oTrie: \texttt{trie\_estr}\longrightarrow\texttt{nat}\\
+  % tama\tilde{n}oTrie(t)\equiv sumarHijosDesde(t,0)-1\\\\
+  % sumarHijosDesde: \texttt{trie\_estr}\times\texttt{nat}\longrightarrow\texttt{nat}\\
+  % sumarHijosDesde(t,k)\equiv$\IFL{1em}G{k=\textsc{dom}()}THEN{\LIF\ t.fin?\ \LTHEN\ 1\ \LELSE\ 0\ \LFI}ELSE{sumarHijo(t.hijos[k])+sumarHijosDesde(t,k+1)}FI$\\
+  % sumarHijo: \texttt{puntero(trie\_estr)}\longrightarrow\texttt{nat}\\
+  % sumarHijo(p)\equiv$\IFL{1em}G{p=NULL}THEN{0}ELSE{sumarHijosDesde(*p,0)}FI$\\\\
+  palabrasDeTrie: \texttt{trie\_estr}\longrightarrow\texttt{conj(secu(letra))}\\
+  palabrasDeTrie(t)\equiv formarPalabrasDesde(t,0,<>)\\\\
+  formarPalabrasDesde: \texttt{trie\_estr}\times\texttt{nat}\times\texttt{secu(letra)}\longrightarrow\texttt{conj(secu(letra))}\\
+  formarPalabrasDesde(t,k,pre)\equiv$\IFL{1em}G{k=\textsc{dom}()}THEN{\LIF\ t.fin?\ \LTHEN\ Ag(pre,\emptyset)\ \LELSE\ \emptyset\ \LFI}ELSE{formarPalabras(t.hijos[k],pre\circulito\textsc{ord}^{-1}(k))\\\cup formarPalabrasDesde(t,k+1,pre)}FI$\\
+  formarPalabras: \texttt{puntero(trie\_estr)}\times\texttt{secu(letra)}\longrightarrow\texttt{conj(secu(letra))}\\
+  formarPalabras(p,pre)\equiv$\IFL{1em}G{p=NULL}THEN{\emptyset}ELSE{formarPalabrasDesde(*p,0,pre)}FI$
+$\end{adjustwidth}
+
+\subsubsection{Algoritmos}
+\begin{algorithm}[H]
+  \defun{iVacío}{}{trie\_estr}
+  \begin{algorithmic}[1]
+    \State\asignar{res.fin?}{false}
+    \State\asignar{res.hijos}{\textsc{CrearArreglo}(\textsc{dom}())}
+    \For{$0\leq i<tam(res.hijos)$}\Comment$O(|\Sigma|)$
+        \State\asignar{res.hijos[i]}{\textsc{NULL}}
+    \EndFor
+    \State\Return$res$
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defunv{iDefinir}{\Inout{t}{trie\_estr}, \In{p}{lista(letra)}}
+  \begin{algorithmic}[1]
+    \iffalse
+      if !pit.haySig
+        t.fin <- true
+      else
+        nodo <- t[ord(pit.sig)]
+        while nodo != null
+          letra <- pit.sig
+          nodo <- (*nodo)[ord(letra)]
+        while pit.haySig
+          nodo <- &vacio
+          letra <- pit.sig
+          nodo <- (*nodo)[ord(letra)]
+        (*nodo).fin <- true
+    \fi
+    \State\asignar{pIt}{\textsc{CrearIt}(p)}
+    \If{$\lnot\textsc{HaySiguiente}(pIt)$}
+      \State\asignar{t.fin?}{true}
+    \Else
+      \State\asignar{nodo}{t.hijos[\textsc{ord}(\textsc{Siguiente}(pIt))]}
+      \While{$nodo\neq\textsc{NULL}$}
+        \State\asignar{letra}{\textsc{Siguiente}(pIt)}
+        \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
+      \EndWhile
+      \While{\textsc{HaySiguiente}(pIt)}
+        \State\asignar{nodo}{\&\textsc{Vacío}()}
+        \State\asignar{letra}{\textsc{Siguiente}(pIt)}
+        \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
+      \EndWhile
+      \State\asignar{(*nodo).fin?}{true}
+    \EndIf
+  \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+  \defun{iDefinida?}{\In{t}{trie\_estr}, \In{p}{lista(letra)}}{bool}
+  \begin{algorithmic}[1]
+    \iffalse
+      if !pit.haySig
+        return t.fin
+      else
+        nodo <- t[ord(pit.sig)]
+        while nodo != null
+          letra <- pit.sig
+          nodo <- (*nodo)[ord(letra)]
+        return !pit.haySig and (*nodo).fin
+    \fi
+    \State\asignar{pIt}{\textsc{CrearIt}(p)}
+    \If{$\lnot\textsc{HaySiguiente}(pIt)$}
+      \State\Return$t.fin?$
+    \Else
+      \State\asignar{nodo}{t.hijos[\textsc{ord}(\textsc{Siguiente}(pIt))]}
+      \While{$nodo\neq\textsc{NULL}$}
+        \State\asignar{letra}{\textsc{Siguiente}(pIt)}
+        \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
+      \EndWhile
+      \State\Return$\lnot\textsc{HaySiguiente}(pIt)\land (*nodo).fin?$
+    \EndIf
+  \end{algorithmic}
+\end{algorithm}
 
 %%% Local Variables:
 %%% mode: latex
