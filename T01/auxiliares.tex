@@ -10,7 +10,7 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
 \subsection{Módulo Variante}
 \begin{interfaz}{\subsubsection{Interfaz}}
   \seExplica{Variante}{variante}\\
-  \usa{\falta}
+  \usa{Diccionario Lineal, Conjunto Lineal, Lista, Letra, ¿Trie de Palabras?}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevaVariante}
@@ -26,31 +26,29 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     {$res\igobs nuevaVariante(n,f,puntajes,leg\acute{\imath}timas)$}
     [$O(|\Sigma|+\#leg\acute{\imath}timas\cdot\Lmax)$]
     [Genera una variante de juego.]
-    [\falta]\\
+    [Se pasa $puntajes:\texttt{dicc(letra,nat)}$ como referencia \textbf{no} modificable.\\
+    \-\hspace{4.7em}Se pasa $leg\acute\imath timas:\texttt{conj(lista(letra))}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{tamañoTablero}
     {\In{v}{variante}}{nat}
     [true]
     {$res\igobs tama\tilde{n}oTablero(v)$}
     [$O(1)$]
-    [Devuelve el tamaño del tablero.]
-    [\falta]\\
+    [Devuelve el tamaño del tablero.]\\
 
     \noindent\InterfazFuncion{fichasPorJugador}
     {\In{v}{variante}}{nat}
     [true]
     {$res\igobs \#fichas(v)$}
     [$O(1)$]
-    [Devuelve la cantidad de fichas que debe de tener cada jugador.]
-    [\falta]\\
+    [Devuelve la cantidad de fichas que debe de tener cada jugador.]\\
 
     \noindent\InterfazFuncion{puntajeLetra}
     {\In{v}{variante}, \In{l}{letra}}{nat}
     [true]
     {$res\igobs puntajeLetra(v,l)$}
     [$O(1)$]
-    [Devuelve el puntaje de una letra.]
-    [\falta]\\
+    [Devuelve el puntaje de una letra.]\\
 
     \noindent\InterfazFuncion{palabraLegítima?}
     {\In{v}{variante}, \In{p}{lista(letra)}}{bool}
@@ -58,7 +56,7 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     {$res\igobs palabraLeg\acute{\imath}tima(v,p)$}
     [$O(\Lmax)$]
     [Determina si una palabra es legítima dentro de la variante de juego.]
-    [\falta]\\
+    [Se pasa $p:\texttt{lista(letra)}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{longPalabraMásLarga}
     {\In{v}{variante}}{nat}
@@ -71,7 +69,6 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
     }
     [$O(1)$]
     [Obtiene la longitud de la palabra legítima más larga de la variante.]
-    [\falta]
   \end{operaciones}
 \end{interfaz}
 \subsubsection{Implementación}
@@ -171,8 +168,7 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
   [true]
   {$res\igobs true\iff(\forall f,f':\texttt{tupla(nat,nat,letra)})(f,f'\in o\land f\neq f'\implies \pi_{2}(f)=\pi_{2}(f'))$}
   [$O(\#o^{2})$]
-  [Determina si una ocurrencia está alineada horizontalmente.]
-  [\falta]\\
+  [Determina si una ocurrencia está alineada horizontalmente.]\\
 
   \noindent\InterfazFuncion{esVertical?}
   {
@@ -181,8 +177,7 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
   [true]
   {$res\igobs true\iff(\forall f,f':\texttt{tupla(nat,nat,letra)})(f,f'\in o\land f\neq f'\implies \pi_{1}(f)=\pi_{1}(f'))$}
   [$O(\#o^{2})$]
-  [Determina si una ocurrencia está alineada verticalmente.]
-  [\falta]\\
+  [Determina si una ocurrencia está alineada verticalmente.]\\
 
   \noindent\InterfazFuncion{haySuperpuestas?}
   {
@@ -194,7 +189,6 @@ Es renombre de \texttt{conj(tupla(nat,nat,letra))} con las siguientes operacione
       \{\langle p,q,l\rangle,\langle p,q,l'\rangle\}\subseteq o\implies l=l')$}
   [$O(\#o^{2})$]
   [Determina si existen fichas distintas en una misma coordenada.]
-  [\falta]
 \end{operaciones}
 \end{adjustwidth}
 
@@ -245,7 +239,6 @@ Asumimos que existe el tipo \texttt{notif}.
 \subsection{Módulo Trie de Palabras}
 \begin{interfaz}{\subsubsection{Interfaz}}
   \seExplica{Conjunto(Secuencia(Letra))}{triePalabra}\\
-  \usa{\falta}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{Vacío}
@@ -253,8 +246,7 @@ Asumimos que existe el tipo \texttt{notif}.
     [true]
     {$res\igobs\emptyset$}
     [$O(1)$]
-    [Genera un trie de palabras.]
-    [\falta]\\
+    [Genera un trie de palabras.]\\
 
     \noindent\InterfazFuncion{Definir}
     {\Inout{t}{triePalabra}, \In{p}{lista(letra)}}{}
@@ -262,7 +254,7 @@ Asumimos que existe el tipo \texttt{notif}.
     {$p\in t$}
     [$O(\Lmax)$]
     [Define una palabra en el trie.]
-    [\falta]\\
+    [Se pasa $p:\texttt{lista(letra)}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{Definida?}
     {\In{t}{triePalabra}, \In{p}{lista(letra)}}{bool}
@@ -270,7 +262,7 @@ Asumimos que existe el tipo \texttt{notif}.
     {$res\igobs p\in t$}
     [$O(\Lmax)$]
     [Determina si una palabra está definida en el trie.]
-    [\falta]
+    [Se pasa $p:\texttt{lista(letra)}$ como referencia \textbf{no} modificable.]
   \end{operaciones}
 \end{interfaz}
 \subsubsection{Implementación}

@@ -4,7 +4,7 @@
   \usa{\falta}\par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoServidor}
-    {\In{k}{nat}, \In{v}{variante}, \In{r}{pila(letra)}}{servidor}
+    {\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{servidor}
     [$tama\tilde{n}o(r)\geq tama\tilde{n}oTablero(v)*tama\tilde{n}oTablero(v)+k*\#fichas(v)$]
     {$res \igobs nuevoServidor(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
@@ -58,6 +58,14 @@
     [$O(1)$]
     [Obtiene el juego que se está jugando en el servidor.]
     [\falta]\\
+
+    \noindent\InterfazFuncion{empezó?}
+    {\In{s}{servidor}}{bool}
+    [true]
+    {$res\igobs empez\acute{o}?(s)$}
+    [$O(1)$]
+    [Determina si la partida empezó.]
+    [\falta]\\
   \end{operaciones}
 \end{interfaz}
 
@@ -71,6 +79,7 @@
   \tupItem{juego}{juego}\\
   \tupItem{jugadoresConectados}{nat}\\
   \tupItem{jugadoresEsperados}{nat}\\
+  \tupItem{configuración}{tupla(\textrm{$variante:$} variante\textrm{$,\ repositorio:$} cola(letra))}\\
   \tupItem{notificaciones}{array\_dimensionable(cola(notif))}
 \end{adjustwidth}\ \ \ \ \ \ \
 \end{Tupla}
@@ -82,7 +91,53 @@
 
 \subsubsection{Algoritmos}
 
-\subsection{Servicios usados}
+\begin{algorithm}[H]
+    \defun{iNuevoServidor}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{servidor\_estr}
+    \begin{algorithmic}[1]
+        \State\asignar{res.juego}{nuevoJuego(k,v,r)}\Comment{$O(N^{2}+|\Sigma|K+FK)$}
+        \State\asignar{res.jugadoresConectados}{0}
+        \State\asignar{res.jugadoresEsperados}{k}
+        \State\asignar{res.configuraci\acute{o}n}{\langle v,r\rangle}
+        \State\asignar{res.notificaciones}{\textsc{CrearArreglo}(k)}
+        \State\Return$res$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defunv{iConectar}{\Inout{s}{servidor}}
+    \begin{algorithmic}[1]
+        \State\asignar{s.notificaciones[s.jugadoresConectados]}{\textsc{Vacía}()}
+        \State$s.jugadoresConectados++$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iClientesEsperados}{\In{s}{servidor\_estr}}{nat}
+    \begin{algorithmic}[1]
+        \State\Return$s.jugadoresEsperados$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iClientesConectados}{\In{s}{servidor\_estr}}{nat}
+    \begin{algorithmic}[1]
+        \State\Return$s.jugadoresConectados$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iPartida}{\In{s}{servidor\_estr}}{juego}
+    \begin{algorithmic}[1]
+        \State\Return$s.juego$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iEmpezó}{\In{s}{servidor\_estr}}{bool}
+    \begin{algorithmic}[1]
+        \State\Return$s.jugadoresEsperados=s.jugadoresConectados$
+    \end{algorithmic}
+\end{algorithm}
 \newpage
 
 %%% Local Variables:

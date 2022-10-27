@@ -1,16 +1,19 @@
 \section{Módulo Juego}
 \begin{interfaz}{\subsection{Interfaz}}
   \seExplica{Juego}{juego}\\\\
-  \usa{\falta}
+  \usa{Variante, Cola, Letra, Ocurrencia, ¿Lista?}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoJuego}
-    {\In{k}{nat}, \In{v}{variante}, \In{r}{pila(letra)}}{juego}
+    {\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{juego}
     [$tama\tilde{n}o(r)\geq tama\tilde{n}oTablero(v)*tama\tilde{n}oTablero(v)+k*\#fichas(v)\land k>0$]
     {$res \igobs nuevoJuego(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
     [Dada una cantidad de jugadores, una variante de juego y un repositorio de fichas, se inicia un nuevo juego con el tablero vacío.]
-    [\falta]\\
+    [
+    $v:\texttt{variante}$ tiene referencia \textbf{no} modificable.\\
+    \-\hspace{5em}$r:\texttt{cola(letra)}$ tiene referencia modificable.
+    ]\\
 
     \noindent\InterfazFuncion{jugadaVálida?}
     {\In{j}{juego}, \In{o}{occurrencia}}{bool}
@@ -18,7 +21,7 @@
     {$res\igobs jugadaV\acute{a}lida?(j,o)$}
     [$O(\Lmax^{2})$]
     [Determina si una jugada es válida.]
-    [\falta]\\
+    [Se pasa $o:\texttt{ocurrencia}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{ubicar}
     {\Inout{j}{juego}, \In{o}{occurrencia}}{}
@@ -26,7 +29,7 @@
     {$j\igobs ubicar(J_{0},o)$}
     [$O(m)$, donde $m$ es el número de fichas que se ubican.]
     [Ubica un conjunto de fichas en el tablero.]
-    [\falta]\\
+    [Se pasa $o:\texttt{ocurrencia}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{variante}
     {\In{j}{juego}}{variante}
@@ -34,23 +37,21 @@
     {$res\igobs variante(j)$}
     [$O(1)$]
     [Obtiene información sobre la variante del juego.]
-    [\falta]\\
+    [Se devuelve $res:\texttt{variante}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{turno}
     {\In{j}{juego}}{nat}
     [true]
     {$res\igobs turno(j)$}
     [$O(1)$]
-    [Obtiene al jugador del turno actual.]
-    [\falta]\\
+    [Obtiene al jugador del turno actual.]\\
 
     \noindent\InterfazFuncion{tiempo}
     {\In{j}{juego}}{nat}
     [true]
     {$res$ es igual a la cantidad de generadores ``ubicar'' de $j$}
     [$O(1)$]
-    [Obtiene la cantidad de jugadas totales que se hicieron desde que empezó el juego.]
-    [\falta]\\
+    [Obtiene la cantidad de jugadas totales que se hicieron desde que empezó el juego.]\\
 
     \noindent\InterfazFuncion{puntaje}
     {\In{j}{juego}, \In{i}{nat}}{nat}
@@ -58,48 +59,42 @@
     {$res\igobs puntaje(j,i)$}
     [$O(1+m\cdot \Lmax)$, donde $m$ es la cantidad de fichas que ubicó el
 jugador desde la última vez que se invocó a esta operación.]
-    [Obtiene el puntaje de un jugador.]
-    [\falta]\\
+    [Obtiene el puntaje de un jugador.]\\
 
     \noindent\InterfazFuncion{enTablero?}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{bool}
     [true]
     {$res\igobs enTablero?(tablero(J),i,j)$}
     [$O(1)$]
-    [Determina si una coordenada $(i,j)$ está en el rango del tablero.]
-    [\falta]\\
+    [Determina si una coordenada $(i,j)$ está en el rango del tablero.]\\
 
     \noindent\InterfazFuncion{hayFicha?}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{bool}
     [$enTablero?(tablero(J),i,j)$]
     {$res\igobs hayLetra?(tablero(J),i,j)$}
     [$O(1)$]
-    [Determina si una celda del tablero dada una coordenada $(i,j)$ está ocupada por una letra.]
-    [\falta]\\
+    [Determina si una celda del tablero dada una coordenada $(i,j)$ está ocupada por una letra.]\\
 
     \noindent\InterfazFuncion{ficha}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{letra}
     [$enTablero?(tablero(J),i,j)\yluego hayLetra?(tablero(J),i,j)$]
     {$res\igobs letra(tablero(J),i,j)$}
     [$O(1)$]
-    [Obtiene el contenido de una celda del tablero dada una coordenada $(i,j)$.]
-    [\falta]\\
+    [Obtiene el contenido de una celda del tablero dada una coordenada $(i,j)$.]\\
 
     \noindent\InterfazFuncion{tiempoFicha}
     {\In{J}{juego}, \In{i}{nat}, \In{j}{nat}}{nat}
     [$enTablero?(tablero(J),i,j)\yluego hayLetra?(tablero(J),i,j)$]
     {$res$ es igual a la cantidad de generadores ``ubicar'' de j desde que empezó el juego hasta que hubo un ``ubicar'' con una ocurrencia que contenía esa coordenada.}
     [$O(1)$]
-    [Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada $(i,j)$.]
-    [\falta]\\
+    [Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada $(i,j)$.]\\
 
     \noindent\InterfazFuncion{\#letraTieneJugador}
     {\In{j}{juego}, \In{x}{letra}, \In{i}{nat}}{nat}
     [$i < \#jugadores(j)$]
     {$res\igobs \#(x,fichas(j,i))$}
     [$O(1)$]
-    [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]
-    [\falta]\\
+    [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]\\
 
   \end{operaciones}
 \end{interfaz}
@@ -114,7 +109,7 @@ jugador desde la última vez que se invocó a esta operación.]
   \tupItem{tablero}{array\_dimensionable(array\_dimensionable(puntero(tupla(letra,nat))))}\\
   \tupItem{jugadores}{array\_dimensionable(jugador)}\\
   \tupItem{tiempo}{nat}\\
-  \tupItem{repositorio}{pila(letra)}\\
+  \tupItem{repositorio}{cola(letra)}\\
   \tupItem{variante}{variante}
 \end{adjustwidth}\ \ \ \ \ \ \
 \end{Tupla}
@@ -258,9 +253,9 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
     \State\asignar{res.repositorio}{r}
     \State\asignar{res.tiempo}{0}
     \State\asignar{filas}{\textsc{CrearArreglo}(n)}
-    \For{$columnas\in filas$}\Comment{$O(N)$}
+    \For{$columnas\in filas$}\Comment{$O(N*(N+N))=O(N^{2})$}
         \State\asignar{columnas}{\textsc{CrearArreglo}(n)}
-        \For{$celda\in columnas$}\Comment{$O(N)$}
+        \For{$celda\in columnas$}
           \State\asignar{celda}{\textsc{NULL}}
         \EndFor
     \EndFor
@@ -268,7 +263,7 @@ $puntajeDeOcurrenciaEnTiempo(e,i,k)$
     \For{$jugador\in res.jugadores$}\Comment{$O(K)$}
         \State\asignar{jugador.puntaje}{0}
         \State\asignar{jugador.historial}{\textsc{Vacía()}}
-        \State\asignar{jugador.tiemposDeJugadasVacias}{\textsc{Vacía()}}
+        \State\asignar{jugador.historialSinVacias}{\textsc{Vacía()}}
         \State\asignar{jugador.jugadasSinCalcularPuntaje}{0}
         \State // Por cada jugador le damos su primer mazo de fichas del repositorio
         \State\asignar{jugador.cantFichasPorLetra}{\textsc{CrearArreglo}(\textsc{dom}())}
@@ -605,7 +600,6 @@ Justificación de complejidad:
     \State\Return{$\textsc{palabraLegítima?}(e.variante,palabra')$}\Comment$O(\Lmax)$
   \end{algorithmic}
 \end{algorithm}
-\subsection{Servicios usados}
 \newpage
 
 %%% Local Variables:
