@@ -20,9 +20,9 @@
     [\falta]\\
 
     \noindent\InterfazFuncion{consultar}
-    {\Inout{s}{servidor}, \In{cid}{nat}}{}
+    {\Inout{s}{servidor}, \In{cid}{nat}}{cola(notif)}
     [$cid\leq \#conectados(s) \land s\igobs S_{0}$]
-    {$s\igobs consultar(S_{0},cid)$}
+    {$s\igobs consultar(S_{0},cid)\land res\igobs notificaciones(S_{0},cid)$}
     [$O(n)$, donde $n$ es la cantidad de mensajes en la cola de dicho cliente.]
     [Consulta la cola de notificaciones de un cliente (lo cual vacía dicha cola).]
     [\falta]\\
@@ -31,7 +31,7 @@
     {\Inout{s}{servidor}, \In{cid}{nat}, \In{o}{ocurrencia}}{}
     [$cid\leq \#conectados(s) \land s\igobs S_{0}$]
     {$s\igobs recibirMensaje(S_{0},cid,o)$}
-    [\falta]
+    [$O(m\cdot\Lmax^{2}+|\Sigma|K+FK)$]
     [Recibe un mensaje de un cliente.]
     [\falta]\\
 
@@ -88,6 +88,13 @@
 \subsubsection{Invariante de Representación}
 
 \subsubsection{Función de Abstracción}
+\Abs[servidor\_estr]{servidor}[e]{S}{$
+  \#esperados(S)\igobs e.jugadoresEsperados\land\\
+  \#conectados(S)\igobs e.jugadoresConectados\land\\
+  configuraci\acute{o}n(S)\igobs e.configuraci\acute{o}n\land\\
+  juego(S)\igobs e.juego\yluego\\
+  (\forall i:\texttt{nat})(i<\#conectados(S)\impluego notificaciones(S,i)\igobs e.notificaciones[i])
+$}
 
 \subsubsection{Algoritmos}
 
@@ -99,6 +106,9 @@
         \State\asignar{res.jugadoresEsperados}{k}
         \State\asignar{res.configuraci\acute{o}n}{\langle v,r\rangle}
         \State\asignar{res.notificaciones}{\textsc{CrearArreglo}(k)}
+        \For{$notif\in res.notificaciones$}
+            \State\asignar{notif}{\textsc{Vacía}()}
+        \EndFor
         \State\Return$res$
     \end{algorithmic}
 \end{algorithm}
@@ -106,8 +116,14 @@
 \begin{algorithm}[H]
     \defunv{iConectar}{\Inout{s}{servidor}}
     \begin{algorithmic}[1]
-        \State\asignar{s.notificaciones[s.jugadoresConectados]}{\textsc{Vacía}()}
+        \State$\textsc{Encolar}(s.notificaciones[s.jugadoresConectados],\textsc{IdCliente}(s.jugadoresConectados))$
         \State$s.jugadoresConectados++$
+        \If{$\textsc{empezó?}(s)$}
+            \For{$notif\in s.notificaciones$}
+                \State$\textsc{Encolar}(notif,\textsc{Empezar}(\textsc{tamañoTablero}(s.configuraci\acute{o}n.variante)))$
+                \State$\textsc{Encolar}(notif,\textsc{TurnoDe}(0))$
+            \EndFor
+        \EndIf
     \end{algorithmic}
 \end{algorithm}
 
@@ -115,6 +131,49 @@
     \defun{iClientesEsperados}{\In{s}{servidor\_estr}}{nat}
     \begin{algorithmic}[1]
         \State\Return$s.jugadoresEsperados$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iConsultar}{\Inout{s}{servidor\_estr}, \In{cid}{nat}}{cola(notif)}
+    \begin{algorithmic}[1]
+        \State\asignar{res}{\textsc{Copiar}(s.notificaciones[cid])}\Comment{$\Theta(\sum_{i=1}^{n}copy(c[i]))=\Theta(\sum_{i=1}^{n}1)=\Theta(n)\in O(n)$, con $c=s.notificaciones[cid]$}
+        \State\asignar{s.notificaciones[cid]}{\textsc{Vacía}()}\Comment$O(1)$
+        \State\Return$res$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defunv{iRecibir}{\Inout{s}{servidor\_estr}, \In{cid}{nat}, \In{o}{ocurrencia}}
+    \begin{algorithmic}[1]
+        \If{$\textsc{jugadaVálida?}(s.juego,o)$}
+            \State\asignar{\#fichasRepuestas}{\textsc{fichasPorJugador}(s.configuraci\acute{o}n.variante)-\#o}
+            \State\asignar{repoViejo}{copy(s.configuraci\acute{o}n.repositorio)}
+            \State\asignar{repuestos}{\textsc{Vacío}()}\Comment{Asumimos que \texttt{multiconj(letra)} es un Diccionario Lineal}
+            \For{$1\dots\#fichasRepuestas$}
+                \State\asignar{ficha}{\textsc{Proximo}(repoViejo)}
+                \If{$\textsc{Definido?}(repuestos,ficha)$}
+                    \State$\textsc{Definir}(repuestos,ficha,\textsc{Significado}(repuestos,ficha)+1)$
+                \Else
+                    \State$\textsc{Definir}(repuestos,ficha,1)$
+                \EndIf
+                \State$\textsc{Desencolar}(repoViejo)$
+            \EndFor
+            \State\asignar{puntajeViejo}{\textsc{puntaje}(s.juego,cid)}
+            \State$\textsc{ubicar}(s.juego,o)$
+            \State\asignar{puntajeNuevo}{\textsc{puntaje}(s.juego,cid)}
+            \For{$0\leq i<tam(s.notificaciones)$}
+                \State\asignar{notif}{s.notificaciones[i]}
+                \State$\textsc{Encolar}(notif,\textsc{Ubicar}(cid,o)$\Comment{\textsc{Ubicar} se refiere al item de notificación}
+                \State$\textsc{Encolar}(notif,\textsc{SumaPuntos}(cid,puntajeNuevo-puntajeViejo)$
+                \If{$i=cid$}
+                    \State$\textsc{Encolar}(notif,\textsc{Reponer}(repuestos))$
+                \EndIf
+                \State$\textsc{Encolar}(notif,\textsc{TurnoDe}(\textsc{turno}(s.juego))$
+            \EndFor
+        \Else
+            \State$\textsc{Encolar}(s.notificaciones[cid],\textsc{Mal})$
+        \EndIf
     \end{algorithmic}
 \end{algorithm}
 

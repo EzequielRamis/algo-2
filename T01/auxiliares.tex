@@ -285,7 +285,7 @@ $}
 
 \subsubsection*{Función de Abstracción}
 \Abs[trie\_estr]{conj(secu(letra))}[t]{C}{$
-  <>\in C\implies C\igobs palabrasDeTrie(t)\oluego\\
+  <>\ \in C\implies C\igobs palabrasDeTrie(t)\oluego\\
   C\igobs palabrasDeTrie(t)-\{<>\}
 $}
 
@@ -344,10 +344,12 @@ $\end{adjustwidth}
         \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
       \EndWhile
       \While{\textsc{HaySiguiente}(pIt)}
-        \State\asignar{nodo}{\&\textsc{Vacío}()}
         \State\asignar{letra}{\textsc{Siguiente}(pIt)}
+        \State\asignar{nodo}{\&\textsc{Vacío}()}
         \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
+        \State$\textsc{Avanzar}(pIt)$
       \EndWhile
+      \State\asignar{nodo}{\&\textsc{Vacío}()}
       \State\asignar{(*nodo).fin?}{true}
     \EndIf
   \end{algorithmic}
@@ -360,7 +362,7 @@ $\end{adjustwidth}
         return t.fin
       else
         nodo <- t[ord(pit.sig)]
-        while nodo != null
+        while pit.haySig and nodo != null
           letra <- pit.sig
           nodo <- (*nodo)[ord(letra)]
         return !pit.haySig and (*nodo).fin
@@ -370,11 +372,12 @@ $\end{adjustwidth}
       \State\Return$t.fin?$
     \Else
       \State\asignar{nodo}{t.hijos[\textsc{ord}(\textsc{Siguiente}(pIt))]}
-      \While{$nodo\neq\textsc{NULL}$}
+      \While{$\textsc{HaySiguiente}(pIt)\land nodo\neq\textsc{NULL}$}
         \State\asignar{letra}{\textsc{Siguiente}(pIt)}
         \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
+        \State$\textsc{Avanzar}(pIt)$
       \EndWhile
-      \State\Return$\lnot\textsc{HaySiguiente}(pIt)\land (*nodo).fin?$
+      \State\Return$\lnot\textsc{HaySiguiente}(pIt)\land(nodo\neq\textsc{NULL}\yluego(*nodo).fin?)$
     \EndIf
   \end{algorithmic}
 \end{algorithm}
