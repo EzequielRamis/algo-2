@@ -53,7 +53,7 @@
 
     \noindent\InterfazFuncion{partida}
     {\In{s}{servidor}}{juego}
-    [true]
+    [$empez\acute{o}?(s)$]
     {$res\igobs juego(s)$}
     [$O(1)$]
     [Obtiene el juego que se está jugando en el servidor.]
@@ -79,32 +79,38 @@
   \tupItem{juego}{juego}\\
   \tupItem{jugadoresConectados}{nat}\\
   \tupItem{jugadoresEsperados}{nat}\\
-  \tupItem{configuración}{tupla(\textrm{$variante:$} variante\textrm{$,\ repositorio:$} cola(letra))}\\
   \tupItem{notificaciones}{array\_dimensionable(cola(notif))}
 \end{adjustwidth}\ \ \ \ \ \ \
 \end{Tupla}
 \end{Estructura}
 
 \subsubsection{Invariante de Representación}
+\Rep[servidor\_estr]{$
+    \#jugadores(e.juego) = e.jugadoresEsperados\land\\
+    e.jugadoresConectados \leq e.jugadoresEsperados\land\\
+    tam(e.notificaciones) = e.jugadoresEsperados
+ $
+ }
 
 \subsubsection{Función de Abstracción}
 \Abs[servidor\_estr]{servidor}[e]{S}{$
-  \#esperados(S)\igobs e.jugadoresEsperados\land\\
-  \#conectados(S)\igobs e.jugadoresConectados\land\\
-  configuraci\acute{o}n(S)\igobs e.configuraci\acute{o}n\land\\
-  juego(S)\igobs e.juego\yluego\\
-  (\forall i:\texttt{nat})(i<\#conectados(S)\impluego notificaciones(S,i)\igobs e.notificaciones[i])
-$}
+  e.jugadoresEsperados\igobs \#esperados(S)\land\\
+  e.jugadoresConectados\igobs \#conectados(S)\land\\
+  e.juego\igobs juego(S)\land\\
+  \langle variante(e.juego), repositorio(e.juego)\rangle\igobs configuracion(S)\land\\
+  (\forall i:\texttt{nat})(i<\#esperados(S)\impluego
+  e.notificaciones[i] \igobs notificaciones(S, i))
+  $
+}
 
 \subsubsection{Algoritmos}
 
 \begin{algorithm}[H]
     \defun{iNuevoServidor}{\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{servidor\_estr}
     \begin{algorithmic}[1]
-        \State\asignar{res.juego}{nuevoJuego(k,v,r)}\Comment{$O(N^{2}+|\Sigma|K+FK)$}
+        \State\asignar{res.juego}{\textsc{nuevoJuego}(k,v,r)}\Comment{$O(N^{2}+|\Sigma|K+FK)$}
         \State\asignar{res.jugadoresConectados}{0}
         \State\asignar{res.jugadoresEsperados}{k}
-        \State\asignar{res.configuraci\acute{o}n}{\langle v,r\rangle}
         \State\asignar{res.notificaciones}{\textsc{CrearArreglo}(k)}
         \For{$notif\in res.notificaciones$}
             \State\asignar{notif}{\textsc{Vacía}()}
@@ -120,7 +126,7 @@ $}
         \State$s.jugadoresConectados++$
         \If{$\textsc{empezó?}(s)$}
             \For{$notif\in s.notificaciones$}
-                \State$\textsc{Encolar}(notif,\textsc{Empezar}(\textsc{tamañoTablero}(s.configuraci\acute{o}n.variante)))$
+                \State$\textsc{Encolar}(notif,\textsc{Empezar}(\textsc{tamañoTablero}(\textsc{variante}(s.juego)))$
                 \State$\textsc{Encolar}(notif,\textsc{TurnoDe}(0))$
             \EndFor
         \EndIf
@@ -128,14 +134,7 @@ $}
 \end{algorithm}
 
 \begin{algorithm}[H]
-    \defun{iClientesEsperados}{\In{s}{servidor\_estr}}{nat}
-    \begin{algorithmic}[1]
-        \State\Return$s.jugadoresEsperados$
-    \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-    \defun{iConsultar}{\Inout{s}{servidor\_estr}, \In{cid}{nat}}{cola(notif)}
+    \defun{iConsultar}{\Inout{s}{servidor}, \In{cid}{nat}}{cola(notif)}
     \begin{algorithmic}[1]
         \State\asignar{res}{\textsc{Copiar}(s.notificaciones[cid])}\Comment{$\Theta(\sum_{i=1}^{n}copy(c[i]))=\Theta(\sum_{i=1}^{n}1)=\Theta(n)\in O(n)$, con $c=s.notificaciones[cid]$}
         \State\asignar{s.notificaciones[cid]}{\textsc{Vacía}()}\Comment$O(1)$
@@ -146,8 +145,8 @@ $}
 \begin{algorithm}[H]
     \defunv{iRecibir}{\Inout{s}{servidor\_estr}, \In{cid}{nat}, \In{o}{ocurrencia}}
     \begin{algorithmic}[1]
-        \If{$\textsc{jugadaVálida?}(s.juego,o)$}
-            \State\asignar{\#fichasRepuestas}{\textsc{fichasPorJugador}(s.configuraci\acute{o}n.variante)-\#o}
+        \If{$\textsc{empezó?}(s)\yluego\textsc{turno}(s.juego)=cid \yluego \textsc{jugadaVálida?}(s.juego, o)$}
+                    \State\asignar{\#fichasRepuestas}{\textsc{fichasPorJugador}(s.configuraci\acute{o}n.variante)-\#o}
             \State\asignar{repoViejo}{copy(s.configuraci\acute{o}n.repositorio)}
             \State\asignar{repuestos}{\textsc{Vacío}()}\Comment{Asumimos que \texttt{multiconj(letra)} es un Diccionario Lineal}
             \For{$1\dots\#fichasRepuestas$}
@@ -171,9 +170,34 @@ $}
                 \EndIf
                 \State$\textsc{Encolar}(notif,\textsc{TurnoDe}(\textsc{turno}(s.juego))$
             \EndFor
+            \iffalse
+            \If{\textsc{Cardinal}(o)$>0$}
+                \State\asignar{nuevasLetras}{\textsc{CrearArreglo}(\textsc{Cardinal}(o))}
+                \For{$1\leq i < $\textsc{ Cardinal}(o)}
+                    \State\asignar{letra}{\textsc{Desapilar}(s.juego.repositorio)}
+                    \State\textsc{AgregarAtras}($nuevasLetras$, $letra$)
+                \EndFor
+                \For{$letra\in nuevasLetras$}
+                    \State{\textsc{Apilar}(letra, s.juego.repositorio)}
+                \EndFor
+                \State\textsc{Encolar}(\textsc{Reponer}($nuevasLetras$), $s.notificaciones[cid]$)
+            \EndIf
+            \State\textsc{ubicar}(s.juego, o)
+            \For{$1\leq i < s.jugadoresConectados$}
+               \State\textsc{Encolar}(\textsc{Ubicar}($juego.variante.n$), $s.notificaciones[i]$)
+               \State\textsc{Encolar}(\textsc{TurnoDe}(\textsc{Turno}($s.juego$)), $s.notificaciones[i]$)
+            \EndFor
+            \fi
         \Else
-            \State$\textsc{Encolar}(s.notificaciones[cid],\textsc{Mal})$
+            \State$\textsc{Encolar}(s.notificaciones[cid], \textsc{Mal})$
         \EndIf
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \defun{iClientesEsperados}{\In{s}{servidor\_estr}}{nat}
+    \begin{algorithmic}[1]
+        \State\Return$s.jugadoresEsperados$
     \end{algorithmic}
 \end{algorithm}
 
@@ -192,7 +216,7 @@ $}
 \end{algorithm}
 
 \begin{algorithm}[H]
-    \defun{iEmpezó}{\In{s}{servidor\_estr}}{bool}
+    \defun{iEmpezó?}{\In{s}{servidor\_estr}}{bool}
     \begin{algorithmic}[1]
         \State\Return$s.jugadoresEsperados=s.jugadoresConectados$
     \end{algorithmic}
