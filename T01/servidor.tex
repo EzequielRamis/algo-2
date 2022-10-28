@@ -1,7 +1,7 @@
 \section{Módulo Servidor}
 \begin{interfaz}{\subsection{Interfaz}}
   \seExplica{Servidor}{servidor}\\\\
-  \usa{\falta}\par\noindent
+  \usa{Variante, Cola, Letra, Ocurrencia, Juego, Notificación}\par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoServidor}
     {\In{k}{nat}, \In{v}{variante}, \In{r}{cola(letra)}}{servidor}
@@ -9,15 +9,17 @@
     {$res \igobs nuevoServidor(k,v,r)$}
     [$O(N^{2}+|\Sigma|K+FK)$]
     [Dada una cantidad de jugadores y una variante de juego, se inicia un nuevo servidor y una nueva partida de juego.]
-    [\falta]\\
+    [
+    $v:\texttt{variante}$ tiene referencia \textbf{no} modificable.\\
+    \-\hspace{5em}$r:\texttt{cola(letra)}$ tiene referencia modificable.
+    ]\\
 
     \noindent\InterfazFuncion{conectar}
     {\Inout{s}{servidor}}{}
     [$\lnot empez\acute{o}?(s) \land s\igobs S_{0}$]
     {$s\igobs conectarCliente(S_{0})$}
     [$O(1)$]
-    [Conecta un cliente a un servidor.]
-    [\falta]\\
+    [Conecta un cliente a un servidor.]\\
 
     \noindent\InterfazFuncion{consultar}
     {\Inout{s}{servidor}, \In{cid}{nat}}{cola(notif)}
@@ -25,7 +27,7 @@
     {$s\igobs consultar(S_{0},cid)\land res\igobs notificaciones(S_{0},cid)$}
     [$O(n)$, donde $n$ es la cantidad de mensajes en la cola de dicho cliente.]
     [Consulta la cola de notificaciones de un cliente (lo cual vacía dicha cola).]
-    [\falta]\\
+    [Se devuelve $res:\texttt{cola(notif)}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{recibir}
     {\Inout{s}{servidor}, \In{cid}{nat}, \In{o}{ocurrencia}}{}
@@ -33,23 +35,21 @@
     {$s\igobs recibirMensaje(S_{0},cid,o)$}
     [$O(m\cdot\Lmax^{2}+|\Sigma|K+FK)$]
     [Recibe un mensaje de un cliente.]
-    [\falta]\\
+    [Se pasa $o:\texttt{ocurrencia}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{clientesEsperados}
     {\In{s}{servidor}}{nat}
     [true]
     {$res\igobs \#esperados(s)$}
     [$O(1)$]
-    [Obtiene el número de clientes esperados.]
-    [\falta]\\
+    [Obtiene el número de clientes esperados.]\\
 
     \noindent\InterfazFuncion{clientesConectados}
     {\In{s}{servidor}}{nat}
     [true]
     {$res\igobs \#conectados(s)$}
     [$O(1)$]
-    [Obtiene el número de clientes conectados.]
-    [\falta]\\
+    [Obtiene el número de clientes conectados.]\\
 
     \noindent\InterfazFuncion{partida}
     {\In{s}{servidor}}{juego}
@@ -57,7 +57,7 @@
     {$res\igobs juego(s)$}
     [$O(1)$]
     [Obtiene el juego que se está jugando en el servidor.]
-    [\falta]\\
+    [Se devuelve $res:\texttt{juego}$ como referencia \textbf{no} modificable.]\\
 
     \noindent\InterfazFuncion{empezó?}
     {\In{s}{servidor}}{bool}
@@ -65,7 +65,6 @@
     {$res\igobs empez\acute{o}?(s)$}
     [$O(1)$]
     [Determina si la partida empezó.]
-    [\falta]\\
   \end{operaciones}
 \end{interfaz}
 
@@ -120,7 +119,7 @@
 \end{algorithm}
 
 \begin{algorithm}[H]
-    \defunv{iConectar}{\Inout{s}{servidor}}
+    \defunv{iConectar}{\Inout{s}{servidor\_estr}}
     \begin{algorithmic}[1]
         \State$\textsc{Encolar}(s.notificaciones[s.jugadoresConectados],\textsc{IdCliente}(s.jugadoresConectados))$
         \State$s.jugadoresConectados++$
@@ -134,7 +133,7 @@
 \end{algorithm}
 
 \begin{algorithm}[H]
-    \defun{iConsultar}{\Inout{s}{servidor}, \In{cid}{nat}}{cola(notif)}
+    \defun{iConsultar}{\Inout{s}{servidor\_estr}, \In{cid}{nat}}{cola(notif)}
     \begin{algorithmic}[1]
         \State\asignar{res}{\textsc{Copiar}(s.notificaciones[cid])}\Comment{$\Theta(\sum_{i=1}^{n}copy(c[i]))=\Theta(\sum_{i=1}^{n}1)=\Theta(n)\in O(n)$, con $c=s.notificaciones[cid]$}
         \State\asignar{s.notificaciones[cid]}{\textsc{Vacía}()}\Comment$O(1)$
@@ -148,14 +147,20 @@
         \If{$\textsc{empezó?}(s)\yluego\textsc{turno}(s.juego)=cid \yluego \textsc{jugadaVálida?}(s.juego, o)$}
                     \State\asignar{\#fichasRepuestas}{\textsc{fichasPorJugador}(s.configuraci\acute{o}n.variante)-\#o}
             \State\asignar{repoViejo}{copy(s.configuraci\acute{o}n.repositorio)}
-            \State\asignar{repuestos}{\textsc{Vacío}()}\Comment{Asumimos que \texttt{multiconj(letra)} es un Diccionario Lineal}
+            \State\asignar{repuestos}{\textsc{CrearArreglo}(\textsc{dom}())}\Comment{Asumimos que \texttt{multiconj(letra)} es un Arreglo Dimensionable del tamaño de dominio de Letra}
+            \For{$cant\in repuestos$}
+                \State\asignar{cant}{0}
+            \EndFor
             \For{$1\dots\#fichasRepuestas$}
                 \State\asignar{ficha}{\textsc{Proximo}(repoViejo)}
+                \State$repuestos[\textsc{ord}(ficha)]++$
+                \iffalse
                 \If{$\textsc{Definido?}(repuestos,ficha)$}
                     \State$\textsc{Definir}(repuestos,ficha,\textsc{Significado}(repuestos,ficha)+1)$
                 \Else
                     \State$\textsc{Definir}(repuestos,ficha,1)$
                 \EndIf
+                \fi
                 \State$\textsc{Desencolar}(repoViejo)$
             \EndFor
             \State\asignar{puntajeViejo}{\textsc{puntaje}(s.juego,cid)}
