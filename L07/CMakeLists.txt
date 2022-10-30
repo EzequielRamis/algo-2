@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(solucion)
 
 set(CMAKE_CXX_STANDARD 14)
-# https://github.com/NixOS/nixpkgs/issues/194929
-set(NIX_CC /dev/null)
 
 # Algunos flags para pasar al compilador (gnu++11 en vez de c++11 para que sea cross-plat)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=gnu++11 -ggdb3 -g")
@@ -20,11 +18,11 @@ add_executable(ej4 tests/test_templates.cpp)
 add_executable(ej5 tests/test_templates.cpp tests/test_diccionario.cpp)
 add_executable(ej6 tests/test_templates.cpp tests/test_diccionario.cpp)
 add_executable(ej7 tests/test_templates.cpp tests/test_diccionario.cpp
-                   tests/test_multiconjunto.cpp)
+        tests/test_multiconjunto.cpp)
 add_executable(ej8 tests/test_templates.cpp tests/test_diccionario.cpp
-                   tests/test_multiconjunto.cpp)
+        tests/test_multiconjunto.cpp)
 add_executable(ej9 tests/test_templates.cpp tests/test_diccionario.cpp
-                   tests/test_multiconjunto.cpp)
+        tests/test_multiconjunto.cpp)
 
 # Definiciones por target
 target_compile_definitions(ej1 PUBLIC EJ=1)
