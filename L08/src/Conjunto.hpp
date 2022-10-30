@@ -9,7 +9,7 @@ Conjunto<T>::~Conjunto() {
 
 template<class T>
 bool Conjunto<T>::pertenece(const T &clave) const {
-    Nodo *n = irHastaValor(_raiz, clave);
+    Nodo *n = irANodo(_raiz, clave);
     if (n == nullptr)
         return false;
     return n->valor == clave;
@@ -17,7 +17,7 @@ bool Conjunto<T>::pertenece(const T &clave) const {
 
 template<class T>
 void Conjunto<T>::insertar(const T &clave) {
-    Nodo *n = irHastaValor(_raiz, clave);
+    Nodo *n = irANodo(_raiz, clave);
     if (n == nullptr) {
         _raiz = new Nodo(clave);
         _cardinal++;
@@ -35,40 +35,106 @@ void Conjunto<T>::insertar(const T &clave) {
 
 template<class T>
 void Conjunto<T>::remover(const T &clave) {
-    Nodo *n = irHastaValor(_raiz, clave);
+    Nodo *n = irANodo(_raiz, clave);
     if (n != nullptr && n->valor == clave) {
         Nodo *padre = n->padre;
-        // Caso 0: n es la raíz
-        if (padre == nullptr) {
-            _raiz = nullptr;
-            delete n;
-        } else {
-            // Caso 1: n es una hoja
-            if (n->izq == nullptr && n->der == nullptr) {
-                if (padre != nullptr) {
-                    if (padre->izq == n)
-                        padre->izq == nullptr;
-                    else
-                        padre->der == nullptr;
-                }
-                delete n;
-            }
-                // Caso 2: n tiene un hijo
-            else if ((n->izq == nullptr) != (n->der == nullptr)) {
-                if (n->izq != nullptr)
-                    padre->izq = n->izq;
+        // Caso 1: n es una hoja
+        if (n->izq == nullptr && n->der == nullptr) {
+            if (padre != nullptr) {
+                if (padre->izq == n)
+                    padre->izq == nullptr;
                 else
-                    padre->der = n->der;
-                delete n;
+                    padre->der == nullptr;
+            } else
+                _raiz = nullptr;
+            delete n;
+        }
+            // Caso 2: n tiene un hijo
+        else if ((n->izq == nullptr) != (n->der == nullptr)) {
+            if (padre != nullptr) {
+                if (n->izq != nullptr) {
+                    n->izq->padre = padre;
+                    if (padre->izq == n)
+                        padre->izq = n->izq;
+                    else
+                        padre->der = n->izq;
+                } else {
+                    n->der->padre = padre;
+                    if (padre->izq == n)
+                        padre->izq = n->der;
+                    else
+                        padre->der = n->der;
+                }
+            } else {
+                if (n->izq != nullptr) {
+                    _raiz = n->izq;
+                    n->izq->padre = nullptr;
+                } else {
+                    _raiz = n->der;
+                    n->der->padre = nullptr;
+                }
             }
-                // Caso 3: n tiene dos hijos
+            delete n;
+        }
+            // Caso 3: n tiene dos hijos
+        else {
+            Nodo *inmediato = siguienteNodo(clave);
+            n->valor = inmediato->valor;
+            /*// Caso 3.1: el inmediato es hoja
+            if (inmediato->der == nullptr) {
+                if (inmediato->padre == n) {
+                    n->der = nullptr;
+                } else {
+                    inmediato->padre->izq = nullptr;
+                }
+            }
+                // Caso 3.2: el inmediato tiene una hoja (derecha)
             else {
-                Nodo *inmediato = siguienteNodo(clave);
-                n->valor = inmediato->valor;
-                n->padre = inmediato->padre;
-                inmediato->padre->izq = n;
-                delete inmediato;
+                if (inmediato->padre == n) {
+                    n->der = inmediato->der;
+                    inmediato->der->padre = n;
+                } else {
+                    inmediato->padre->izq = inmediato->der;
+                    inmediato->der->padre = inmediato->padre;
+                }
             }
+            delete inmediato;*/
+            /*Nodo *inmediatoPadre = inmediato->padre;
+            // Caso 3.1: inmediato es una hoja
+            if (inmediato->der == nullptr) {
+                if (inmediatoPadre != nullptr) {
+                    if (inmediatoPadre->izq == inmediato)
+                        inmediatoPadre->izq == nullptr;
+                    else
+                        inmediatoPadre->der == nullptr;
+                } else {
+                    _raiz = n;
+                    n->padre = nullptr;
+                }
+
+            }
+                // Caso 3.2: inmediato tiene un hijo (derecho)
+            else {
+                if (inmediatoPadre != nullptr) {
+                    inmediato->der->padre = inmediatoPadre;
+                    if (inmediatoPadre->izq == inmediato)
+                        inmediatoPadre->izq = inmediato->der;
+                    else
+                        inmediatoPadre->der = inmediato->der;
+                } else {
+                    _raiz = inmediato->der;
+                    inmediato->der->padre = nullptr;
+                    n->padre = inmediato->der;
+                }
+            }*/
+            if (inmediato->padre != n) {
+                inmediato->padre->izq = inmediato->der;
+                if (inmediato->der != nullptr)
+                    inmediato->der->padre = inmediato->padre;
+            } else {
+                n->der = inmediato->der;
+            }
+            delete inmediato;
         }
         _cardinal--;
     }
@@ -94,19 +160,18 @@ unsigned int Conjunto<T>::cardinal() const {
     return _cardinal;
 }
 
-// Devuelve el nodo con ese valor o su padre si no está.
 template<class T>
-typename Conjunto<T>::Nodo *Conjunto<T>::irHastaValor(Conjunto::Nodo *n, const T &elem) const {
+typename Conjunto<T>::Nodo *Conjunto<T>::irANodo(Conjunto::Nodo *n, const T &elem) const {
     if (n == nullptr || n->valor == elem)
         return n;
     if (n->valor < elem) {
         if (n->der == nullptr)
             return n;
-        return irHastaValor(n->der, elem);
+        return irANodo(n->der, elem);
     } else {
         if (n->izq == nullptr)
             return n;
-        return irHastaValor(n->izq, elem);
+        return irANodo(n->izq, elem);
     }
 }
 
@@ -126,7 +191,7 @@ typename Conjunto<T>::Nodo *Conjunto<T>::maximoDesde(Conjunto::Nodo *n) const {
 
 template<class T>
 typename Conjunto<T>::Nodo *Conjunto<T>::siguienteNodo(const T &clave) {
-    Nodo *n = irHastaValor(_raiz, clave);
+    Nodo *n = irANodo(_raiz, clave);
     if (n->der != nullptr)
         return minimoDesde(n->der);
     Nodo *m = n->padre;

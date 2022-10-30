@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string>
 #include <iostream>
+#include <stack>
 
 using namespace std;
 
@@ -63,14 +64,15 @@ private:
         Nodo *izq;
         // Puntero a la raíz del subárbol derecho.
         Nodo *der;
-        // Puntero al padre del nodo.
+        // Puntero al padre.
         Nodo *padre;
     };
 
     // Puntero a la raíz de nuestro árbol.
     Nodo *_raiz;
 
-    Nodo *irHastaValor(Nodo *n, const T &elem) const;
+    // Devuelve el nodo con ese valor o su padre si no está.
+    Nodo *irANodo(Nodo *n, const T &elem) const;
 
     Nodo *minimoDesde(Nodo *n) const;
 
