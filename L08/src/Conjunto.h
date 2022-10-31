@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <string>
 #include <iostream>
-#include <stack>
 
 using namespace std;
 
@@ -78,7 +77,13 @@ private:
 
     Nodo *maximoDesde(Nodo *n) const;
 
-    Nodo *siguienteNodo(const T &elem);
+    Nodo *siguienteNodo(const T &clave);
+
+    void moverNodo(Nodo *u, Nodo *v);
+
+    void borrarNodos(Nodo *ab);
+
+    void mostrarDesde(std::ostream &, Nodo *n) const;
 };
 
 template<class T>

@@ -13,6 +13,7 @@
             clang
             clang-tools
             cmake
+            valgrind
             libcxx
             bear
             gdb

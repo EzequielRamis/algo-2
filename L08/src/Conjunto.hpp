@@ -4,7 +4,7 @@ Conjunto<T>::Conjunto(): _cardinal(0), _raiz(nullptr) {}
 
 template<class T>
 Conjunto<T>::~Conjunto() {
-    // Completar
+    borrarNodos(_raiz);
 }
 
 template<class T>
@@ -22,13 +22,12 @@ void Conjunto<T>::insertar(const T &clave) {
         _raiz = new Nodo(clave);
         _cardinal++;
     } else if (n->valor != clave) {
-        if (n->valor < clave) {
-            n->der = new Nodo(clave);
-            n->der->padre = n;
-        } else {
-            n->izq = new Nodo(clave);
-            n->izq->padre = n;
-        }
+        Nodo *nuevo = new Nodo(clave);
+        nuevo->padre = n;
+        if (n->valor < clave)
+            n->der = nuevo;
+        else
+            n->izq = nuevo;
         _cardinal++;
     }
 }
@@ -37,105 +36,22 @@ template<class T>
 void Conjunto<T>::remover(const T &clave) {
     Nodo *n = irANodo(_raiz, clave);
     if (n != nullptr && n->valor == clave) {
-        Nodo *padre = n->padre;
-        // Caso 1: n es una hoja
-        if (n->izq == nullptr && n->der == nullptr) {
-            if (padre != nullptr) {
-                if (padre->izq == n)
-                    padre->izq == nullptr;
-                else
-                    padre->der == nullptr;
-            } else
-                _raiz = nullptr;
-            delete n;
-        }
-            // Caso 2: n tiene un hijo
-        else if ((n->izq == nullptr) != (n->der == nullptr)) {
-            if (padre != nullptr) {
-                if (n->izq != nullptr) {
-                    n->izq->padre = padre;
-                    if (padre->izq == n)
-                        padre->izq = n->izq;
-                    else
-                        padre->der = n->izq;
-                } else {
-                    n->der->padre = padre;
-                    if (padre->izq == n)
-                        padre->izq = n->der;
-                    else
-                        padre->der = n->der;
-                }
-            } else {
-                if (n->izq != nullptr) {
-                    _raiz = n->izq;
-                    n->izq->padre = nullptr;
-                } else {
-                    _raiz = n->der;
-                    n->der->padre = nullptr;
-                }
-            }
-            delete n;
-        }
-            // Caso 3: n tiene dos hijos
+        if (n->izq == nullptr)
+            moverNodo(n, n->der);
+        else if (n->der == nullptr)
+            moverNodo(n, n->izq);
         else {
             Nodo *inmediato = siguienteNodo(clave);
-            n->valor = inmediato->valor;
-            /*// Caso 3.1: el inmediato es hoja
-            if (inmediato->der == nullptr) {
-                if (inmediato->padre == n) {
-                    n->der = nullptr;
-                } else {
-                    inmediato->padre->izq = nullptr;
-                }
-            }
-                // Caso 3.2: el inmediato tiene una hoja (derecha)
-            else {
-                if (inmediato->padre == n) {
-                    n->der = inmediato->der;
-                    inmediato->der->padre = n;
-                } else {
-                    inmediato->padre->izq = inmediato->der;
-                    inmediato->der->padre = inmediato->padre;
-                }
-            }
-            delete inmediato;*/
-            /*Nodo *inmediatoPadre = inmediato->padre;
-            // Caso 3.1: inmediato es una hoja
-            if (inmediato->der == nullptr) {
-                if (inmediatoPadre != nullptr) {
-                    if (inmediatoPadre->izq == inmediato)
-                        inmediatoPadre->izq == nullptr;
-                    else
-                        inmediatoPadre->der == nullptr;
-                } else {
-                    _raiz = n;
-                    n->padre = nullptr;
-                }
-
-            }
-                // Caso 3.2: inmediato tiene un hijo (derecho)
-            else {
-                if (inmediatoPadre != nullptr) {
-                    inmediato->der->padre = inmediatoPadre;
-                    if (inmediatoPadre->izq == inmediato)
-                        inmediatoPadre->izq = inmediato->der;
-                    else
-                        inmediatoPadre->der = inmediato->der;
-                } else {
-                    _raiz = inmediato->der;
-                    inmediato->der->padre = nullptr;
-                    n->padre = inmediato->der;
-                }
-            }*/
             if (inmediato->padre != n) {
-                inmediato->padre->izq = inmediato->der;
-                if (inmediato->der != nullptr)
-                    inmediato->der->padre = inmediato->padre;
-            } else {
-                n->der = inmediato->der;
+                moverNodo(inmediato, inmediato->der);
+                inmediato->der = n->der;
+                inmediato->der->padre = inmediato;
             }
-            delete inmediato;
+            moverNodo(n, inmediato);
+            inmediato->izq = n->izq;
+            inmediato->izq->padre = inmediato;
         }
+        delete n;
         _cardinal--;
     }
 }
@@ -203,7 +119,46 @@ typename Conjunto<T>::Nodo *Conjunto<T>::siguienteNodo(const T &clave) {
 }
 
 template<class T>
-void Conjunto<T>::mostrar(std::ostream &) const {
-    assert(false);
+void Conjunto<T>::moverNodo(Conjunto::Nodo *u, Conjunto::Nodo *v) {
+    if (u->padre == nullptr)
+        _raiz = v;
+    else if (u == u->padre->izq)
+        u->padre->izq = v;
+    else
+        u->padre->der = v;
+    if (v != nullptr)
+        v->padre = u->padre;
 }
 
+template<class T>
+void Conjunto<T>::borrarNodos(Conjunto::Nodo *ab) {
+    if (ab != nullptr) {
+        if (ab->izq != nullptr)
+            borrarNodos(ab->izq);
+        if (ab->der != nullptr)
+            borrarNodos(ab->der);
+        delete ab;
+    }
+}
+
+template<class T>
+void Conjunto<T>::mostrar(std::ostream &os) const {
+    os << "{";
+    mostrarDesde(os, _raiz);
+    os << "}";
+}
+
+template<class T>
+void Conjunto<T>::mostrarDesde(std::ostream &os, Conjunto::Nodo *n) const {
+    if (n != nullptr) {
+        if (n->izq != nullptr) {
+            mostrarDesde(os, n->izq);
+            os << ", ";
+        }
+        os << n->valor;
+        if (n->der != nullptr) {
+            os << ", ";
+            mostrarDesde(os, n->der);
+        }
+    }
+}
