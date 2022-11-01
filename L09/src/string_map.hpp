@@ -83,8 +83,11 @@ void string_map<T>::insert(const pair<string, T> &kv) {
 
 template<typename T>
 T &string_map<T>::operator[](const string &clave) {
-    if (count(clave) == 0)
-        insert(make_pair(clave, *new T()));
+    if (count(clave) == 0) {
+        T *v = new T();
+        insert(make_pair(clave, *v));
+        delete v;
+    }
     return at(clave);
 }
 
