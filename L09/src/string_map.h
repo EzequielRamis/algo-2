@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define ASCII_SIZE 256
+
 template<typename T>
 class string_map {
 public:
@@ -18,12 +20,12 @@ public:
     CONSTRUCTOR POR COPIA
     * Construye un diccionario por copia.
     **/
-    string_map(const string_map<T>& aCopiar);
+    string_map(const string_map<T> &aCopiar);
 
     /**
     OPERADOR ASIGNACION
      */
-    string_map& operator=(const string_map& d);
+    string_map &operator=(const string_map &d);
 
     /**
     DESTRUCTOR
@@ -34,7 +36,7 @@ public:
     INSERT 
     * Inserta un par clave, valor en el diccionario
     **/
-    void insert(const pair<string, T>&);
+    void insert(const pair<string, T> &);
 
     /**
     COUNT
@@ -51,8 +53,9 @@ public:
     --PRODUCE ALIASING--
     -- Versión modificable y no modificable
     **/
-    const T& at(const string& key) const;
-    T& at(const string& key);
+    const T &at(const string &key) const;
+
+    T &at(const string &key);
 
     /**
     ERASE
@@ -60,7 +63,7 @@ public:
     * PRE: La clave está definida.
     --PRODUCE ALIASING--
     **/
-    void erase(const string& key);
+    void erase(const string &key);
 
     /**
      SIZE
@@ -81,12 +84,28 @@ public:
 private:
 
     struct Nodo {
-        vector<Nodo*> siguientes;
-        T* definicion;
+        Nodo();
+
+        Nodo(const Nodo &aCopiar);
+
+        Nodo &operator=(const Nodo &d);
+
+        vector<Nodo *> siguientes;
+        T *definicion;
+
+        Nodo *copiarNodos(Nodo *n);
     };
 
-    Nodo* raiz;
+    Nodo *raiz;
     int _size;
+
+    /**
+     * Dada una clave devuelve la cantidad de letras acertadas
+     * y el último nodo no nulo recorrido.
+     */
+    pair<int, Nodo *> recorrer(const string &key) const;
+
+    pair<int, Nodo *> recorrerDesde(int acc, Nodo *n, const string &key) const;
 };
 
 #include "string_map.hpp"
