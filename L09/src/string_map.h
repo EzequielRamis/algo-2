@@ -106,6 +106,8 @@ private:
     pair<int, Nodo *> recorrer(const string &key) const;
 
     pair<int, Nodo *> recorrerDesde(int acc, Nodo *n, const string &key) const;
+
+    void borrarNodos(Nodo *);
 };
 
 #include "string_map.hpp"

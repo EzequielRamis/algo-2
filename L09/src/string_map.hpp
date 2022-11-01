@@ -47,7 +47,17 @@ bool string_map<T>::Nodo::hayPrefijos() {
 
 template<typename T>
 string_map<T>::~string_map() {
-    // COMPLETAR
+    borrarNodos(raiz);
+}
+
+template<typename T>
+void string_map<T>::borrarNodos(string_map::Nodo *n) {
+    if (n != nullptr) {
+        for (auto pre: n->siguientes)
+            borrarNodos(pre);
+        delete n->definicion;
+        delete n;
+    }
 }
 
 template<typename T>
@@ -66,11 +76,15 @@ void string_map<T>::insert(const pair<string, T> &kv) {
     }
     if (pre->definicion == nullptr)
         _size++;
+    else
+        delete pre->definicion;
     pre->definicion = new T(kv.second);
 }
 
 template<typename T>
 T &string_map<T>::operator[](const string &clave) {
+    if (count(clave) == 0)
+        insert(make_pair(clave, *new T()));
     return at(clave);
 }
 
@@ -78,7 +92,7 @@ T &string_map<T>::operator[](const string &clave) {
 template<typename T>
 int string_map<T>::count(const string &clave) const {
     pair<int, Nodo *> rec = recorrer(clave);
-    return rec.first == clave.size() && rec.second != nullptr && rec.second->definicion != nullptr ? 1 : 0;
+    return rec.first == clave.size() && rec.second->definicion != nullptr ? 1 : 0;
 }
 
 template<typename T>
@@ -105,10 +119,10 @@ void string_map<T>::erase(const string &clave) {
     ult->definicion = nullptr;
     for (int i = ((int) recorrido.size()) - 2; i >= 0; i--) {
         Nodo *letra = recorrido[i];
-        letra->siguientes[int(clave[i + 1])] = nullptr;
         if (!letra->hayPrefijos() && letra->definicion == nullptr)
             letra->siguientes.clear();
     }
+    _size--;
 }
 
 template<typename T>
