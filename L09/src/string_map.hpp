@@ -24,19 +24,25 @@ string_map<T>::Nodo::Nodo(const Nodo &aCopiar) : Nodo() { *this = aCopiar; }
 
 template<typename T>
 typename string_map<T>::Nodo &string_map<T>::Nodo::operator=(const Nodo &d) {
-    if (this != nullptr) {
-        delete definicion;
-        for (auto l: siguientes)
-            delete l;
-        if (d.definicion != nullptr)
-            definicion = new T(*d.definicion);
-        for (int i = 0; i < (int) d.siguientes.size(); i++)
-            if (d.siguientes[i] == nullptr)
-                siguientes[i] = nullptr;
-            else
-                siguientes[i] = new Nodo(*d.siguientes[i]);
-        return *this;
-    }
+    delete definicion;
+    for (auto l: siguientes)
+        delete l;
+    if (d.definicion != nullptr)
+        definicion = new T(*d.definicion);
+    for (int i = 0; i < (int) d.siguientes.size(); i++)
+        if (d.siguientes[i] == nullptr)
+            siguientes[i] = nullptr;
+        else
+            siguientes[i] = new Nodo(*d.siguientes[i]);
+    return *this;
+}
+
+template<typename T>
+bool string_map<T>::Nodo::hayPrefijos() {
+    for (auto l: this->siguientes)
+        if (l != nullptr)
+            return true;
+    return false;
 }
 
 template<typename T>
@@ -77,7 +83,7 @@ int string_map<T>::count(const string &clave) const {
 
 template<typename T>
 const T &string_map<T>::at(const string &clave) const {
-    return recorrer(clave).second->definicion;
+    return *recorrer(clave).second->definicion;
 }
 
 template<typename T>
@@ -87,7 +93,22 @@ T &string_map<T>::at(const string &clave) {
 
 template<typename T>
 void string_map<T>::erase(const string &clave) {
-    // COMPLETAR
+    vector<Nodo *> recorrido;
+    Nodo *m = raiz;
+    recorrido.push_back(m);
+    for (auto l: clave) {
+        m = m->siguientes[int(l)];
+        recorrido.push_back(m);
+    }
+    Nodo *ult = recorrido.back();
+    delete ult->definicion;
+    ult->definicion = nullptr;
+    for (int i = ((int) recorrido.size()) - 2; i >= 0; i--) {
+        Nodo *letra = recorrido[i];
+        letra->siguientes[int(clave[i + 1])] = nullptr;
+        if (!letra->hayPrefijos() && letra->definicion == nullptr)
+            letra->siguientes.clear();
+    }
 }
 
 template<typename T>

@@ -93,7 +93,7 @@ private:
         vector<Nodo *> siguientes;
         T *definicion;
 
-        Nodo *copiarNodos(Nodo *n);
+        bool hayPrefijos();
     };
 
     Nodo *raiz;
