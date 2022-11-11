@@ -10,7 +10,7 @@ Se asume una implementación acorde\footnote{Una buena opción es usar un \href{
 \subsection{Módulo Variante}
 \begin{interfaz}{\subsubsection{Interfaz}}
   \seExplica{Variante}{variante}\\
-  \usa{Diccionario Lineal, Conjunto Lineal, Lista, Letra, ¿Trie de Palabras?}
+  \usa{Diccionario Lineal, Conjunto Lineal, Lista, Letra, Trie de Palabras}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevaVariante}
@@ -279,8 +279,8 @@ Asumimos que existe el tipo \texttt{notif}.
 \subsubsection*{Invariante de Representación}
 \Rep[trie\_estr]{$
   tam(e.hijos)=\textsc{dom}()\yluego\\
-  (\forall h:\texttt{nat})(h<tam(e.hijos)\impluego definido?(e.hijos[h])\land\\
-  (\forall h:\texttt{nat})(h<tam(e.hijos)\impluego e.hijos[h]=\textsc{NULL})\implies e.fin?=true
+  (\forall h:\texttt{nat})(h<tam(e.hijos)\impluego definido?(e.hijos,h))\land\\
+  ((\forall h:\texttt{nat})(h<tam(e.hijos)\impluego e.hijos[h]=\textsc{NULL})\implies e.fin?=true)
 $}
 
 \subsubsection*{Función de Abstracción}
@@ -377,7 +377,8 @@ $\end{adjustwidth}
         \State\asignar{nodo}{(*nodo).hijos[\textsc{ord}(letra)]}
         \State$\textsc{Avanzar}(pIt)$
       \EndWhile
-      \State\Return$\lnot\textsc{HaySiguiente}(pIt)\land(nodo\neq\textsc{NULL}\yluego(*nodo).fin?)$
+      % \State\Return$\lnot\textsc{HaySiguiente}(pIt)\land(nodo\neq\textsc{NULL}\impluego(*nodo).fin?)$
+      \State\Return$\lnot\textsc{HaySiguiente}(pIt)\yluego (*nodo).fin?$
     \EndIf
   \end{algorithmic}
 \end{algorithm}

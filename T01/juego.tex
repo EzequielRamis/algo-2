@@ -1,7 +1,7 @@
 \section{Módulo Juego}
 \begin{interfaz}{\subsection{Interfaz}}
   \seExplica{Juego}{juego}\\\\
-  \usa{Variante, Cola, Letra, Ocurrencia, ¿Lista?}
+  \usa{Variante, Cola, Letra, Ocurrencia, Lista}
   \par\noindent
   \begin{operaciones}
     \InterfazFuncion{nuevoJuego}
@@ -96,6 +96,12 @@ jugador desde la última vez que se invocó a esta operación.]
     [$O(1)$]
     [Dada una cierta letra $x$ del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.]\\
 
+    % \noindent\InterfazFuncion{\#jugadores}
+    % {\In{j}{juego}}{nat}
+    % [true]
+    % {$res\igobs \#jugadores(j)$}
+    % [$O(1)$]
+    % [Devuelve la cantidad de jugadores.]\\
   \end{operaciones}
 \end{interfaz}
 
@@ -518,7 +524,6 @@ Justificación de complejidad:
   \defun{iFichaTiempo}{\In{j}{estr\_juego}, \In{i}{nat}, \In{j}{nat}}{nat}
   \begin{algorithmic}[1]
     \State\Return{$\pi_{2}(*t[i][j])$}
-    \State\Return{$\textsc{letra}(j.tablero,i,j)$}
   \end{algorithmic}
 \end{algorithm}
 
@@ -528,6 +533,13 @@ Justificación de complejidad:
     \State\Return{$j.jugadores[i].cantFichasPorLetra[\textsc{ord}(l)]$}
   \end{algorithmic}
 \end{algorithm}
+
+%\begin{algorithm}[H]
+%  \defun{i\#jugadores}{\In{j}{estr\_juego}}{nat}
+%  \begin{algorithmic}[1]
+%    \State\Return{$tam(j.jugadores)$}
+%  \end{algorithmic}
+%\end{algorithm}
 
 \subsubsection{Algoritmos Auxiliares}
 \begin{algorithm}[H]
