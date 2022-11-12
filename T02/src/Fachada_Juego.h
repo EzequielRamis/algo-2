@@ -5,7 +5,6 @@
 #include "Fachada_Variante.h"
 #include "Juego.h"
 
-
 class Fachada_Juego {
 public:
     /**
@@ -13,7 +12,7 @@ public:
      *
      * Complejidad: O(tamanoTab**2 + ALPHABET_SIZE*cantJugadores + cantFichas*cantJugadores)
      */
-    Fachada_Juego(Nat k, const Fachada_Variante& v, const Repositorio& r);
+    Fachada_Juego(Nat k, const Fachada_Variante &v, const Repositorio &r);
 
     /**
      * Ubica una Ocurrencia o en el juego
@@ -21,7 +20,7 @@ public:
      * Complejidad: O(m)
      *   donde m es el numero de fichas que se ubican
      */
-    void ubicar(const Ocurrencia& o);
+    void ubicar(const Ocurrencia &o);
 
     /**
      * Retorna el id del cliente al cual le toca jugar
@@ -35,14 +34,14 @@ public:
      *
      * Complejidad: O(1)
      */
-    const Fachada_Variante& variante();
+    const Fachada_Variante &variante();
 
     /**
      * Determina si una jugada es valida o no
      *
      * Complejidad: O(Lmax ** 2)
      */
-    bool jugadaValida(const Ocurrencia& o);
+    bool jugadaValida(const Ocurrencia &o);
 
     /**
      * Retorna true sii la coordenada se encuentra ocupada.
