@@ -1,13 +1,13 @@
-#ifndef FACHADA_SERVIDOR_H
-#define FACHADA_SERVIDOR_H
+#ifndef SERVIDOR_H
+#define SERVIDOR_H
 
 #include "Tipos.h"
 #include "Notificacion.h"
 #include "Fachada_Variante.h"
-#include "Servidor.h"
+#include "Juego.h"
 
 
-class Fachada_Servidor {
+class Servidor {
 public:
     /**
      * El constructor de Fachada_Servidor debe inicializar un nuevo servidor, y todas sus dependencias (como el juego,
@@ -15,9 +15,9 @@ public:
      *
      * Complejidad: O(tamanoTab**2 + TAMANIO_ALFABETO*cantJugadores + cantFichas*cantJugadores)
      */
-    Fachada_Servidor(
+    Servidor(
             Nat cantJugadores,
-            const Fachada_Variante &variante,
+            const Variante &variante,
             const Repositorio &r
     );
 
@@ -58,11 +58,13 @@ public:
      *   donde n es la cantidad de mensajes sin consultar de dicho cliente
      *   y F es la cantidad de fichas por jugador de la variante.
      */
-    std::list<Notificacion> notificaciones(IdCliente id);
+    list<Notificacion> notificaciones(IdCliente id);
 
 private:
-    Servidor servidor;
+    Juego _juego;
+    Nat _jugadoresConectados;
+    Nat _jugadoresEsperados;
+    vector<list<Notificacion>> _notificaciones;
 };
 
-#endif // FACHADA_SERVIDOR_H
-
+#endif // SERVIDOR_H;
