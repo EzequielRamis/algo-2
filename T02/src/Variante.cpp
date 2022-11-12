@@ -7,20 +7,24 @@ Variante::Variante(
         const set<vector<Letra>> &palabrasLegitimas
 ) : _tablero(tamanoTab),
     _fichas(cantFichas),
-    _puntaje(new Nat[TAMANIO_ALFABETO]),
-        /*_palabra(Trie constructor),*/
+    _puntaje(),
+    _palabras(new trie()),
     _palabraMasLarga(0) {
     for (int i = 0; i < TAMANIO_ALFABETO; i++) {
-        if (puntajes.count(inversaDeOrd(i)) > 0)
-            _puntaje[i] = puntajes.at(inversaDeOrd(i));
-        else
-            _puntaje[i] = 1;
+        if (puntajes.count(inversaDeOrd(i)) > 0){
+            Nat* nuevo = new Nat(puntajes.at(inversaDeOrd(i)));
+            _puntaje[i] = nuevo;
+        } else {
+            Nat *nuevo = new Nat(1);
+            _puntaje[i] = nuevo;
+        }
     }
-    /*for (vector<Letra> pal : palabrasLegitimas){
-        _palabra.insert(pal);
-        if (pal.size() > _palabraMasLarga)
+    for (vector<Letra> pal : palabrasLegitimas){
+        (*_palabras).insert(pal);
+        if (pal.size() > _palabraMasLarga) {
             _palabraMasLarga = pal.size();
-    }*/
+        }
+    }
 }
 
 Nat Variante::tamanoTablero() const {
@@ -32,10 +36,9 @@ Nat Variante::fichas() const {
 }
 
 Nat Variante::puntajeLetra(Letra l) const {
-    return _puntaje[ord(l)];
+    return *_puntaje[ord(l)];
 }
 
 bool Variante::palabraLegitima(const Palabra &palabra) const {
-    //return _palabra.count(palabra) == 1;
-    return true;
+    return (*_palabras).count(palabra) == 1;
 }

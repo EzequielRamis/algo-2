@@ -37,7 +37,7 @@ public:
     bool palabraLegitima(const Palabra &palabra) const;
 
 private:
-    Variante _variante;
+    Variante* _variante;
 };
 
 #endif //FACHADA_VARIANTE_H

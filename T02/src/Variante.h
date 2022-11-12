@@ -3,6 +3,7 @@
 
 #include "Tipos.h"
 #include "Letra.h"
+#include "Palabras.h"
 
 class Variante {
 public:
@@ -39,8 +40,8 @@ public:
 private:
     Nat _tablero;
     Nat _fichas;
-    Nat *_puntaje;
-    //Trie _palabras;
+    Nat* _puntaje[TAMANIO_ALFABETO] = {};
+    trie* _palabras;
     Nat _palabraMasLarga;
 };
 
