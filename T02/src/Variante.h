@@ -1,15 +1,15 @@
-#ifndef FACHADA_VARIANTE_H
-#define FACHADA_VARIANTE_H
+#ifndef VARIANTE_H
+#define VARIANTE_H
 
 #include "Tipos.h"
-#include "Variante.h"
+#include "Letra.h"
 
-class Fachada_Variante {
+class Variante {
 public:
     /**
      * Construye una Fachada_Variante a partir de los parametros de las variantes
      */
-    Fachada_Variante(
+    Variante(
             Nat tamanoTab,
             Nat cantFichas,
             const map<Letra, Nat> &puntajes,
@@ -37,7 +37,11 @@ public:
     bool palabraLegitima(const Palabra &palabra) const;
 
 private:
-    Variante _variante;
+    Nat _tablero;
+    Nat _fichas;
+    Nat *_puntaje[TAMANIO_ALFABETO];
+    //trie<> palabras
+    Nat _palabraMasLarga;
 };
 
-#endif //FACHADA_VARIANTE_H
+#endif //VARIANTE_H

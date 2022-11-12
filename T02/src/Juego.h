@@ -1,19 +1,19 @@
-#ifndef FACHADA_JUEGO_H
-#define FACHADA_JUEGO_H
+#ifndef JUEGO_H
+#define JUEGO_H
 
 #include "Tipos.h"
 #include "Fachada_Variante.h"
-#include "Juego.h"
+#include "Tablero.h"
+#include "Variante.h"
 
-
-class Fachada_Juego {
+class Juego {
 public:
     /**
      * Construye un juego a partir de la cantidad de jugadores k, la variante v y el repositorio r
      *
      * Complejidad: O(tamanoTab**2 + ALPHABET_SIZE*cantJugadores + cantFichas*cantJugadores)
      */
-    Fachada_Juego(Nat k, const Fachada_Variante& v, const Repositorio& r);
+    Juego(Nat k, const Variante &v, const Repositorio &r);
 
     /**
      * Ubica una Ocurrencia o en el juego
@@ -21,7 +21,7 @@ public:
      * Complejidad: O(m)
      *   donde m es el numero de fichas que se ubican
      */
-    void ubicar(const Ocurrencia& o);
+    void ubicar(const Ocurrencia &o);
 
     /**
      * Retorna el id del cliente al cual le toca jugar
@@ -35,14 +35,14 @@ public:
      *
      * Complejidad: O(1)
      */
-    const Fachada_Variante& variante();
+    const Variante &variante();
 
     /**
      * Determina si una jugada es valida o no
      *
      * Complejidad: O(Lmax ** 2)
      */
-    bool jugadaValida(const Ocurrencia& o);
+    bool jugadaValida(const Ocurrencia &o);
 
     /**
      * Retorna true sii la coordenada se encuentra ocupada.
@@ -75,7 +75,23 @@ public:
     Nat cantFicha(IdCliente id, Letra l);
 
 private:
-    Juego juego;
+    struct Jugador {
+        Jugador();
+        //Jugador(const Jugador &aCopiar);
+        //Jugador &operator=(const Jugador &d);
+
+        Nat _puntaje;
+        list<tuple<Ocurrencia, Nat>> _historial;
+        list<tuple<Ocurrencia, Nat>> _historialSinVacias;
+        Nat _jugadasSinCalcularPuntaje;
+        vector<Nat> _cantFichasPorLetra;
+    };
+
+    Tablero _tablero;
+    vector<Jugador> _jugadores;
+    Nat _tiempo;
+    Repositorio _repositorio;
+    Variante _variante;
 };
 
-#endif // FACHADA_JUEGO_H
+#endif // JUEGO_H
