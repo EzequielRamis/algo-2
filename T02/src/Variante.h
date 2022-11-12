@@ -39,8 +39,8 @@ public:
 private:
     Nat _tablero;
     Nat _fichas;
-    Nat *_puntaje[TAMANIO_ALFABETO];
-    //trie<> palabras
+    Nat *_puntaje;
+    //Trie _palabras;
     Nat _palabraMasLarga;
 };
 
