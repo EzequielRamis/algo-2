@@ -10,7 +10,7 @@
 class Servidor {
 public:
     /**
-     * El constructor de Fachada_Servidor debe inicializar un nuevo servidor, y todas sus dependencias (como el juego,
+     * El constructor de Servidor debe inicializar un nuevo servidor, y todas sus dependencias (como el juego,
      * la variante, el tablero, etc)
      *
      * Complejidad: O(tamanoTab**2 + TAMANIO_ALFABETO*cantJugadores + cantFichas*cantJugadores)

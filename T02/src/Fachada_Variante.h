@@ -17,6 +17,11 @@ public:
     );
 
     /**
+     * Construye una Fachada_Variante a partir de una Variante
+     */
+    Fachada_Variante(Variante v);
+
+    /**
      * Retorna el tamano del tablero de la variante
      */
     Nat tamanoTablero() const;

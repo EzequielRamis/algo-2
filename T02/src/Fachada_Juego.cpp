@@ -12,7 +12,7 @@ IdCliente Fachada_Juego::turno() {
 }
 
 const Fachada_Variante &Fachada_Juego::variante() {
-    return juego.variante();
+    return *(new Fachada_Variante(juego.variante()));
 }
 
 bool Fachada_Juego::jugadaValida(const Ocurrencia &o) {
@@ -28,7 +28,7 @@ Letra Fachada_Juego::letra(Nat i, Nat j) {
 }
 
 Nat Fachada_Juego::puntaje(IdCliente id) {
-    return juego.puntaje();
+    return juego.puntaje(id);
 }
 
 Nat Fachada_Juego::cantFicha(IdCliente id, Letra l) {

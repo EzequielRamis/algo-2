@@ -7,7 +7,7 @@
 class Variante {
 public:
     /**
-     * Construye una Fachada_Variante a partir de los parametros de las variantes
+     * Construye una Variante a partir de los parametros de las variantes
      */
     Variante(
             Nat tamanoTab,

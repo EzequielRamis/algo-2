@@ -3,7 +3,6 @@
 
 #include "Tipos.h"
 #include "Fachada_Variante.h"
-#include "Tablero.h"
 #include "Variante.h"
 
 class Juego {
@@ -87,7 +86,7 @@ private:
         vector<Nat> _cantFichasPorLetra;
     };
 
-    Tablero _tablero;
+    vector<vector<pair<Letra, int> *>> tablero;
     vector<Jugador> _jugadores;
     Nat _tiempo;
     Repositorio _repositorio;
