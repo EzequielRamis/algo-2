@@ -3,14 +3,13 @@
 
 Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         _tablero(
-                new pair<Letra, Nat> **[v.tamanoTablero()]{
-                        new pair<Letra, Nat> *[v.tamanoTablero()]{nullptr}
-                }
+                vector<vector<pair<Letra, Nat> *>>(v.tamanoTablero(),
+                                                   vector<pair<Letra, Nat> *>(v.tamanoTablero(), nullptr))
         ),
         _variante(v),
         _repositorio(r),
         _tiempo(0),
-        _jugadores(new Jugador[k]{Jugador()}) {
+        _jugadores(vector<Jugador>(k, Jugador())) {
     for (int j = 0; j < v.tamanoTablero(); j++)
         for (int i = 0; i < v.fichas(); i++) {
             auto ficha = *_repositorio.rbegin();
@@ -23,9 +22,9 @@ Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
 Juego::Jugador::Jugador() :
         puntaje(0),
         jugadasSinCalcularPuntaje(0),
-        cantFichasPorLetra(new Nat[TAMANIO_ALFABETO]{0}),
-        historial(list<tuple<Ocurrencia, Nat>>()),
-        historialSinVacias(list<tuple<Ocurrencia, Nat>>()) {}
+        cantFichasPorLetra(vector<Nat>(TAMANIO_ALFABETO, 0)),
+        historial(list<pair<Ocurrencia, Nat>>()),
+        historialSinVacias(list<pair<Ocurrencia, Nat>>()) {}
 
 bool Juego::jugadaValida(const Ocurrencia &o) {
     assert(false);
@@ -53,7 +52,7 @@ const Variante &Juego::variante() {
 }
 
 IdCliente Juego::turno() {
-    return _tiempo % (sizeof(_jugadores) / sizeof(Nat));
+    return _tiempo % _jugadores.size();
 }
 
 Nat Juego::tiempo() const {
@@ -61,7 +60,58 @@ Nat Juego::tiempo() const {
 }
 
 Nat Juego::puntaje(IdCliente id) {
-    assert(false);
+    Jugador *jugador = &_jugadores[id];
+    Nat *k = &jugador->jugadasSinCalcularPuntaje;
+    auto histIt = jugador->historialSinVacias.rbegin();
+    while (*k > 0) {
+        pair<Ocurrencia, Nat> jugada = *histIt;
+        Ocurrencia::iterator ocIt = jugada.first.begin();
+        bool esHorizontal = true;
+        tuple<Nat, Nat, Letra> ficha = *ocIt;
+        ocIt++;
+        if (ocIt != jugada.first.end())
+            esHorizontal = get<0>(ficha) = get<0>(*ocIt);
+        sumarPuntaje(*jugador, ficha, jugada.second, true, esHorizontal);
+        for (auto fichaSecundaria: jugada.first)
+            sumarPuntaje(*jugador, fichaSecundaria, jugada.second, false, !esHorizontal);
+        histIt--;
+        *k = *k - 1;
+    }
+    return jugador->puntaje;
+}
+
+void
+Juego::sumarPuntaje(Jugador &jugador,
+                    tuple<Nat, Nat, Letra> &ficha,
+                    Nat tiempo,
+                    bool esPrincipal,
+                    bool esHorizontal) {
+    Nat linea = esHorizontal ? get<0>(ficha) : get<1>(ficha);
+    Nat i = esHorizontal ? get<1>(ficha) : get<0>(ficha) - (esPrincipal ? 0 : 1);
+    Nat j = i + 1;
+    sumarPuntajeEnDir(jugador, ficha, tiempo, linea, i, false, esHorizontal);
+    sumarPuntajeEnDir(jugador, ficha, tiempo, linea, j, true, esHorizontal);
+}
+
+void Juego::sumarPuntajeEnDir(Jugador &jugador,
+                              tuple<Nat, Nat, Letra> &ficha,
+                              Nat tiempo,
+                              Nat pos,
+                              Nat desde,
+                              bool adelante,
+                              bool esHorizontal) {
+    while (enTablero(pos, desde) &&
+           hayLetra(pos, desde) &&
+           fichaTiempo(pos, desde) <= tiempo) {
+        if (esHorizontal)
+            jugador.puntaje += _variante.puntajeLetra(this->ficha(pos, desde));
+        else
+            jugador.puntaje += _variante.puntajeLetra(this->ficha(desde, pos));
+        if (adelante)
+            desde++;
+        else
+            desde--;
+    }
 }
 
 bool Juego::enTablero(Nat i, Nat j) {
@@ -73,11 +123,11 @@ bool Juego::hayLetra(Nat i, Nat j) {
 }
 
 Letra Juego::ficha(Nat i, Nat j) {
-    return get<0>(*_tablero[x][y]);
+    return _tablero[i][j]->first;
 }
 
 Nat Juego::fichaTiempo(Nat i, Nat j) {
-    return get<1>(*_tablero[x][y]);
+    return _tablero[i][j]->second;
 }
 
 Nat Juego::cantLetrasTieneJugador(Letra x, Nat i) {

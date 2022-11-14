@@ -7,7 +7,7 @@ Variante::Variante(
         const set<vector<Letra>> &palabrasLegitimas
 ) : _tablero(tamanoTab),
     _fichas(cantFichas),
-    _puntaje(new Nat[TAMANIO_ALFABETO]),
+    _puntaje(vector<Nat>(TAMANIO_ALFABETO)),
         /*_palabra(Trie constructor),*/
     _palabraMasLarga(0) {
     for (int i = 0; i < TAMANIO_ALFABETO; i++) {

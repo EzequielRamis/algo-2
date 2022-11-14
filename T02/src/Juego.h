@@ -98,17 +98,30 @@ private:
         Jugador();
 
         Nat puntaje;
-        list<tuple<Ocurrencia, Nat>> historial;
-        list<tuple<Ocurrencia, Nat>> historialSinVacias;
+        list<pair<Ocurrencia, Nat>> historial;
+        list<pair<Ocurrencia, Nat>> historialSinVacias;
         Nat jugadasSinCalcularPuntaje;
-        Nat *cantFichasPorLetra;
+        vector<Nat> cantFichasPorLetra;
     };
 
-    pair<Letra, Nat> ***_tablero;
-    Jugador *_jugadores;
+    vector<vector<pair<Letra, Nat> *>> _tablero;
+    vector<Jugador> _jugadores;
     Nat _tiempo;
     Repositorio _repositorio;
     Variante _variante;
+
+    void sumarPuntaje(Jugador &jugador,
+                      tuple<Nat, Nat, Letra> &ficha,
+                      Nat tiempo, bool esPrincipal,
+                      bool esHorizontal);
+
+    void sumarPuntajeEnDir(Jugador &jugador,
+                           tuple<Nat, Nat, Letra> &ficha,
+                           Nat tiempo,
+                           Nat pos,
+                           Nat desde,
+                           bool adelante,
+                           bool esHorizontal);
 };
 
 #endif // JUEGO_H

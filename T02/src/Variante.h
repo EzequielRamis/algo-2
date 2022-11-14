@@ -39,7 +39,7 @@ public:
 private:
     Nat _tablero;
     Nat _fichas;
-    Nat *_puntaje;
+    vector<Nat> _puntaje;
     //Trie _palabras;
     Nat _palabraMasLarga;
 };
