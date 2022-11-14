@@ -7,6 +7,8 @@ Fachada_Variante::Fachada_Variante(
         const set<vector<Letra>> &palabrasLegitimas
 ) : _variante(Variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas)) {}
 
+Fachada_Variante::Fachada_Variante(Variante v) : _variante(v) {}
+
 Nat Fachada_Variante::tamanoTablero() const {
     return _variante.tamanoTablero();
 }
