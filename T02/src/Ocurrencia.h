@@ -3,10 +3,10 @@
 
 #include "Tipos.h"
 
-bool esHorizontal(Ocurrencia &o);
+bool esHorizontal(const Ocurrencia &o);
 
-bool esVertical(Ocurrencia &o);
+bool esVertical(const Ocurrencia &o);
 
-bool haySuperpuestas(Ocurrencia &o);
+bool haySuperpuestas(const Ocurrencia &o);
 
 #endif // OCURRENCIA_H

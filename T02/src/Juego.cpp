@@ -1,5 +1,6 @@
 #include "Juego.h"
 #include "Letra.h"
+#include "Ocurrencia.h"
 
 Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         _tablero(
@@ -27,13 +28,86 @@ Juego::Jugador::Jugador() :
         historialSinVacias(list<pair<Ocurrencia, Nat>>()) {}
 
 bool Juego::jugadaValida(const Ocurrencia &o) {
-    assert(false);
+    if (o.size() > _variante.longPalabraMasLarga())
+        return false;
+    for (auto ficha: o)
+        if (!enTablero(get<0>(ficha), get<1>(ficha))
+            || hayLetra(get<0>(ficha), get<1>(ficha)))
+            return false;
+    bool horizontal = esHorizontal(o);
+    if (haySuperpuestas(o) || !(horizontal || esVertical(o)))
+        return false;
+    ponerLetras(o);
+    auto cualquierFicha = *o.begin();
+    pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, horizontal);
+    for (auto ficha: o)
+        if (!(rango.first <= get<1>(ficha) && get<1>(ficha) <= rango.second)) {
+            sacarLetras(o);
+            return false;
+        }
+    if (!formaPalabraLegitima(rango, horizontal, horizontal ?
+                                                 get<0>(cualquierFicha) :
+                                                 get<1>(cualquierFicha))) {
+        sacarLetras(o);
+        return false;
+    }
+    for (auto ficha: o) {
+        pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal);
+        if (rango.first != rango.second &&
+            !formaPalabraLegitima(rango, !horizontal, horizontal ?
+                                                      get<1>(cualquierFicha) :
+                                                      get<0>(cualquierFicha))) {
+            sacarLetras(o);
+            return false;
+        }
+    }
+    sacarLetras(o);
+    return true;
+}
+
+void Juego::ponerLetras(const Ocurrencia &o) {
+    for (auto ficha: o)
+        _tablero[get<0>(ficha)][get<1>(ficha)] = new pair<Letra, Nat>{get<2>(ficha), _tiempo};
+}
+
+void Juego::sacarLetras(const Ocurrencia &o) {
+    for (auto ficha: o) {
+        delete _tablero[get<0>(ficha)][get<1>(ficha)];
+        _tablero[get<0>(ficha)][get<1>(ficha)] = nullptr;
+    }
+}
+
+pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal) {
+    Nat linea = horizontal ? get<0>(ficha) : get<1>(ficha);
+    Nat i = horizontal ? get<1>(ficha) : get<0>(ficha);
+    Nat j = i;
+    if (horizontal) {
+        while (enTablero(linea, i) && hayLetra(linea, i))
+            i--;
+        while (enTablero(linea, j) && hayLetra(linea, j))
+            j++;
+    } else {
+        while (enTablero(i, linea) && hayLetra(i, linea))
+            i--;
+        while (enTablero(j, linea) && hayLetra(j, linea))
+            j++;
+    }
+    return make_pair(i, j);
+}
+
+bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat padding) {
+    Nat i = r.first;
+    Nat j = r.second;
+    Palabra palabra(j - i);
+    for (int k = i; k <= j; k++)
+        palabra[k] = horizontal ? ficha(padding, k) : ficha(k, padding);
+    return _variante.palabraLegitima(palabra);
 }
 
 void Juego::ubicar(const Ocurrencia &o) {
     auto j = _jugadores[turno()];
+    ponerLetras(o);
     for (auto ficha: o) {
-        _tablero[get<0>(ficha)][get<1>(ficha)] = new pair<Letra, Nat>{get<2>(ficha), _tiempo};
         j.cantFichasPorLetra[ord(get<2>(ficha))]--;
         auto puesta = *_repositorio.rbegin();
         _repositorio.pop_back();
@@ -65,7 +139,7 @@ Nat Juego::puntaje(IdCliente id) {
     auto histIt = jugador->historialSinVacias.rbegin();
     while (*k > 0) {
         pair<Ocurrencia, Nat> jugada = *histIt;
-        Ocurrencia::iterator ocIt = jugada.first.begin();
+        auto ocIt = jugada.first.begin();
         bool esHorizontal = true;
         tuple<Nat, Nat, Letra> ficha = *ocIt;
         ocIt++;

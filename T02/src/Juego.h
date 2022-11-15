@@ -122,6 +122,14 @@ private:
                            Nat desde,
                            bool adelante,
                            bool esHorizontal);
+
+    void ponerLetras(const Ocurrencia &o);
+
+    void sacarLetras(const Ocurrencia &o);
+
+    pair<Nat, Nat> rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal);
+
+    bool formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat padding);
 };
 
 #endif // JUEGO_H

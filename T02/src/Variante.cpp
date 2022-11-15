@@ -39,3 +39,7 @@ bool Variante::palabraLegitima(const Palabra &palabra) const {
     //return _palabra.count(palabra) == 1;
     return true;
 }
+
+Nat Variante::longPalabraMasLarga() {
+    return _palabraMasLarga;
+}

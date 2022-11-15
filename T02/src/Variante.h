@@ -36,6 +36,11 @@ public:
      */
     bool palabraLegitima(const Palabra &palabra) const;
 
+    /**
+     * Retorna la longitud de la palabra definida más larga
+     */
+    Nat longPalabraMasLarga();
+
 private:
     Nat _tablero;
     Nat _fichas;
