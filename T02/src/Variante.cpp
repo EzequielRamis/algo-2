@@ -5,41 +5,43 @@ Variante::Variante(
         Nat cantFichas,
         const map<Letra, Nat> &puntajes,
         const set<vector<Letra>> &palabrasLegitimas
-) : _tablero(tamanoTab),
-    _fichas(cantFichas),
-    _puntaje(vector<Nat>(TAMANIO_ALFABETO)),
-        /*_palabra(Trie constructor),*/
-    _palabraMasLarga(0) {
-    for (int i = 0; i < TAMANIO_ALFABETO; i++) {
-        if (puntajes.count(inversaDeOrd(i)) > 0)
-            _puntaje[i] = puntajes.at(inversaDeOrd(i));
-        else
-            _puntaje[i] = 1;
-    }
-    /*for (vector<Letra> pal : palabrasLegitimas){
-        _palabra.insert(pal);
-        if (pal.size() > _palabraMasLarga)
-            _palabraMasLarga = pal.size();
-    }*/
-}
+) : _tamanoTab(tamanoTab), _cantFichas(cantFichas), _puntajes(puntajes), _palabrasLegitimas(palabrasLegitimas){}
 
 Nat Variante::tamanoTablero() const {
-    return _tablero;
+    return _tamanoTab;
 }
 
 Nat Variante::fichas() const {
-    return _fichas;
+    return _cantFichas;
 }
 
 Nat Variante::puntajeLetra(Letra l) const {
-    return _puntaje[ord(l)];
+    return _puntajes.at(l);
 }
 
 bool Variante::palabraLegitima(const Palabra &palabra) const {
-    //return _palabra.count(palabra) == 1;
-    return true;
+    for (vector<Letra> palabraLegitima : _palabrasLegitimas) {
+        if (palabra == palabraLegitima) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Nat Variante::longPalabraMasLarga() {
-    return _palabraMasLarga;
+    Nat palabraMasLarga = 0;
+    for (vector<Letra> palabra : _palabrasLegitimas) {
+        if (palabra.size() > palabraMasLarga) {
+            palabraMasLarga = palabra.size();
+        }
+    }
+    return palabraMasLarga;
+}
+
+map<Letra, Nat> Variante::puntajes() const {
+    return _puntajes;
+}
+
+set<vector<Letra>> Variante::palabrasLegitimas() const {
+    return _palabrasLegitimas;
 }

@@ -17,11 +17,6 @@ public:
     );
 
     /**
-     * Construye una Fachada_Variante a partir de una Variante
-     */
-    explicit Fachada_Variante(Variante v);
-
-    /**
      * Retorna el tamano del tablero de la variante
      */
     Nat tamanoTablero() const;
@@ -40,6 +35,10 @@ public:
      * Indica si una palabra es legitima o no
      */
     bool palabraLegitima(const Palabra &palabra) const;
+
+    map<Letra, Nat> puntajes() const;
+
+    set<vector<Letra>> palabrasLegitimas() const;
 
 private:
     Variante _variante;

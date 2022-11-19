@@ -7,8 +7,6 @@ Fachada_Variante::Fachada_Variante(
         const set<vector<Letra>> &palabrasLegitimas
 ) : _variante(Variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas)) {}
 
-Fachada_Variante::Fachada_Variante(Variante v) : _variante(v) {}
-
 Nat Fachada_Variante::tamanoTablero() const {
     return _variante.tamanoTablero();
 }
@@ -23,4 +21,12 @@ Nat Fachada_Variante::puntajeLetra(Letra l) const {
 
 bool Fachada_Variante::palabraLegitima(const Palabra &palabra) const {
     return _variante.palabraLegitima(palabra);
+}
+
+map<Letra, Nat> Fachada_Variante::puntajes() const {
+    return _variante.puntajes();
+}
+
+set<vector<Letra>> Fachada_Variante::palabrasLegitimas() const {
+    return _variante.palabrasLegitimas();
 }

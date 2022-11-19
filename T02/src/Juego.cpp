@@ -1,6 +1,5 @@
 #include "Juego.h"
 #include "Letra.h"
-#include "Ocurrencia.h"
 
 Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         _tablero(
@@ -11,7 +10,7 @@ Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         _repositorio(r),
         _tiempo(0),
         _jugadores(vector<Jugador>(k, Jugador())) {
-    for (int j = 0; j < v.tamanoTablero(); j++)
+    for (int j = 0; j < k; j++)
         for (int i = 0; i < v.fichas(); i++) {
             auto ficha = *_repositorio.rbegin();
             _repositorio.pop_back();
@@ -19,13 +18,35 @@ Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         }
 }
 
-
 Juego::Jugador::Jugador() :
         puntaje(0),
         jugadasSinCalcularPuntaje(0),
         cantFichasPorLetra(vector<Nat>(TAMANIO_ALFABETO, 0)),
-        historial(list<pair<Ocurrencia, Nat>>()),
-        historialSinVacias(list<pair<Ocurrencia, Nat>>()) {}
+        historial(list<pair<Ocurrencia, Nat>>()) {}
+
+void Juego::ubicar(const Ocurrencia &o) {
+    Jugador &j = _jugadores[turno()];
+    ponerLetras(o);
+    for (auto ficha: o) {
+        j.cantFichasPorLetra[ord(get<2>(ficha))]--;
+        auto nuevaFicha = *_repositorio.rbegin();
+        _repositorio.pop_back();
+        j.cantFichasPorLetra[ord(nuevaFicha)]++;
+    }
+    if (!o.empty()) {
+        j.historial.push_back(make_pair(o, _tiempo));
+        j.jugadasSinCalcularPuntaje++;
+    }
+    _tiempo++;
+}
+
+IdCliente Juego::turno() {
+    return _tiempo % _jugadores.size();
+}
+
+const Variante &Juego::variante() {
+    return _variante;
+}
 
 bool Juego::jugadaValida(const Ocurrencia &o) {
     if (o.size() > _variante.longPalabraMasLarga())
@@ -34,7 +55,9 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
         if (!enTablero(get<0>(ficha), get<1>(ficha))
             || hayLetra(get<0>(ficha), get<1>(ficha)))
             return false;
+
     bool horizontal = esHorizontal(o);
+
     if (haySuperpuestas(o) || !(horizontal || esVertical(o)))
         return false;
     ponerLetras(o);
@@ -51,6 +74,7 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
         sacarLetras(o);
         return false;
     }
+
     for (auto ficha: o) {
         pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal);
         if (rango.first != rango.second &&
@@ -104,39 +128,20 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     return _variante.palabraLegitima(palabra);
 }
 
-void Juego::ubicar(const Ocurrencia &o) {
-    auto j = _jugadores[turno()];
-    ponerLetras(o);
-    for (auto ficha: o) {
-        j.cantFichasPorLetra[ord(get<2>(ficha))]--;
-        auto puesta = *_repositorio.rbegin();
-        _repositorio.pop_back();
-        j.cantFichasPorLetra[ord(puesta)]--;
-    }
-    if (!o.empty()) {
-        j.historialSinVacias.push_back(make_pair(o, _tiempo));
-        j.jugadasSinCalcularPuntaje++;
-    }
-    j.historial.push_back(make_pair(o, _tiempo));
-    _tiempo++;
-}
-
-const Variante &Juego::variante() {
-    return _variante;
-}
-
-IdCliente Juego::turno() {
-    return _tiempo % _jugadores.size();
-}
-
 Nat Juego::tiempo() const {
     return _tiempo;
+}
+Repositorio Juego::repositorio() const {
+    return _repositorio;
+}
+Nat Juego::consultarPuntaje(IdCliente id) const {
+    return _jugadores[id].puntaje;
 }
 
 Nat Juego::puntaje(IdCliente id) {
     Jugador *jugador = &_jugadores[id];
     Nat *k = &jugador->jugadasSinCalcularPuntaje;
-    auto histIt = jugador->historialSinVacias.rbegin();
+    auto histIt = jugador->historial.rbegin();
     while (*k > 0) {
         pair<Ocurrencia, Nat> jugada = *histIt;
         auto ocIt = jugada.first.begin();
@@ -206,4 +211,44 @@ Nat Juego::fichaTiempo(Nat i, Nat j) {
 
 Nat Juego::cantLetrasTieneJugador(Letra x, Nat i) {
     return _jugadores[i].cantFichasPorLetra[ord(x)];
+}
+
+bool Juego::haySuperpuestas(const Ocurrencia &o) const{
+    vector<set<Nat>> ocurrencias = vector<set<Nat>>(_variante.tamanoTablero());
+    for (auto ficha : o) {
+        set<Nat> fila = ocurrencias[(get<0>(ficha))];
+        if (fila.find(get<1>(ficha)) != fila.end()) {
+            return true;
+        }
+        ocurrencias[get<0>(ficha)].insert(get<1>(ficha));
+    }
+    return false;
+}
+
+//Chequeamos que todos los primeros elementos de la tupla "o" sean iguales
+bool Juego::esHorizontal(const Ocurrencia &o) const{
+    auto itr = o.begin();
+    Nat fila = get<0>(*itr);
+    itr++;
+    while (itr != o.end()){
+        if (get<0>(*itr) != fila) {
+            return false;
+        }
+        itr++;
+    }
+    return true;
+}
+
+//Chequeamos que todos los segundos elementos de la tupla "o" sean iguales
+bool Juego::esVertical(const Ocurrencia &o) const{
+    auto itr = o.begin();
+    Nat col = get<1>(*itr);
+    itr++;
+    while (itr != o.end()){
+        if (get<1>(*itr) != col) {
+            return false;
+        }
+        itr++;
+    }
+    return true;
 }

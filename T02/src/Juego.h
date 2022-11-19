@@ -15,26 +15,12 @@ public:
     Juego(Nat k, const Variante &v, const Repositorio &r);
 
     /**
-     * Determina si una jugada es valida o no
-     *
-     * Complejidad: O(Lmax ** 2)
-     */
-    bool jugadaValida(const Ocurrencia &o);
-
-    /**
      * Ubica una Ocurrencia o en el juego
      *
      * Complejidad: O(m)
      *   donde m es el numero de fichas que se ubican
      */
     void ubicar(const Ocurrencia &o);
-
-    /**
-     * Retorna informacion sobre la variante del juego
-     *
-     * Complejidad: O(1)
-     */
-    const Variante &variante();
 
     /**
      * Retorna el id del cliente al cual le toca jugar
@@ -44,19 +30,18 @@ public:
     IdCliente turno();
 
     /**
-     * Retorna el tiempo actual del juego
+     * Retorna informacion sobre la variante del juego
      *
      * Complejidad: O(1)
      */
-    Nat tiempo() const;
+    const Variante &variante();
 
     /**
-     * Retorna el puntaje del jugador id
+     * Determina si una jugada es valida o no
      *
-     * Complejidad: O(1 + m*Lmax)
-     *   donde m es la cantidad de fichas que ubico el jugador desde la ultima vez que se preguntó por su puntaje.
+     * Complejidad: O(Lmax ** 2)
      */
-    Nat puntaje(IdCliente id);
+    bool jugadaValida(const Ocurrencia &o);
 
     /**
      * Retorna true sii la coordenada se encuentra ocupada.
@@ -66,18 +51,47 @@ public:
     bool hayLetra(Nat x, Nat y);
 
     /**
-     * Determina si una coordenada (i,j) está en el rango del tablero
-     *
-     * Complejidad: O(1)
-     */
-    bool enTablero(Nat i, Nat j);
-
-    /**
      * Obtiene el contenido del tablero en una coordenada.
      *
      * Complejidad: O(1)
      */
     Letra ficha(Nat i, Nat j);
+
+    /**
+     * Calcula y retorna el puntaje del jugador id
+     *
+     * Complejidad: O(1 + m*Lmax)
+     *   donde m es la cantidad de fichas que ubico el jugador desde la ultima vez que se preguntó por su puntaje.
+     */
+    Nat puntaje(IdCliente id);
+
+    /**
+     * Retorna el puntaje del jugador id
+     *
+     * Complejidad: O(1)
+     */
+    Nat consultarPuntaje(IdCliente id) const;
+
+    /**
+     * Retorna el repositorio
+     *
+     * Complejidad: O(1)
+     */
+    Repositorio repositorio() const;
+
+    /**
+     * Dada una cierta letra x del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.
+     *
+     * Complejidad: O(1)
+     */
+    Nat cantLetrasTieneJugador(Letra x, Nat i);
+
+    /**
+     * Determina si una coordenada (i,j) está en el rango del tablero
+     *
+     * Complejidad: O(1)
+     */
+    bool enTablero(Nat i, Nat j);
 
     /**
      * Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada (i, j).
@@ -87,11 +101,11 @@ public:
     Nat fichaTiempo(Nat i, Nat j);
 
     /**
-     * Dada una cierta letra x del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.
+     * Retorna el tiempo actual del juego
      *
      * Complejidad: O(1)
      */
-    Nat cantLetrasTieneJugador(Letra x, Nat i);
+    Nat tiempo() const;
 
 private:
     struct Jugador {
@@ -99,7 +113,6 @@ private:
 
         Nat puntaje;
         list<pair<Ocurrencia, Nat>> historial;
-        list<pair<Ocurrencia, Nat>> historialSinVacias;
         Nat jugadasSinCalcularPuntaje;
         vector<Nat> cantFichasPorLetra;
     };
@@ -130,6 +143,13 @@ private:
     pair<Nat, Nat> rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal);
 
     bool formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat padding);
+
+    bool haySuperpuestas(const Ocurrencia &o) const;
+
+    bool esHorizontal(const Ocurrencia &o) const;
+
+    bool esVertical(const Ocurrencia &o) const;
+
 };
 
 #endif // JUEGO_H

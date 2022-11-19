@@ -41,12 +41,15 @@ public:
      */
     Nat longPalabraMasLarga();
 
+    map<Letra, Nat> puntajes() const;
+
+    set<vector<Letra>> palabrasLegitimas() const;
+
 private:
-    Nat _tablero;
-    Nat _fichas;
-    vector<Nat> _puntaje;
-    //Trie _palabras;
-    Nat _palabraMasLarga;
+    Nat _tamanoTab;
+    Nat _cantFichas;
+    map<Letra, Nat> _puntajes;
+    set<vector<Letra>> _palabrasLegitimas;
 };
 
 #endif //VARIANTE_H
