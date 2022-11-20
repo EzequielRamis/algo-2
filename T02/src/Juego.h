@@ -123,24 +123,13 @@ private:
     Repositorio _repositorio;
     Variante _variante;
 
-    void sumarPuntaje(Jugador &jugador,
-                      tuple<Nat, Nat, Letra> &ficha,
-                      Nat tiempo, bool esPrincipal,
-                      bool esHorizontal);
-
-    void sumarPuntajeEnDir(Jugador &jugador,
-                           tuple<Nat, Nat, Letra> &ficha,
-                           Nat tiempo,
-                           Nat pos,
-                           Nat desde,
-                           bool adelante,
-                           bool esHorizontal);
+    Nat calcularPuntaje(pair<Ocurrencia, Nat> jugada);
 
     void ponerLetras(const Ocurrencia &o);
 
     void sacarLetras(const Ocurrencia &o);
 
-    pair<Nat, Nat> rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal);
+    pair<Nat, Nat> rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal, Nat antesDeTiempo);
 
     bool formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat padding);
 

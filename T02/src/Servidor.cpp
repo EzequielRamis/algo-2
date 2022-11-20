@@ -8,10 +8,10 @@ Servidor::Servidor(
     _notificaciones(vector<list<Notificacion>>(cantJugadores)) {}
 
 IdCliente Servidor::conectarCliente() {
-    _jugadoresConectados++;
     Notificacion n = Notificacion::nuevaIdCliente(_jugadoresConectados);
     _notificaciones[_jugadoresConectados].push_back(n);
 
+    _jugadoresConectados++;
     if (_jugadoresConectados == _jugadoresEsperados) {
         Notificacion empezar = Notificacion::nuevaEmpezar(_juego.variante().tamanoTablero());
         Notificacion turnoDe = Notificacion::nuevaTurnoDe(0);
@@ -67,5 +67,7 @@ Nat Servidor::jugadoresConectados() {
 
 
 list<Notificacion> Servidor::notificaciones(IdCliente id) {
-    return _notificaciones[id];
+    list<Notificacion> n = _notificaciones[id];
+    _notificaciones[id] = list<Notificacion>();
+    return n;
 }

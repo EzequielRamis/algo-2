@@ -51,18 +51,22 @@ const Variante &Juego::variante() {
 bool Juego::jugadaValida(const Ocurrencia &o) {
     if (o.size() > _variante.longPalabraMasLarga())
         return false;
-    for (auto ficha: o)
+    for (auto ficha: o) {
         if (!enTablero(get<0>(ficha), get<1>(ficha))
             || hayLetra(get<0>(ficha), get<1>(ficha)))
             return false;
 
+        if (_jugadores[turno()].cantFichasPorLetra[ord(get<2>(ficha))] == 0)
+            return false;
+
+    }
     bool horizontal = esHorizontal(o);
 
     if (haySuperpuestas(o) || !(horizontal || esVertical(o)))
         return false;
     ponerLetras(o);
     auto cualquierFicha = *o.begin();
-    pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, horizontal);
+    pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, horizontal, _tiempo + 1);
     for (auto ficha: o)
         if (!(rango.first <= get<1>(ficha) && get<1>(ficha) <= rango.second)) {
             sacarLetras(o);
@@ -76,7 +80,7 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
     }
 
     for (auto ficha: o) {
-        pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal);
+        pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal, _tiempo + 1);
         if (rango.first != rango.second &&
             !formaPalabraLegitima(rango, !horizontal, horizontal ?
                                                       get<1>(cualquierFicha) :
@@ -101,20 +105,24 @@ void Juego::sacarLetras(const Ocurrencia &o) {
     }
 }
 
-pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal) {
+pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool horizontal, Nat antesDeTiempo) {
     Nat linea = horizontal ? get<0>(ficha) : get<1>(ficha);
     Nat i = horizontal ? get<1>(ficha) : get<0>(ficha);
     Nat j = i;
     if (horizontal) {
-        while (enTablero(linea, i) && hayLetra(linea, i))
+        while (enTablero(linea, i) && hayLetra(linea, i) && _tablero[linea][i]->second < antesDeTiempo)
             i--;
-        while (enTablero(linea, j) && hayLetra(linea, j))
+        i++;
+        while (enTablero(linea, j) && hayLetra(linea, j)  && _tablero[linea][j]->second < antesDeTiempo)
             j++;
+        j--;
     } else {
-        while (enTablero(i, linea) && hayLetra(i, linea))
+        while (enTablero(i, linea) && hayLetra(i, linea) && _tablero[i][linea]->second < antesDeTiempo)
             i--;
-        while (enTablero(j, linea) && hayLetra(j, linea))
+        i++;
+        while (enTablero(j, linea) && hayLetra(j, linea) && _tablero[j][linea]->second < antesDeTiempo)
             j++;
+        j--;
     }
     return make_pair(i, j);
 }
@@ -123,8 +131,10 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     Nat i = r.first;
     Nat j = r.second;
     Palabra palabra(j - i);
-    for (int k = i; k <= j; k++)
-        palabra[k] = horizontal ? ficha(padding, k) : ficha(k, padding);
+    for (int k = i; k <= j; k++) {
+        Letra letra = horizontal ? ficha(padding, k) : ficha(k, padding);
+        palabra.push_back(letra);
+    }
     return _variante.palabraLegitima(palabra);
 }
 
@@ -139,58 +149,36 @@ Nat Juego::consultarPuntaje(IdCliente id) const {
 }
 
 Nat Juego::puntaje(IdCliente id) {
-    Jugador *jugador = &_jugadores[id];
-    Nat *k = &jugador->jugadasSinCalcularPuntaje;
-    auto histIt = jugador->historial.rbegin();
-    while (*k > 0) {
+    Nat k = _jugadores[id].jugadasSinCalcularPuntaje;
+    auto histIt = _jugadores[id].historial.rbegin();
+    while (k > 0) {
         pair<Ocurrencia, Nat> jugada = *histIt;
-        auto ocIt = jugada.first.begin();
-        bool esHorizontal = true;
-        tuple<Nat, Nat, Letra> ficha = *ocIt;
-        ocIt++;
-        if (ocIt != jugada.first.end())
-            esHorizontal = get<0>(ficha) = get<0>(*ocIt);
-        sumarPuntaje(*jugador, ficha, jugada.second, true, esHorizontal);
-        for (auto fichaSecundaria: jugada.first)
-            sumarPuntaje(*jugador, fichaSecundaria, jugada.second, false, !esHorizontal);
+        Nat puntos = calcularPuntaje(jugada);
+        _jugadores[id].puntaje += puntos;
         histIt--;
-        *k = *k - 1;
+        k -= 1;
     }
-    return jugador->puntaje;
+    return _jugadores[id].puntaje;
 }
 
-void
-Juego::sumarPuntaje(Jugador &jugador,
-                    tuple<Nat, Nat, Letra> &ficha,
-                    Nat tiempo,
-                    bool esPrincipal,
-                    bool esHorizontal) {
-    Nat linea = esHorizontal ? get<0>(ficha) : get<1>(ficha);
-    Nat i = esHorizontal ? get<1>(ficha) : get<0>(ficha) - (esPrincipal ? 0 : 1);
-    Nat j = i + 1;
-    sumarPuntajeEnDir(jugador, ficha, tiempo, linea, i, false, esHorizontal);
-    sumarPuntajeEnDir(jugador, ficha, tiempo, linea, j, true, esHorizontal);
-}
-
-void Juego::sumarPuntajeEnDir(Jugador &jugador,
-                              tuple<Nat, Nat, Letra> &ficha,
-                              Nat tiempo,
-                              Nat pos,
-                              Nat desde,
-                              bool adelante,
-                              bool esHorizontal) {
-    while (enTablero(pos, desde) &&
-           hayLetra(pos, desde) &&
-           fichaTiempo(pos, desde) <= tiempo) {
-        if (esHorizontal)
-            jugador.puntaje += _variante.puntajeLetra(this->ficha(pos, desde));
-        else
-            jugador.puntaje += _variante.puntajeLetra(this->ficha(desde, pos));
-        if (adelante)
-            desde++;
-        else
-            desde--;
+Nat Juego::calcularPuntaje(pair<Ocurrencia, Nat> jugada) {
+    Nat puntos = 0;
+    auto ocurrencia = jugada.first;
+    bool horizontal = esHorizontal(ocurrencia);
+    auto itr = ocurrencia.begin();
+    while (itr != ocurrencia.end()) {
+        puntos += _variante.puntajeLetra(get<2>(*itr));
+        auto rango = rangoDePalabra(*itr, !horizontal, jugada.second);
+        for (Nat i = rango.first; i <= rango.second; i++ ) {
+            if (horizontal) {
+                puntos += _variante.puntajeLetra(_tablero[i][get<1>(*itr)]->first);
+            } else {
+                puntos += _variante.puntajeLetra(_tablero[get<0>(*itr)][i]->first);
+            }
+        }
+        itr++;
     }
+    return puntos;
 }
 
 bool Juego::enTablero(Nat i, Nat j) {

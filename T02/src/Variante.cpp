@@ -16,7 +16,11 @@ Nat Variante::fichas() const {
 }
 
 Nat Variante::puntajeLetra(Letra l) const {
-    return _puntajes.at(l);
+    for (auto letra : _puntajes)
+        if (letra.first == l)
+            return letra.second;
+
+    return 1;
 }
 
 bool Variante::palabraLegitima(const Palabra &palabra) const {
