@@ -42,6 +42,7 @@ public:
 
 private:
     Variante _variante;
+    set<Palabra> _palabrasLegitimas;
 };
 
 #endif //FACHADA_VARIANTE_H

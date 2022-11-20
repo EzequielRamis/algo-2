@@ -60,6 +60,8 @@ public:
      */
     list<Notificacion> notificaciones(IdCliente id);
 
+    bool empezo();
+
 private:
     Juego _juego;
     Nat _jugadoresConectados;

@@ -4,53 +4,61 @@ Servidor::Servidor(
         Nat cantJugadores,
         const Variante &variante,
         const Repositorio &r
-) : _jugadoresConectados(0), _jugadoresEsperados(cantJugadores), _juego(Juego(cantJugadores, variante, r)),
-    _notificaciones(vector<list<Notificacion>>(cantJugadores)) {}
+) : _jugadoresConectados(0),
+    _jugadoresEsperados(cantJugadores),
+    _juego(cantJugadores, variante, r),
+    _notificaciones(cantJugadores) {}
 
 IdCliente Servidor::conectarCliente() {
     Notificacion n = Notificacion::nuevaIdCliente(_jugadoresConectados);
     _notificaciones[_jugadoresConectados].push_back(n);
-
     _jugadoresConectados++;
-    if (_jugadoresConectados == _jugadoresEsperados) {
+
+    if (empezo()) {
         Notificacion empezar = Notificacion::nuevaEmpezar(_juego.variante().tamanoTablero());
         Notificacion turnoDe = Notificacion::nuevaTurnoDe(0);
-        for (int i = 0; i < _notificaciones.size(); i++) {
-            _notificaciones[i].push_back(empezar);
-            _notificaciones[i].push_back(turnoDe);
+        for (auto notif: _notificaciones) {
+            notif.push_back(empezar);
+            notif.push_back(turnoDe);
         }
     }
 
     return _jugadoresConectados;
 }
 
-void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
-    if(_jugadoresConectados == _jugadoresEsperados && _juego.turno() == id && _juego.jugadaValida(o)) {
+list<Notificacion> Servidor::notificaciones(IdCliente id) {
+    list<Notificacion> n = _notificaciones[id];
+    _notificaciones[id] = list<Notificacion>();
+    return n;
+}
 
-        Repositorio repo = _juego.repositorio();
+void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
+    if (empezo() && _juego.turno() == id && _juego.jugadaValida(o)) {
+        auto *repoViejo = new Repositorio(_juego.repositorio());
+
+        multiset<Letra> letrasRepuestas;
+        for (int i = 0; i < o.size(); i++) {
+            letrasRepuestas.insert(*repoViejo->begin());
+            repoViejo->pop_front();
+        }
+        delete repoViejo;
+
+        Nat puntajeViejo = _juego.consultarPuntaje(id);
         _juego.ubicar(o);
-        Nat puntajeAnterior = _juego.consultarPuntaje(id);
         Nat puntajeNuevo = _juego.puntaje(id);
 
-        Notificacion sumaPuntos = Notificacion::nuevaSumaPuntos(id, puntajeNuevo-puntajeAnterior);
+        Notificacion sumaPuntos = Notificacion::nuevaSumaPuntos(id, puntajeNuevo - puntajeViejo);
         Notificacion ubicar = Notificacion::nuevaUbicar(id, o);
         Notificacion turnoDe = Notificacion::nuevaTurnoDe(_juego.turno());
+        Notificacion reponer = Notificacion::nuevaReponer(letrasRepuestas);
 
         for (int i = 0; i < _notificaciones.size(); i++) {
             _notificaciones[i].push_back(ubicar);
             _notificaciones[i].push_back(sumaPuntos);
+            if (i == id)
+                _notificaciones[id].push_back(reponer);
             _notificaciones[i].push_back(turnoDe);
         }
-
-        multiset<Letra> letrasRepuestas;
-        for (int i = 0; i < o.size(); i++) {
-            letrasRepuestas.insert(*repo.rbegin());
-            repo.pop_back();
-        }
-
-        Notificacion reponer = Notificacion::nuevaReponer(letrasRepuestas);
-        _notificaciones[id].push_back(reponer);
-
     } else {
         Notificacion mal = Notificacion::nuevaMal();
         _notificaciones[id].push_back(mal);
@@ -65,9 +73,6 @@ Nat Servidor::jugadoresConectados() {
     return _jugadoresConectados;
 }
 
-
-list<Notificacion> Servidor::notificaciones(IdCliente id) {
-    list<Notificacion> n = _notificaciones[id];
-    _notificaciones[id] = list<Notificacion>();
-    return n;
+bool Servidor::empezo() {
+    return _jugadoresConectados == _jugadoresEsperados;
 }

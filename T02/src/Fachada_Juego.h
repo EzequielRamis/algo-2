@@ -75,6 +75,7 @@ public:
 
 private:
     Juego juego;
+    Fachada_Variante fachadaVariante;
 };
 
 #endif // FACHADA_JUEGO_H

@@ -3,6 +3,7 @@
 
 #include "Tipos.h"
 #include "Letra.h"
+#include "Trie.h"
 
 class Variante {
 public:
@@ -49,7 +50,8 @@ private:
     Nat _tamanoTab;
     Nat _cantFichas;
     map<Letra, Nat> _puntajes;
-    set<vector<Letra>> _palabrasLegitimas;
+    Trie _palabras;
+    Nat _longPalabraMasLarga;
 };
 
 #endif //VARIANTE_H

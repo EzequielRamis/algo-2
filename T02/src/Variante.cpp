@@ -5,7 +5,17 @@ Variante::Variante(
         Nat cantFichas,
         const map<Letra, Nat> &puntajes,
         const set<vector<Letra>> &palabrasLegitimas
-) : _tamanoTab(tamanoTab), _cantFichas(cantFichas), _puntajes(puntajes), _palabrasLegitimas(palabrasLegitimas){}
+) : _tamanoTab(tamanoTab),
+    _cantFichas(cantFichas),
+    _puntajes(puntajes),
+    _palabras(),
+    _longPalabraMasLarga(0) {
+    for (Palabra p: palabrasLegitimas) {
+        _palabras.definir(p);
+        if (p.size() > _longPalabraMasLarga)
+            _longPalabraMasLarga = p.size();
+    }
+}
 
 Nat Variante::tamanoTablero() const {
     return _tamanoTab;
@@ -16,36 +26,19 @@ Nat Variante::fichas() const {
 }
 
 Nat Variante::puntajeLetra(Letra l) const {
-    for (auto letra : _puntajes)
-        if (letra.first == l)
-            return letra.second;
-
+    if (_puntajes.count(l) > 0)
+        return _puntajes.at(l);
     return 1;
 }
 
 bool Variante::palabraLegitima(const Palabra &palabra) const {
-    for (vector<Letra> palabraLegitima : _palabrasLegitimas) {
-        if (palabra == palabraLegitima) {
-            return true;
-        }
-    }
-    return false;
+    return _palabras.definida(palabra);
 }
 
 Nat Variante::longPalabraMasLarga() {
-    Nat palabraMasLarga = 0;
-    for (vector<Letra> palabra : _palabrasLegitimas) {
-        if (palabra.size() > palabraMasLarga) {
-            palabraMasLarga = palabra.size();
-        }
-    }
-    return palabraMasLarga;
+    return _longPalabraMasLarga;
 }
 
 map<Letra, Nat> Variante::puntajes() const {
     return _puntajes;
-}
-
-set<vector<Letra>> Variante::palabrasLegitimas() const {
-    return _palabrasLegitimas;
 }
