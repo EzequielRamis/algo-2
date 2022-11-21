@@ -123,20 +123,20 @@ pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool h
     if (horizontal) {
         while (enTablero(linea, i - 1)
                && hayLetra(linea, i - 1)
-               && _tablero[linea][i - 1]->second < antesDeTiempo)
+               && _tablero[linea][i - 1]->second <= antesDeTiempo)
             i--;
         while (enTablero(linea, j + 1)
                && hayLetra(linea, j + 1)
-               && _tablero[linea][j + 1]->second < antesDeTiempo)
+               && _tablero[linea][j + 1]->second <= antesDeTiempo)
             j++;
     } else {
         while (enTablero(i - 1, linea)
                && hayLetra(i - 1, linea)
-               && _tablero[i - 1][linea]->second < antesDeTiempo)
+               && _tablero[i - 1][linea]->second <= antesDeTiempo)
             i--;
         while (enTablero(j + 1, linea)
                && hayLetra(j + 1, linea)
-               && _tablero[j + 1][linea]->second < antesDeTiempo)
+               && _tablero[j + 1][linea]->second <= antesDeTiempo)
             j++;
     }
     return make_pair(i, j);
@@ -177,20 +177,25 @@ Nat Juego::puntaje(IdCliente id) {
 Nat Juego::calcularPuntaje(const pair<Ocurrencia, Nat> &jugada) {
     Nat puntos = 0;
     auto ocurrencia = jugada.first;
+    if (ocurrencia.empty())
+        return puntos;
     bool horizontal = esHorizontal(ocurrencia);
     auto itr = ocurrencia.begin();
+    auto cualquierFicha = *itr;
+    auto rango = rangoDePalabra(*itr, horizontal, jugada.second);
     while (itr != ocurrencia.end()) {
-        puntos += _variante.puntajeLetra(get<2>(*itr));
-        auto rango = rangoDePalabra(*itr, !horizontal, jugada.second);
-        for (Nat i = rango.first; i <= rango.second; i++) {
-            if (horizontal) {
-                puntos += _variante.puntajeLetra(_tablero[i][get<1>(*itr)]->first);
-            } else {
-                puntos += _variante.puntajeLetra(_tablero[get<0>(*itr)][i]->first);
-            }
-        }
+        Letra letra = get<2>(*itr);
+        puntos += _variante.puntajeLetra(letra);
         itr++;
     }
+    for (Nat i = rango.first; i <= rango.second; i++)
+        if (horizontal) {
+            Nat linea = get<0>(cualquierFicha);
+            puntos += _variante.puntajeLetra(_tablero[linea][i]->first);
+        } else {
+            Nat linea = get<1>(cualquierFicha);
+            puntos += _variante.puntajeLetra(_tablero[i][linea]->first);
+        }
     return puntos;
 }
 

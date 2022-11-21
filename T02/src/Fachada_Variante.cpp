@@ -9,6 +9,7 @@ Fachada_Variante::Fachada_Variante(
               cantFichas,
               puntajes,
               palabrasLegitimas),
+    _puntajes(puntajes),
     _palabrasLegitimas(palabrasLegitimas) {}
 
 Nat Fachada_Variante::tamanoTablero() const {
