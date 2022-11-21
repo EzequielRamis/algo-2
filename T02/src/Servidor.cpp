@@ -73,14 +73,14 @@ void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
     }
 }
 
-Nat Servidor::jugadoresEsperados() {
+Nat Servidor::jugadoresEsperados() const {
     return _jugadoresEsperados;
 }
 
-Nat Servidor::jugadoresConectados() {
+Nat Servidor::jugadoresConectados() const {
     return _jugadoresConectados;
 }
 
-bool Servidor::empezo() {
+bool Servidor::empezo() const {
     return _jugadoresConectados == _jugadoresEsperados;
 }

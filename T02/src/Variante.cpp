@@ -7,10 +7,13 @@ Variante::Variante(
         const set<vector<Letra>> &palabrasLegitimas
 ) : _tamanoTab(tamanoTab),
     _cantFichas(cantFichas),
-    _puntajes(puntajes),
-    _palabras(),
     _longPalabraMasLarga(0) {
-    for (Palabra p: palabrasLegitimas) {
+    for (int i = 0; i < TAMANIO_ALFABETO; i++)
+        if (puntajes.count(inversaDeOrd(i)) > 0)
+            _puntajes[i] = puntajes.at(inversaDeOrd(i));
+        else
+            _puntajes[i] = 1;
+    for (const Palabra &p: palabrasLegitimas) {
         _palabras.definir(p);
         if (p.size() > _longPalabraMasLarga)
             _longPalabraMasLarga = p.size();
@@ -26,19 +29,13 @@ Nat Variante::fichas() const {
 }
 
 Nat Variante::puntajeLetra(Letra l) const {
-    if (_puntajes.count(l) > 0)
-        return _puntajes.at(l);
-    return 1;
+    return _puntajes[ord(l)];
 }
 
 bool Variante::palabraLegitima(const Palabra &palabra) const {
     return _palabras.definida(palabra);
 }
 
-Nat Variante::longPalabraMasLarga() {
+Nat Variante::longPalabraMasLarga() const {
     return _longPalabraMasLarga;
-}
-
-map<Letra, Nat> Variante::puntajes() const {
-    return _puntajes;
 }

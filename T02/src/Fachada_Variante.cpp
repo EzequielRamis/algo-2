@@ -28,7 +28,7 @@ bool Fachada_Variante::palabraLegitima(const Palabra &palabra) const {
 }
 
 map<Letra, Nat> Fachada_Variante::puntajes() const {
-    return _variante.puntajes();
+    return _puntajes;
 }
 
 set<Palabra> Fachada_Variante::palabrasLegitimas() const {

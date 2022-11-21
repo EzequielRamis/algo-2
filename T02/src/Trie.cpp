@@ -1,10 +1,20 @@
 #include "Trie.h"
-#include "Letra.h"
 
 Trie::Trie() : _fin(false),
-               _hijos(TAMANIO_ALFABETO, nullptr) {}
+               _hijos{nullptr} {}
 
-void Trie::definir(Palabra p) {
+Trie::~Trie() {
+    for (auto h: _hijos)
+        borrarNodos(h);
+}
+
+void Trie::borrarNodos(Trie *t) {
+    if (t != nullptr)
+        for (auto h: t->_hijos)
+            borrarNodos(h);
+}
+
+void Trie::definir(const Palabra &p) {
     auto pIt = p.begin();
     if (pIt == p.end()) {
         _fin = true;
@@ -24,7 +34,7 @@ void Trie::definir(Palabra p) {
     nodo->_fin = true;
 }
 
-bool Trie::definida(Palabra p) const {
+bool Trie::definida(const Palabra &p) const {
     auto pIt = p.begin();
     if (pIt == p.end())
         return _fin;

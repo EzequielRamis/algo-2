@@ -40,16 +40,12 @@ public:
     /**
      * Retorna la longitud de la palabra definida más larga
      */
-    Nat longPalabraMasLarga();
-
-    map<Letra, Nat> puntajes() const;
-
-    set<vector<Letra>> palabrasLegitimas() const;
+    Nat longPalabraMasLarga() const;
 
 private:
     Nat _tamanoTab;
     Nat _cantFichas;
-    map<Letra, Nat> _puntajes;
+    Nat _puntajes[TAMANIO_ALFABETO];
     Trie _palabras;
     Nat _longPalabraMasLarga;
 };

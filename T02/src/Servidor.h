@@ -42,14 +42,14 @@ public:
      *
      * Complejidad: O(1)
      */
-    Nat jugadoresEsperados();
+    Nat jugadoresEsperados() const;
 
     /**
      * Retorna la cantidad de jugadores necesarios para poder empezar el juego
      *
      * Complejidad: O(1)
      */
-    Nat jugadoresConectados();
+    Nat jugadoresConectados() const;
 
     /**
      * Consulta y vacia la cola de notificaciones del cliente id
@@ -60,7 +60,7 @@ public:
      */
     list<Notificacion> notificaciones(IdCliente id);
 
-    bool empezo();
+    bool empezo() const;
 
 private:
     Juego _juego;

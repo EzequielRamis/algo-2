@@ -12,7 +12,9 @@ public:
      *
      * Complejidad: O(tamanoTab**2 + ALPHABET_SIZE*cantJugadores + cantFichas*cantJugadores)
      */
-    Juego(Nat k, const Variante &v, const Repositorio &r);
+    Juego(Nat k, const Variante &v, Repositorio r);
+
+    ~Juego();
 
     /**
      * Ubica una Ocurrencia o en el juego
@@ -64,13 +66,6 @@ public:
      *   donde m es la cantidad de fichas que ubico el jugador desde la ultima vez que se preguntó por su puntaje.
      */
     Nat puntaje(IdCliente id);
-
-    /**
-     * Retorna el puntaje del jugador id
-     *
-     * Complejidad: O(1)
-     */
-    Nat consultarPuntaje(IdCliente id) const;
 
     /**
      * Retorna el repositorio
@@ -128,9 +123,9 @@ private:
     vector<Jugador> _jugadores;
     Nat _tiempo;
     Repositorio _repositorio;
-    Variante _variante;
+    const Variante _variante;
 
-    Nat calcularPuntaje(pair<Ocurrencia, Nat> jugada);
+    Nat calcularPuntaje(const pair<Ocurrencia, Nat> &jugada);
 
     void ponerLetras(const Ocurrencia &o);
 
@@ -142,9 +137,9 @@ private:
 
     bool haySuperpuestas(const Ocurrencia &o) const;
 
-    bool esHorizontal(const Ocurrencia &o) const;
+    static bool esHorizontal(const Ocurrencia &o);
 
-    bool esVertical(const Ocurrencia &o) const;
+    static bool esVertical(const Ocurrencia &o);
 
 };
 

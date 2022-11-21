@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Tipos.h"
+#include "Letra.h"
 
 using namespace std;
 
@@ -10,13 +11,17 @@ class Trie {
 public:
     Trie();
 
-    void definir(Palabra p);
+    ~Trie();
 
-    bool definida(Palabra p) const;
+    void definir(const Palabra &p);
+
+    bool definida(const Palabra &p) const;
 
 private:
-    vector<Trie *> _hijos;
+    Trie *_hijos[TAMANIO_ALFABETO];
     bool _fin;
+
+    static void borrarNodos(Trie *t);
 };
 
 #endif //TRIE_H

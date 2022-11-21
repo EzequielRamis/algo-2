@@ -41,8 +41,9 @@ public:
     set<vector<Letra>> palabrasLegitimas() const;
 
 private:
-    Variante _variante;
-    set<Palabra> _palabrasLegitimas;
+    const Variante _variante;
+    const map<Letra, Nat> _puntajes;
+    const set<Palabra> _palabrasLegitimas;
 };
 
 #endif //FACHADA_VARIANTE_H

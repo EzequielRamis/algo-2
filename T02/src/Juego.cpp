@@ -1,7 +1,7 @@
 #include "Juego.h"
 #include "Letra.h"
 
-Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
+Juego::Juego(Nat k, const Variante &v, Repositorio r) :
         _tablero(
                 v.tamanoTablero(),
                 vector<pair<Letra, Nat> *>(v.tamanoTablero(), nullptr)
@@ -16,6 +16,12 @@ Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
             _repositorio.pop_front();
             _jugadores[j].cantFichasPorLetra[ord(ficha)]++;
         }
+}
+
+Juego::~Juego() {
+    for (const auto &col: _tablero)
+        for (auto ficha: col)
+            delete ficha;
 }
 
 Juego::Jugador::Jugador() :
@@ -49,7 +55,7 @@ const Variante &Juego::variante() {
 }
 
 bool Juego::jugadaValida(const Ocurrencia &o) {
-    if (o.size() == 0)
+    if (o.empty())
         return true;
     if (o.size() > _variante.longPalabraMasLarga())
         return false;
@@ -82,11 +88,11 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
     }
 
     for (auto ficha: o) {
-        pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal, _tiempo + 1);
-        if (rango.first != rango.second &&
-            !formaPalabraLegitima(rango, !horizontal, horizontal ?
-                                                      get<1>(cualquierFicha) :
-                                                      get<0>(cualquierFicha))) {
+        pair<Nat, Nat> rangoAdicional = rangoDePalabra(cualquierFicha, !horizontal, _tiempo + 1);
+        if (rangoAdicional.first != rangoAdicional.second &&
+            !formaPalabraLegitima(rangoAdicional, !horizontal, horizontal ?
+                                                               get<1>(cualquierFicha) :
+                                                               get<0>(cualquierFicha))) {
             sacarLetras(o);
             return false;
         }
@@ -140,7 +146,7 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     Nat i = r.first;
     Nat j = r.second;
     Palabra palabra;
-    for (int k = i; k <= j; k++) {
+    for (Nat k = i; k <= j; k++) {
         Letra letra = horizontal ? ficha(padding, k) : ficha(k, padding);
         palabra.push_back(letra);
     }
@@ -153,10 +159,6 @@ Nat Juego::tiempo() const {
 
 Repositorio Juego::repositorio() const {
     return _repositorio;
-}
-
-Nat Juego::consultarPuntaje(IdCliente id) const {
-    return _jugadores[id].puntaje;
 }
 
 Nat Juego::puntaje(IdCliente id) {
@@ -172,7 +174,7 @@ Nat Juego::puntaje(IdCliente id) {
     return _jugadores[id].puntaje;
 }
 
-Nat Juego::calcularPuntaje(pair<Ocurrencia, Nat> jugada) {
+Nat Juego::calcularPuntaje(const pair<Ocurrencia, Nat> &jugada) {
     Nat puntos = 0;
     auto ocurrencia = jugada.first;
     bool horizontal = esHorizontal(ocurrencia);
@@ -225,7 +227,7 @@ bool Juego::haySuperpuestas(const Ocurrencia &o) const {
 }
 
 //Chequeamos que todos los primeros elementos de la tupla "o" sean iguales
-bool Juego::esHorizontal(const Ocurrencia &o) const {
+bool Juego::esHorizontal(const Ocurrencia &o) {
     auto itr = o.begin();
     Nat fila = get<0>(*itr);
     itr++;
@@ -239,7 +241,7 @@ bool Juego::esHorizontal(const Ocurrencia &o) const {
 }
 
 //Chequeamos que todos los segundos elementos de la tupla "o" sean iguales
-bool Juego::esVertical(const Ocurrencia &o) const {
+bool Juego::esVertical(const Ocurrencia &o) {
     auto itr = o.begin();
     Nat col = get<1>(*itr);
     itr++;
@@ -255,7 +257,7 @@ bool Juego::esVertical(const Ocurrencia &o) const {
 multiset<Letra> Juego::mazoDeJugador(Nat i) {
     multiset<Letra> res;
     for (int l = 0; l < (int) _jugadores[i].cantFichasPorLetra.size(); l++) {
-        int cant = _jugadores[i].cantFichasPorLetra[l];
+        Nat cant = _jugadores[i].cantFichasPorLetra[l];
         while (cant > 0) {
             res.insert(inversaDeOrd(l));
             cant--;
