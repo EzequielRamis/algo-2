@@ -4,14 +4,18 @@ Trie::Trie() : _fin(false),
                _hijos{nullptr} {}
 
 Trie::~Trie() {
-    for (auto h: _hijos)
+    for (auto h: _hijos) {
         borrarNodos(h);
+        delete h;
+    }
 }
 
 void Trie::borrarNodos(Trie *t) {
     if (t != nullptr)
-        for (auto h: t->_hijos)
+        for (auto h: t->_hijos) {
             borrarNodos(h);
+            delete h;
+        }
 }
 
 void Trie::definir(const Palabra &p) {
