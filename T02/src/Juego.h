@@ -87,6 +87,13 @@ public:
     Nat cantLetrasTieneJugador(Letra x, Nat i);
 
     /**
+     * Obtiene el mazo de letras del jugador i (Sirve para el constructor Reponer del tipo Notificación)
+     *
+     * Complejidad: O(F)
+     */
+    multiset<Letra> mazoDeJugador(Nat i);
+
+    /**
      * Determina si una coordenada (i,j) está en el rango del tablero
      *
      * Complejidad: O(1)

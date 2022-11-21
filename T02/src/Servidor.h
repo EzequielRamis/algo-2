@@ -67,6 +67,8 @@ private:
     Nat _jugadoresConectados;
     Nat _jugadoresEsperados;
     vector<list<Notificacion>> _notificaciones;
+    // Sirve para el constructor Reponer del tipo Notificación
+    vector<multiset<Letra>> _mazos;
 };
 
 #endif // SERVIDOR_H;

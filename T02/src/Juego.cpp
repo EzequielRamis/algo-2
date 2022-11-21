@@ -49,6 +49,8 @@ const Variante &Juego::variante() {
 }
 
 bool Juego::jugadaValida(const Ocurrencia &o) {
+    if (o.size() == 0)
+        return true;
     if (o.size() > _variante.longPalabraMasLarga())
         return false;
     for (auto ficha: o) {
@@ -94,12 +96,15 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
 }
 
 void Juego::ponerLetras(const Ocurrencia &o) {
-    for (auto ficha: o)
-        _tablero[get<0>(ficha)][get<1>(ficha)] = new pair<Letra, Nat>{get<2>(ficha), _tiempo};
+    for (auto &ficha: o) {
+        Letra letra = get<2>(ficha);
+        pair<Letra, Nat> ubicado(letra, _tiempo);
+        _tablero[get<0>(ficha)][get<1>(ficha)] = new pair<Letra, Nat>(ubicado);
+    }
 }
 
 void Juego::sacarLetras(const Ocurrencia &o) {
-    for (auto ficha: o) {
+    for (auto &ficha: o) {
         delete _tablero[get<0>(ficha)][get<1>(ficha)];
         _tablero[get<0>(ficha)][get<1>(ficha)] = nullptr;
     }
@@ -110,19 +115,23 @@ pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool h
     Nat i = horizontal ? get<1>(ficha) : get<0>(ficha);
     Nat j = i;
     if (horizontal) {
-        while (enTablero(linea, i) && hayLetra(linea, i) && _tablero[linea][i]->second < antesDeTiempo)
+        while (enTablero(linea, i - 1)
+               && hayLetra(linea, i - 1)
+               && _tablero[linea][i - 1]->second < antesDeTiempo)
             i--;
-        i++;
-        while (enTablero(linea, j) && hayLetra(linea, j) && _tablero[linea][j]->second < antesDeTiempo)
+        while (enTablero(linea, j + 1)
+               && hayLetra(linea, j + 1)
+               && _tablero[linea][j + 1]->second < antesDeTiempo)
             j++;
-        j--;
     } else {
-        while (enTablero(i, linea) && hayLetra(i, linea) && _tablero[i][linea]->second < antesDeTiempo)
+        while (enTablero(i - 1, linea)
+               && hayLetra(i - 1, linea)
+               && _tablero[i - 1][linea]->second < antesDeTiempo)
             i--;
-        i++;
-        while (enTablero(j, linea) && hayLetra(j, linea) && _tablero[j][linea]->second < antesDeTiempo)
+        while (enTablero(j + 1, linea)
+               && hayLetra(j + 1, linea)
+               && _tablero[j + 1][linea]->second < antesDeTiempo)
             j++;
-        j--;
     }
     return make_pair(i, j);
 }
@@ -130,7 +139,7 @@ pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool h
 bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat padding) {
     Nat i = r.first;
     Nat j = r.second;
-    Palabra palabra(j - i);
+    Palabra palabra;
     for (int k = i; k <= j; k++) {
         Letra letra = horizontal ? ficha(padding, k) : ficha(k, padding);
         palabra.push_back(letra);
@@ -241,4 +250,16 @@ bool Juego::esVertical(const Ocurrencia &o) const {
         itr++;
     }
     return true;
+}
+
+multiset<Letra> Juego::mazoDeJugador(Nat i) {
+    multiset<Letra> res;
+    for (int l = 0; l < (int) _jugadores[i].cantFichasPorLetra.size(); l++) {
+        int cant = _jugadores[i].cantFichasPorLetra[l];
+        while (cant > 0) {
+            res.insert(inversaDeOrd(l));
+            cant--;
+        }
+    }
+    return res;
 }
