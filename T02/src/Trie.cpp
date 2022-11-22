@@ -1,52 +1,41 @@
 #include "Trie.h"
 
-Trie::Trie() : _fin(false),
-               _hijos{nullptr} {}
+Trie::Trie() : _raiz(nullptr) {}
+
+Trie::Nodo::Nodo() : fin(false),
+                     hijos(TAMANIO_ALFABETO, nullptr) {}
 
 Trie::~Trie() {
-    for (auto h: _hijos) {
-        borrarNodos(h);
-        delete h;
-    }
+    borrarNodos(_raiz);
 }
 
-void Trie::borrarNodos(Trie *t) {
-    if (t != nullptr)
-        for (auto h: t->_hijos) {
-            borrarNodos(h);
-            delete h;
-        }
+void Trie::borrarNodos(Nodo *n) {
+    if (n == nullptr) return;
+    for (int i = 0; i < TAMANIO_ALFABETO; i++)
+        borrarNodos(n->hijos[i]);
+    delete n;
 }
 
 void Trie::definir(const Palabra &p) {
-    auto pIt = p.begin();
-    if (pIt == p.end()) {
-        _fin = true;
-        return;
+    Nodo *nodo;
+    if (_raiz == nullptr)
+        _raiz = new Nodo();
+    nodo = _raiz;
+    for (auto pIt: p) {
+        Nat letra = ord(pIt);
+        if (nodo->hijos[letra] == nullptr)
+            nodo->hijos[letra] = new Nodo();
+        nodo = nodo->hijos[letra];
     }
-    Trie *nodo = this;
-    while (nodo->_hijos[ord(*pIt)] != nullptr) {
-        nodo = nodo->_hijos[ord(*pIt)];
-        pIt++;
-    }
-    while (pIt != p.end()) {
-        Letra letra = *pIt;
-        nodo->_hijos[ord(letra)] = new Trie();
-        nodo = nodo->_hijos[ord(letra)];
-        pIt++;
-    }
-    nodo->_fin = true;
+    nodo->fin = true;
 }
 
 bool Trie::definida(const Palabra &p) const {
     auto pIt = p.begin();
-    if (pIt == p.end())
-        return _fin;
-    const Trie *nodo = this;
-    while (pIt != p.end() && nodo->_hijos[ord(*pIt)] != nullptr) {
-        Letra letra = *pIt;
-        nodo = nodo->_hijos[ord(letra)];
+    const Nodo *nodo = _raiz;
+    while (pIt != p.end() && nodo->hijos[ord(*pIt)] != nullptr) {
+        nodo = nodo->hijos[ord(*pIt)];
         pIt++;
     }
-    return pIt == p.end() && nodo->_fin;
+    return pIt == p.end() && nodo->fin;
 }

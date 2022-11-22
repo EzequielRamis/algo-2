@@ -123,7 +123,7 @@ private:
     vector<Jugador> _jugadores;
     Nat _tiempo;
     Repositorio _repositorio;
-    const Variante _variante;
+    const Variante &_variante;
 
     Nat calcularPuntaje(const pair<Ocurrencia, Nat> &jugada);
 

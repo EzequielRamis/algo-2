@@ -40,6 +40,8 @@ public:
 
     set<vector<Letra>> palabrasLegitimas() const;
 
+    const Variante &variante() const;
+
 private:
     const Variante _variante;
     const map<Letra, Nat> _puntajes;

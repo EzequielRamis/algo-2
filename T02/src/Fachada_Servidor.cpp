@@ -5,10 +5,7 @@ Fachada_Servidor::Fachada_Servidor(
         const Fachada_Variante &variante,
         const Repositorio &r
 ) : servidor(cantJugadores,
-             Variante(variante.tamanoTablero(),
-                      variante.fichas(),
-                      variante.puntajes(),
-                      variante.palabrasLegitimas()),
+             variante.variante(),
              r) {}
 
 IdCliente Fachada_Servidor::conectarCliente() {

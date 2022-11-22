@@ -18,10 +18,16 @@ public:
     bool definida(const Palabra &p) const;
 
 private:
-    Trie *_hijos[TAMANIO_ALFABETO];
-    bool _fin;
+    struct Nodo {
+        Nodo();
 
-    static void borrarNodos(Trie *t);
+        vector<Nodo *> hijos;
+        bool fin;
+    };
+
+    Nodo *_raiz;
+
+    static void borrarNodos(Nodo *n);
 };
 
 #endif //TRIE_H

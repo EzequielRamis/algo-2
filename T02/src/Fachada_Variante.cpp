@@ -35,3 +35,7 @@ map<Letra, Nat> Fachada_Variante::puntajes() const {
 set<Palabra> Fachada_Variante::palabrasLegitimas() const {
     return _palabrasLegitimas;
 }
+
+const Variante &Fachada_Variante::variante() const {
+    return _variante;
+}
