@@ -3,7 +3,7 @@
 Trie::Trie() : _raiz(nullptr) {}
 
 Trie::Nodo::Nodo() : fin(false),
-                     hijos(TAMANIO_ALFABETO, nullptr) {}
+                     hijos{nullptr} {}
 
 Trie::~Trie() {
     borrarNodos(_raiz);
@@ -11,8 +11,8 @@ Trie::~Trie() {
 
 void Trie::borrarNodos(Nodo *n) {
     if (n == nullptr) return;
-    for (int i = 0; i < TAMANIO_ALFABETO; i++)
-        borrarNodos(n->hijos[i]);
+    for (auto &h: n->hijos)
+        borrarNodos(h);
     delete n;
 }
 
@@ -31,8 +31,8 @@ void Trie::definir(const Palabra &p) {
 }
 
 bool Trie::definida(const Palabra &p) const {
-    auto pIt = p.begin();
     const Nodo *nodo = _raiz;
+    auto pIt = p.begin();
     while (pIt != p.end() && nodo->hijos[ord(*pIt)] != nullptr) {
         nodo = nodo->hijos[ord(*pIt)];
         pIt++;

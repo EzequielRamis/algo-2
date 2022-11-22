@@ -141,6 +141,8 @@ private:
 
     static bool esVertical(const Ocurrencia &o);
 
+    static bool estaAlineada(const Ocurrencia &o, bool horizontalmente);
+
 };
 
 #endif // JUEGO_H

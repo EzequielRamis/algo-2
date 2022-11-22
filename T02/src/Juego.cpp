@@ -27,8 +27,7 @@ Juego::~Juego() {
 Juego::Jugador::Jugador() :
         puntaje(0),
         jugadasSinCalcularPuntaje(0),
-        cantFichasPorLetra(vector<Nat>(TAMANIO_ALFABETO, 0)),
-        historial(list<pair<Ocurrencia, Nat>>()) {}
+        cantFichasPorLetra(TAMANIO_ALFABETO, 0) {}
 
 void Juego::ubicar(const Ocurrencia &o) {
     Jugador &j = _jugadores[turno()];
@@ -88,11 +87,11 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
     }
 
     for (auto ficha: o) {
-        pair<Nat, Nat> rangoAdicional = rangoDePalabra(cualquierFicha, !horizontal, _tiempo + 1);
-        if (rangoAdicional.first != rangoAdicional.second &&
-            !formaPalabraLegitima(rangoAdicional, !horizontal, horizontal ?
-                                                               get<1>(cualquierFicha) :
-                                                               get<0>(cualquierFicha))) {
+        pair<Nat, Nat> rango = rangoDePalabra(cualquierFicha, !horizontal, _tiempo + 1);
+        if (rango.first != rango.second &&
+            !formaPalabraLegitima(rango, !horizontal, horizontal ?
+                                                      get<1>(cualquierFicha) :
+                                                      get<0>(cualquierFicha))) {
             sacarLetras(o);
             return false;
         }
@@ -223,9 +222,8 @@ bool Juego::haySuperpuestas(const Ocurrencia &o) const {
     vector<set<Nat>> ocurrencias = vector<set<Nat>>(_variante.tamanoTablero());
     for (auto ficha: o) {
         set<Nat> fila = ocurrencias[(get<0>(ficha))];
-        if (fila.find(get<1>(ficha)) != fila.end()) {
+        if (fila.find(get<1>(ficha)) != fila.end())
             return true;
-        }
         ocurrencias[get<0>(ficha)].insert(get<1>(ficha));
     }
     return false;
@@ -233,27 +231,22 @@ bool Juego::haySuperpuestas(const Ocurrencia &o) const {
 
 //Chequeamos que todos los primeros elementos de la tupla "o" sean iguales
 bool Juego::esHorizontal(const Ocurrencia &o) {
-    auto itr = o.begin();
-    Nat fila = get<0>(*itr);
-    itr++;
-    while (itr != o.end()) {
-        if (get<0>(*itr) != fila) {
-            return false;
-        }
-        itr++;
-    }
-    return true;
+    return estaAlineada(o, true);
 }
 
 //Chequeamos que todos los segundos elementos de la tupla "o" sean iguales
 bool Juego::esVertical(const Ocurrencia &o) {
+    return estaAlineada(o, false);
+}
+
+bool Juego::estaAlineada(const Ocurrencia &o, bool horizontalmente) {
     auto itr = o.begin();
-    Nat col = get<1>(*itr);
+    Nat linea = horizontalmente ? get<0>(*itr) : get<1>(*itr);
     itr++;
     while (itr != o.end()) {
-        if (get<1>(*itr) != col) {
+        Nat linea2 = horizontalmente ? get<0>(*itr) : get<1>(*itr);
+        if (linea != linea2)
             return false;
-        }
         itr++;
     }
     return true;

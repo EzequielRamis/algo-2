@@ -21,7 +21,7 @@ private:
     struct Nodo {
         Nodo();
 
-        vector<Nodo *> hijos;
+        Nodo *hijos[TAMANIO_ALFABETO];
         bool fin;
     };
 
