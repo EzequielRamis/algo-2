@@ -160,6 +160,10 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     return _variante.palabraLegitima(palabra);
 }
 
+Nat Juego::tiempo() const {
+    return _tiempo;
+}
+
 const Repositorio &Juego::repositorio() const {
     return _repositorio;
 }

@@ -66,7 +66,10 @@ private:
     Juego _juego;
     Nat _jugadoresConectados;
     Nat _jugadoresEsperados;
-    vector<list<Notificacion>> _notificaciones;
+    list<tuple<int, int, Notificacion>> _notificacionesGlobales;
+    vector<list<tuple<int, int, Notificacion>>> _notificacionesParticulares;
+    vector<int> _indiceDeMensajesSinConsultar;
+    int _cantMensajesRecibidos;
     // Sirve para el constructor Reponer del tipo Notificación
     vector<multiset<Letra>> _mazos;
 };
