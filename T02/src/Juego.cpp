@@ -66,11 +66,14 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
             || hayLetra(get<0>(ficha), get<1>(ficha)))
             return false;
 
-        // Este chequeo no alcanza, puede tener fichas pero menos de las necesarias
         if (_jugadores[turno()].cantFichasPorLetra[ord(get<2>(ficha))] == 0)
             return false;
+        else
+            _jugadores[turno()].cantFichasPorLetra[ord(get<2>(ficha))]--;
 
     }
+    for (auto ficha: o)
+        _jugadores[turno()].cantFichasPorLetra[ord(get<2>(ficha))]++;
     bool horizontal = esHorizontal(o);
 
     if (haySuperpuestas(o) || !(horizontal || esVertical(o)))
@@ -155,6 +158,10 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
         palabra.push_back(letra);
     }
     return _variante.palabraLegitima(palabra);
+}
+
+const Repositorio &Juego::repositorio() const {
+    return _repositorio;
 }
 
 Nat Juego::puntaje(IdCliente id) {

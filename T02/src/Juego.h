@@ -68,6 +68,13 @@ public:
     Nat puntaje(IdCliente id);
 
     /**
+     * Retorna el repositorio
+     *
+     * Complejidad: O(1)
+     */
+    const Repositorio &repositorio() const;
+
+    /**
      * Dada una cierta letra x del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.
      *
      * Complejidad: O(1)
