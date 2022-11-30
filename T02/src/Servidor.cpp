@@ -14,6 +14,7 @@ Servidor::Servidor(
         _mazos[i] = _juego.mazoDeJugador(i);
 }
 
+// Esta mal, ya que no es O(1) como pide el enunciado, es O(cantJugadores)
 IdCliente Servidor::conectarCliente() {
     Notificacion n = Notificacion::nuevaIdCliente(_jugadoresConectados);
     _notificaciones[_jugadoresConectados].push_back(n);
@@ -38,10 +39,13 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
     return n;
 }
 
+// La complejidad de recibirMensaje depende de la cantidad de jugadores, que no sigue el enunciado
 void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
     if (empezo() && _juego.turno() == id && _juego.jugadaValida(o)) {
         auto *repoViejo = new Repositorio(_juego.repositorio());
 
+        // Es una cagada que esto este aca y no encapsulado dentro de juego
+        // podrían hacer que ubicar retorne esto
         multiset<Letra> letrasRepuestas;
         for (int i = 0; i < o.size(); i++) {
             letrasRepuestas.insert(*repoViejo->begin());

@@ -7,6 +7,7 @@ Juego::Juego(Nat k, const Variante &v, Repositorio r) :
                 vector<pair<Letra, Nat> *>(v.tamanoTablero(), nullptr)
         ),
         _variante(v),
+        // Aca lo estan copiando, ojo que se les va la complejidad al tacho
         _repositorio(r),
         _tiempo(0),
         _jugadores(k, Jugador()) {
@@ -63,6 +64,7 @@ bool Juego::jugadaValida(const Ocurrencia &o) {
             || hayLetra(get<0>(ficha), get<1>(ficha)))
             return false;
 
+        // Este chequeo no alcanza, puede tener fichas pero menos de las necesarias
         if (_jugadores[turno()].cantFichasPorLetra[ord(get<2>(ficha))] == 0)
             return false;
 
@@ -119,6 +121,7 @@ pair<Nat, Nat> Juego::rangoDePalabra(const tuple<Nat, Nat, Letra> &ficha, bool h
     Nat linea = horizontal ? get<0>(ficha) : get<1>(ficha);
     Nat i = horizontal ? get<1>(ficha) : get<0>(ficha);
     Nat j = i;
+    // Muy bueno, los invito a pensar como deshacerse del if (obviamente no necesario para la aprobacion)
     if (horizontal) {
         while (enTablero(linea, i - 1)
                && hayLetra(linea, i - 1)
@@ -152,11 +155,13 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     return _variante.palabraLegitima(palabra);
 }
 
+// Si no se usan para que las tienen?
 Nat Juego::tiempo() const {
     return _tiempo;
 }
 
 Repositorio Juego::repositorio() const {
+    // Copia el repositorio, costoso
     return _repositorio;
 }
 
@@ -167,6 +172,8 @@ Nat Juego::puntaje(IdCliente id) {
         pair<Ocurrencia, Nat> jugada = *histIt;
         Nat puntos = calcularPuntaje(jugada);
         _jugadores[id].puntaje += puntos;
+        // Rarisimo que esto ande, deberia ser ++
+        // Les deje un test que rompe
         histIt--;
         k -= 1;
     }
@@ -182,6 +189,9 @@ Nat Juego::calcularPuntaje(const pair<Ocurrencia, Nat> &jugada) {
     auto itr = ocurrencia.begin();
     auto cualquierFicha = *itr;
     auto rango = rangoDePalabra(*itr, horizontal, jugada.second);
+    // Esto tiene pinta de estar mal, solo suman una vez cada letra y una vez el rango
+    // Por ahi en el TP1 se me escapo
+    // Vean el test no_calcula_palabras_transversales
     while (itr != ocurrencia.end()) {
         Letra letra = get<2>(*itr);
         puntos += _variante.puntajeLetra(letra);
@@ -252,6 +262,7 @@ bool Juego::estaAlineada(const Ocurrencia &o, bool horizontalmente) {
     return true;
 }
 
+// Me parece rara esta funcion, despues reviso su uso
 multiset<Letra> Juego::mazoDeJugador(Nat i) {
     multiset<Letra> res;
     for (int l = 0; l < (int) _jugadores[i].cantFichasPorLetra.size(); l++) {
