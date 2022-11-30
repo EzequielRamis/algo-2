@@ -28,16 +28,6 @@ bool Fachada_Variante::palabraLegitima(const Palabra &palabra) const {
     return _variante.palabraLegitima(palabra);
 }
 
-// Para que la tienen?
-map<Letra, Nat> Fachada_Variante::puntajes() const {
-    return _puntajes;
-}
-
-// Para que la tienen?
-set<Palabra> Fachada_Variante::palabrasLegitimas() const {
-    return _palabrasLegitimas;
-}
-
 const Variante &Fachada_Variante::variante() const {
     return _variante;
 }

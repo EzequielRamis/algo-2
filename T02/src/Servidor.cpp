@@ -42,19 +42,8 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
 // La complejidad de recibirMensaje depende de la cantidad de jugadores, que no sigue el enunciado
 void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
     if (empezo() && _juego.turno() == id && _juego.jugadaValida(o)) {
-        auto *repoViejo = new Repositorio(_juego.repositorio());
-
-        // Es una cagada que esto este aca y no encapsulado dentro de juego
-        // podrían hacer que ubicar retorne esto
-        multiset<Letra> letrasRepuestas;
-        for (int i = 0; i < o.size(); i++) {
-            letrasRepuestas.insert(*repoViejo->begin());
-            repoViejo->pop_front();
-        }
-        delete repoViejo;
-
         Nat puntajeViejo = _juego.puntaje(id);
-        _juego.ubicar(o);
+        multiset<Letra> letrasRepuestas = _juego.ubicar(o);
         Nat puntajeNuevo = _juego.puntaje(id);
 
         Notificacion sumaPuntos = Notificacion::nuevaSumaPuntos(id, puntajeNuevo - puntajeViejo);

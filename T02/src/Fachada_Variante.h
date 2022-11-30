@@ -36,10 +36,6 @@ public:
      */
     bool palabraLegitima(const Palabra &palabra) const;
 
-    map<Letra, Nat> puntajes() const;
-
-    set<vector<Letra>> palabrasLegitimas() const;
-
     const Variante &variante() const;
 
 private:

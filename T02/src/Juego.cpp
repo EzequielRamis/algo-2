@@ -1,13 +1,12 @@
 #include "Juego.h"
 #include "Letra.h"
 
-Juego::Juego(Nat k, const Variante &v, Repositorio r) :
+Juego::Juego(Nat k, const Variante &v, const Repositorio &r) :
         _tablero(
                 v.tamanoTablero(),
                 vector<pair<Letra, Nat> *>(v.tamanoTablero(), nullptr)
         ),
         _variante(v),
-        // Aca lo estan copiando, ojo que se les va la complejidad al tacho
         _repositorio(r),
         _tiempo(0),
         _jugadores(k, Jugador()) {
@@ -30,7 +29,8 @@ Juego::Jugador::Jugador() :
         jugadasSinCalcularPuntaje(0),
         cantFichasPorLetra(TAMANIO_ALFABETO, 0) {}
 
-void Juego::ubicar(const Ocurrencia &o) {
+multiset<Letra> Juego::ubicar(const Ocurrencia &o) {
+    multiset<Letra> letrasRespuestas;
     Jugador &j = _jugadores[turno()];
     ponerLetras(o);
     for (auto ficha: o) {
@@ -38,12 +38,14 @@ void Juego::ubicar(const Ocurrencia &o) {
         auto nuevaFicha = *_repositorio.begin();
         _repositorio.pop_front();
         j.cantFichasPorLetra[ord(nuevaFicha)]++;
+        letrasRespuestas.insert(nuevaFicha);
     }
     if (!o.empty()) {
         j.historial.push_back(make_pair(o, _tiempo));
         j.jugadasSinCalcularPuntaje++;
     }
     _tiempo++;
+    return letrasRespuestas;
 }
 
 IdCliente Juego::turno() {
@@ -155,11 +157,6 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     return _variante.palabraLegitima(palabra);
 }
 
-// Si no se usan para que las tienen?
-Nat Juego::tiempo() const {
-    return _tiempo;
-}
-
 Repositorio Juego::repositorio() const {
     // Copia el repositorio, costoso
     return _repositorio;
@@ -172,9 +169,7 @@ Nat Juego::puntaje(IdCliente id) {
         pair<Ocurrencia, Nat> jugada = *histIt;
         Nat puntos = calcularPuntaje(jugada);
         _jugadores[id].puntaje += puntos;
-        // Rarisimo que esto ande, deberia ser ++
-        // Les deje un test que rompe
-        histIt--;
+        histIt++;
         k -= 1;
     }
     return _jugadores[id].puntaje;
@@ -218,10 +213,6 @@ bool Juego::hayLetra(Nat i, Nat j) {
 
 Letra Juego::ficha(Nat i, Nat j) {
     return _tablero[i][j]->first;
-}
-
-Nat Juego::fichaTiempo(Nat i, Nat j) {
-    return _tablero[i][j]->second;
 }
 
 Nat Juego::cantLetrasTieneJugador(Letra x, Nat i) {

@@ -12,7 +12,7 @@ public:
      *
      * Complejidad: O(tamanoTab**2 + ALPHABET_SIZE*cantJugadores + cantFichas*cantJugadores)
      */
-    Juego(Nat k, const Variante &v, Repositorio r);
+    Juego(Nat k, const Variante &v, const Repositorio &r);
 
     ~Juego();
 
@@ -22,7 +22,7 @@ public:
      * Complejidad: O(m)
      *   donde m es el numero de fichas que se ubican
      */
-    void ubicar(const Ocurrencia &o);
+    multiset<Letra> ubicar(const Ocurrencia &o);
 
     /**
      * Retorna el id del cliente al cual le toca jugar
@@ -94,20 +94,6 @@ public:
      * Complejidad: O(1)
      */
     bool enTablero(Nat i, Nat j);
-
-    /**
-     * Obtiene el momento en que una ficha del tablero fue puesta dada una coordenada (i, j).
-     *
-     * Complejidad: O(1)
-     */
-    Nat fichaTiempo(Nat i, Nat j);
-
-    /**
-     * Retorna el tiempo actual del juego
-     *
-     * Complejidad: O(1)
-     */
-    Nat tiempo() const;
 
 private:
     struct Jugador {
