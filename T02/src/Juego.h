@@ -68,13 +68,6 @@ public:
     Nat puntaje(IdCliente id);
 
     /**
-     * Retorna el repositorio
-     *
-     * Complejidad: O(1)
-     */
-    Repositorio repositorio() const;
-
-    /**
      * Dada una cierta letra x del alfabeto, conocer cuántas fichas tiene un jugador de dicha letra.
      *
      * Complejidad: O(1)
@@ -112,6 +105,11 @@ private:
     const Variante &_variante;
 
     Nat calcularPuntaje(const pair<Ocurrencia, Nat> &jugada);
+
+    Nat calcularPuntajeEnRango(
+            const pair<Ocurrencia, Nat> &jugada,
+            const tuple<Nat, Nat, Letra> &desdeFicha,
+            bool horizontal);
 
     void ponerLetras(const Ocurrencia &o);
 

@@ -157,11 +157,6 @@ bool Juego::formaPalabraLegitima(const pair<Nat, Nat> &r, bool horizontal, Nat p
     return _variante.palabraLegitima(palabra);
 }
 
-Repositorio Juego::repositorio() const {
-    // Copia el repositorio, costoso
-    return _repositorio;
-}
-
 Nat Juego::puntaje(IdCliente id) {
     Nat k = _jugadores[id].jugadasSinCalcularPuntaje;
     auto histIt = _jugadores[id].historial.rbegin();
@@ -183,21 +178,25 @@ Nat Juego::calcularPuntaje(const pair<Ocurrencia, Nat> &jugada) {
     bool horizontal = esHorizontal(ocurrencia);
     auto itr = ocurrencia.begin();
     auto cualquierFicha = *itr;
-    auto rango = rangoDePalabra(*itr, horizontal, jugada.second);
-    // Esto tiene pinta de estar mal, solo suman una vez cada letra y una vez el rango
-    // Por ahi en el TP1 se me escapo
-    // Vean el test no_calcula_palabras_transversales
     while (itr != ocurrencia.end()) {
-        Letra letra = get<2>(*itr);
-        puntos += _variante.puntajeLetra(letra);
+        puntos += calcularPuntajeEnRango(jugada, *itr, !horizontal);
         itr++;
     }
+    puntos += calcularPuntajeEnRango(jugada, cualquierFicha, horizontal);
+    return puntos;
+}
+
+Nat Juego::calcularPuntajeEnRango(const pair<Ocurrencia, Nat> &jugada,
+                                  const tuple<Nat, Nat, Letra> &desdeFicha,
+                                  bool horizontal) {
+    Nat puntos = 0;
+    auto rango = rangoDePalabra(desdeFicha, horizontal, jugada.second);
     for (Nat i = rango.first; i <= rango.second; i++)
         if (horizontal) {
-            Nat linea = get<0>(cualquierFicha);
+            Nat linea = get<0>(desdeFicha);
             puntos += _variante.puntajeLetra(_tablero[linea][i]->first);
         } else {
-            Nat linea = get<1>(cualquierFicha);
+            Nat linea = get<1>(desdeFicha);
             puntos += _variante.puntajeLetra(_tablero[i][linea]->first);
         }
     return puntos;
