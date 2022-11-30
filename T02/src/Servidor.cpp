@@ -51,46 +51,38 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
     auto nIt = _notificacionesGlobales.rbegin();
     auto rIt = _notificacionesParticulares[id].rbegin();
 
-    while ((nIt != _notificacionesGlobales.rend() &&
-            get<0>(*nIt) >= _indiceDeMensajesSinConsultar[id]) ||
-           (rIt != _notificacionesParticulares[id].rend())
-            ) {
-//        if (nIt != _notificacionesGlobales.rend() &&
-//            get<2>(*nIt).tipoNotificacion() == TipoNotificacion::TurnoDe &&
-//            get<1>(*nIt) % jugadoresEsperados() == id) {
-//            res.push_front(get<2>(*nIt));
-//            res.push_front(get<2>(*rIt));
-//            rIt++;
-//            nIt++;
-//            continue;
-//        }
+    while (nIt != _notificacionesGlobales.rend() &&
+           rIt != _notificacionesParticulares[id].rend()) {
+
+
+        if (get<2>(*rIt).tipoNotificacion() == TipoNotificacion::Reponer) {
+            res.push_front(get<2>(*rIt));
+            rIt++;
+        }
+
+
         if (nIt != _notificacionesGlobales.rend() &&
             get<0>(*nIt) >= get<0>(*rIt)) {
             res.push_front(get<2>(*nIt));
             nIt++;
         } else {
+            if (get<2>(*rIt).tipoNotificacion() == TipoNotificacion::IdCliente) { break; }
             res.push_front(get<2>(*rIt));
             rIt++;
         }
     }
-
-
-//    for (int i = 0; i < _cantNotifsSinConsultar[id]; i++) {
-//        if (rIt->second.tipoNotificacion() == TipoNotificacion::IdCliente &&
-//            rIt->second.idCliente() == id)
-//            res.push_front(rIt->second);
-//        if (nIt != _notificacionesGlobales.rend()) {
-//            res.push_front(nIt->second);
-//
-//            if ((nIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe &&
-//                 nIt->first % jugadoresEsperados() == id + 1)) {
-//                res.push_front(rIt->second);
-//                rIt++;
-//            }
-//
-//            nIt++;
-//        }
-//    }
+    if (rIt != _notificacionesParticulares[id].rend()) {
+        while (rIt != _notificacionesParticulares[id].rend()) {
+            res.push_front(get<2>(*rIt));
+            rIt++;
+        }
+    } else {
+        while (nIt != _notificacionesGlobales.rend() &&
+               get<0>(*nIt) >= _indiceDeMensajesSinConsultar[id]) {
+            res.push_front(get<2>(*nIt));
+            nIt++;
+        }
+    }
 
     _indiceDeMensajesSinConsultar[id] = _cantMensajesRecibidos;
     _notificacionesParticulares[id].clear();
