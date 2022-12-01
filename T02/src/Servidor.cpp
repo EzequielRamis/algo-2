@@ -85,7 +85,7 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
 
     while (gIt != _notificacionesGlobales.end() &&
            //           _indiceDeMensajesSinConsultar[id] < _cantMensajesRecibidos) {
-           get<1>(*gIt) >= _indiceDeMensajesSinConsultar[id]) {
+           get<1>(*gIt) > _indiceDeMensajesSinConsultar[id]) {
 
         auto primer = gIt;
         if (pIt != _notificacionesParticulares[id].end() &&
@@ -103,35 +103,17 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
             case TipoNotificacion::TurnoDe:
                 res.push_front(primerNotif);
                 primer++;
+                gIt++;
+                if (get<2>(*pIt).tipoNotificacion() == TipoNotificacion::Reponer) {
+                    res.push_front(get<2>(*pIt));
+                    pIt++;
+                }
                 res.push_front(get<2>(*primer));
                 primer++;
-                if (get<2>(*primer).tipoNotificacion() == TipoNotificacion::Reponer)
-                    res.push_front(get<2>(*primer));
-                primer++;
-                res.push_front(get<2>(*primer));
-                primer++;
+                gIt++;
                 res.push_front(get<2>(*primer));
                 break;
         }
-
-
-//        if (pIt != _notificacionesParticulares[id].end() &&
-//            get<1>(*pIt) >= get<1>(*gIt)) {
-//            if (get<2>(*gIt).tipoNotificacion() == TipoNotificacion::TurnoDe) {
-////                    if (get<2>(*gIt).tipoNotificacion() == TipoNotificacion::TurnoDe &&
-////                        (get<1>(*gIt) - 1) % jugadoresEsperados() == id) {
-//                res.push_front(get<2>(*gIt));
-//                gIt++;
-//            }
-////            if (get<2>(*pIt).tipoNotificacion() == TipoNotificacion::IdCliente) {
-////                break;
-////            }
-//            res.push_front(get<2>(*pIt));
-//            pIt++;
-//        } else {
-//            res.push_front(get<2>(*gIt));
-//            gIt++;
-//        }
         _indiceDeMensajesSinConsultar[id]++;
     }
 
