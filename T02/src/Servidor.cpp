@@ -49,8 +49,9 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
            ) ||
            pIt != _notificacionesParticulares[id].end()) {
 
-        if (pIt->second.tipoNotificacion() == TipoNotificacion::Mal ||
-            pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente) {
+        if (pIt != _notificacionesParticulares[id].end() && (
+                pIt->second.tipoNotificacion() == TipoNotificacion::Mal ||
+                pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)) {
             res.push_front(pIt->second);
             pIt++;
         } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
