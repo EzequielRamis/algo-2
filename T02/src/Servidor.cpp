@@ -52,8 +52,9 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
                 pIt->second.tipoNotificacion() == TipoNotificacion::Mal ||
                 pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)) {
             res.push_front(pIt->second);
+            if (pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)
+                _indiceDeMensajesSinConsultar[id]++;
             pIt++;
-            _indiceDeMensajesSinConsultar[id]++;
         } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
             if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::Empezar) {
                 if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
