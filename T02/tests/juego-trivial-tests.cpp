@@ -91,6 +91,33 @@ TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_ilegitima) {
     });
 };
 
+TEST_F(JuegoTrivialTest, jugadores_reciben_mal_ante_jugadas_ilegitimas) {
+    /*
+     * A B B
+     * A
+     * A
+     */
+    fachada.recibirMensaje(0, {{0, 0, 'a'},
+                               {0, 1, 'a'},
+                               {0, 2, 'a'}});
+
+    // limpiar notifs
+    fachada.notificaciones(1);
+    fachada.notificaciones(2);
+
+    Ocurrencia o = {{1, 0, 'b'},
+                    {2, 0, 'b'}};
+    fachada.recibirMensaje(1, o);
+    fachada.recibirMensaje(2, o);
+
+    compareNotificaciones(fachada.notificaciones(1), {
+            Notificacion::nuevaMal()
+    });
+    compareNotificaciones(fachada.notificaciones(2), {
+            Notificacion::nuevaMal()
+    });
+};
+
 TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_ilegitima_sin_limpiar) {
     /*
      * A B B

@@ -55,25 +55,26 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
             if (pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)
                 _indiceDeMensajesSinConsultar[id]++;
             pIt++;
-        } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
+        } else { // No hay más notifs particulares || pIt->second.tipoNotificacion() == Reponer
             if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::SumaPuntos) {
+                // TurnoDe si el juego empezó
                 res.push_front(gIt->second);
                 gIt++;
             }
             if (pIt != _notificacionesParticulares[id].end() &&
                 pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
                 gIt->first == pIt->first) {
+                // Reponer
                 res.push_front(pIt->second);
                 pIt++;
             }
+            // TurnoDe si no empezó / SumaPuntos si empezó
             res.push_front(gIt->second);
             gIt++;
+            // Empezar si no empezó / Ubicar si empezó
             res.push_front(gIt->second);
             gIt++;
             _indiceDeMensajesSinConsultar[id]++;
-        } else {
-            res.push_front(gIt->second);
-            gIt++;
         }
     }
 
