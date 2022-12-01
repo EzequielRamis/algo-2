@@ -19,7 +19,6 @@ Servidor::Servidor(
 IdCliente Servidor::conectarCliente() {
     Notificacion n = Notificacion::nuevaIdCliente(_jugadoresConectados);
     _notificacionesParticulares[n.idCliente()].emplace_front(_cantMensajesRecibidos,
-                                                             -1,
                                                              n);
     _jugadoresConectados++;
 
@@ -27,15 +26,12 @@ IdCliente Servidor::conectarCliente() {
         Notificacion empezar = Notificacion::nuevaEmpezar(_juego.variante().tamanoTablero());
         Notificacion turnoDe = Notificacion::nuevaTurnoDe(0);
         _notificacionesGlobales.emplace_front(_cantMensajesRecibidos,
-                                              -1,
                                               empezar);
         _notificacionesGlobales.emplace_front(_cantMensajesRecibidos,
-                                              -1,
                                               turnoDe);
         for (int i = 0; i < (int) _notificacionesParticulares.size(); i++) {
             _notificacionesParticulares[i]
                     .emplace_front(_cantMensajesRecibidos,
-                                   -1,
                                    Notificacion::nuevaReponer(_mazos[i]));
         }
     }
@@ -43,107 +39,74 @@ IdCliente Servidor::conectarCliente() {
     return n.idCliente();
 }
 
-// Hay dos listas de notifs, una global y otra personal.
-// Ambas tienen el tipo <Indice de mensaje recibido, Notificacion>.
-// Despues hay un vector de cantidad de mensajes sin consultar por id.
-// En "notificaciones" recorro con un while y hago un pseudo two-fingers sort.
-
 list<Notificacion> Servidor::notificaciones(IdCliente id) {
     list<Notificacion> res;
     // Preludio son las notificaciones antes de que empieze el juego.
     list<Notificacion> preludio;
-    auto comienzoGlobal = _notificacionesGlobales.begin();
-    auto comienzoParticular = _notificacionesParticulares[id].begin();
+    auto gIt = _notificacionesGlobales.begin();
+    auto pIt = _notificacionesParticulares[id].begin();
     if (_indiceDeMensajesSinConsultar[id] == -1) {
         if (_notificacionesParticulares[id].size() > 0) {
             // IdCliente
-            preludio.push_front(get<2>(*comienzoParticular));
-            comienzoParticular++;
+            preludio.push_front(pIt->second);
+            pIt++;
             // Mensajes inválidos
-            while (get<2>(*comienzoParticular).tipoNotificacion() == TipoNotificacion::Mal) {
-                preludio.push_front(get<2>(*comienzoParticular));
-                comienzoParticular++;
+            while (pIt->second.tipoNotificacion() == TipoNotificacion::Mal) {
+                preludio.push_front(pIt->second);
+                pIt++;
             }
             if (empezo()) {
                 // Empezar
-                preludio.push_front(get<2>(*comienzoGlobal));
-                comienzoGlobal++;
+                preludio.push_front(gIt->second);
+                gIt++;
                 // TurnoDe
-                preludio.push_front(get<2>(*comienzoGlobal));
+                preludio.push_front(gIt->second);
                 // Reponer
-                preludio.push_front(get<2>(*comienzoParticular));
-//                _indiceDeMensajesSinConsultar[id]++;
+                preludio.push_front(pIt->second);
             }
         }
     }
-    // Mientras |global| > 0 y
-    //   Agrego notifs globales hasta TurnoDe id + 1
-    //   Agrego notifs particulares
-    //
-    auto gIt = comienzoGlobal;
-    auto pIt = comienzoParticular;
 
     while (gIt != _notificacionesGlobales.end() &&
-           //           _indiceDeMensajesSinConsultar[id] < _cantMensajesRecibidos) {
-           get<1>(*gIt) > _indiceDeMensajesSinConsultar[id]) {
+           gIt->first > _indiceDeMensajesSinConsultar[id]) {
 
-        auto primer = gIt;
-        if (pIt != _notificacionesParticulares[id].end() &&
-            get<1>(*pIt) >= get<1>(*gIt) &&
-            get<2>(*pIt).tipoNotificacion() == TipoNotificacion::Mal) {
-            primer = pIt;
-        }
+        if (pIt->second.tipoNotificacion() == TipoNotificacion::Mal) {
+            res.push_front(pIt->second);
+            pIt++;
+            _indiceDeMensajesSinConsultar[id]++;
+            break;
+        } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
+            res.push_front(gIt->second);
+            gIt++;
+            if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer) {
+                res.push_front(pIt->second);
+                pIt++;
+            }
+            res.push_front(gIt->second);
+            gIt++;
+            res.push_front(gIt->second);
+            _indiceDeMensajesSinConsultar[id]++;
+        } else
+            break;
 
-        Notificacion primerNotif = get<2>(*primer);
-
-        switch (primerNotif.tipoNotificacion()) {
-            case TipoNotificacion::Mal:
-                res.push_front(primerNotif);
-                break;
-            case TipoNotificacion::TurnoDe:
-                res.push_front(primerNotif);
-                primer++;
-                gIt++;
-                if (get<2>(*pIt).tipoNotificacion() == TipoNotificacion::Reponer) {
-                    res.push_front(get<2>(*pIt));
-                    pIt++;
-                }
-                res.push_front(get<2>(*primer));
-                primer++;
-                gIt++;
-                res.push_front(get<2>(*primer));
-                break;
-        }
-        _indiceDeMensajesSinConsultar[id]++;
     }
 
     while (pIt != _notificacionesParticulares[id].end()) {
-//        if (get<2>(*pIt).tipoNotificacion() == TipoNotificacion::IdCliente) {
-//            break;
-//        }
-        res.push_front(get<2>(*pIt));
+        if (empezo() &&
+            pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)
+            break;
+        res.push_front(pIt->second);
         pIt++;
     }
 
-//    _indiceDeMensajesSinConsultar[id] = _cantMensajesRecibidos;
     _notificacionesParticulares[id].clear();
 
     for (auto p: preludio)
         res.push_back(p);
 
-    // Hay IdCliente duplicados
-    if (res.size() > 1) {
-        auto idCheck = res.begin();
-        auto idCheck2 = next(idCheck);
-        if (idCheck->tipoNotificacion() == TipoNotificacion::IdCliente &&
-            idCheck->tipoNotificacion() == idCheck2->tipoNotificacion())
-            res.pop_front();
-    }
-
     return res;
 }
 
-// La complejidad de recibirMensaje depende de la cantidad de jugadores, que no sigue el enunciado
 void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
     _cantMensajesRecibidos++;
     _indiceDeMensajesSinConsultar[id]++;
@@ -157,16 +120,16 @@ void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
         Notificacion turnoDe = Notificacion::nuevaTurnoDe(_juego.tiempo());
         Notificacion reponer = Notificacion::nuevaReponer(letrasRepuestas);
 
-        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, _juego.tiempo(), ubicar);
-        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, _juego.tiempo(), sumaPuntos);
-        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, _juego.tiempo(), turnoDe);
+        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, ubicar);
+        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, sumaPuntos);
+        _notificacionesGlobales.emplace_front(_cantMensajesRecibidos, turnoDe);
 
-        _notificacionesParticulares[id].emplace_front(_cantMensajesRecibidos, _juego.tiempo(), reponer);
+        _notificacionesParticulares[id].emplace_front(_cantMensajesRecibidos, reponer);
 
         _mazos[id] = _juego.mazoDeJugador(id); // O(F)
     } else {
         Notificacion mal = Notificacion::nuevaMal();
-        _notificacionesParticulares[id].emplace_front(_cantMensajesRecibidos, _juego.tiempo(), mal);
+        _notificacionesParticulares[id].emplace_front(_cantMensajesRecibidos, mal);
     }
 }
 
