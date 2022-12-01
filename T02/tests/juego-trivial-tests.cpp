@@ -19,31 +19,38 @@ protected:
     Fachada_Variante variante;
     Fachada_Servidor fachada;
 
-    JuegoTrivialTest():
-      puntajes(puntajesIngles),
-      palabrasLegitimas({
-                {'a'}, {'a', 'a'}, {'a', 'a', 'a'}, {'a', 'a', 'a', 'a'}, {'a', 'a', 'a', 'a', 'a'},
-                {'b'}, {'b', 'b'}, {'b', 'b', 'b'}, {'b', 'b', 'b', 'b'}, {'b', 'b', 'b', 'b', 'b'},
-          }),
-      repo(RepositorioGrande::repositorioAB()),
-      variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas),
-      fachada(cantJugadores, variante, repo)
-      {
-        for (Nat i = 0; i < cantJugadores; i++){
+    JuegoTrivialTest() :
+            puntajes(puntajesIngles),
+            palabrasLegitimas({
+                                      {'a'},
+                                      {'a', 'a'},
+                                      {'a', 'a', 'a'},
+                                      {'a', 'a', 'a', 'a'},
+                                      {'a', 'a', 'a', 'a', 'a'},
+                                      {'b'},
+                                      {'b', 'b'},
+                                      {'b', 'b', 'b'},
+                                      {'b', 'b', 'b', 'b'},
+                                      {'b', 'b', 'b', 'b', 'b'},
+                              }),
+            repo(RepositorioGrande::repositorioAB()),
+            variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas),
+            fachada(cantJugadores, variante, repo) {
+        for (Nat i = 0; i < cantJugadores; i++) {
             fachada.conectarCliente();
         }
-      }
+    }
 
 
 };
-
 
 
 TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_discontigua) {
     // limpiar notifs
     fachada.notificaciones(0);
 
-    fachada.recibirMensaje(0, {{0, 0, 'a'}, {0, 2, 'a'}});
+    fachada.recibirMensaje(0, {{0, 0, 'a'},
+                               {0, 2, 'a'}});
 
     compareNotificaciones(fachada.notificaciones(0), {
             Notificacion::nuevaMal()
@@ -54,7 +61,8 @@ TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_diagonal) {
     // limpiar notifs
     fachada.notificaciones(0);
 
-    fachada.recibirMensaje(0, {{0, 0, 'a'}, {1, 1, 'a'}});
+    fachada.recibirMensaje(0, {{0, 0, 'a'},
+                               {1, 1, 'a'}});
 
     compareNotificaciones(fachada.notificaciones(0), {
             Notificacion::nuevaMal()
@@ -67,12 +75,15 @@ TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_ilegitima) {
      * A
      * A
      */
-    fachada.recibirMensaje(0, {{0, 0, 'a'}, {0, 1, 'a'}, {0, 2, 'a'}});
+    fachada.recibirMensaje(0, {{0, 0, 'a'},
+                               {0, 1, 'a'},
+                               {0, 2, 'a'}});
 
     // limpiar notifs
     fachada.notificaciones(1);
 
-    Ocurrencia o = {{1, 0, 'b'}, {2, 0, 'b'}};
+    Ocurrencia o = {{1, 0, 'b'},
+                    {2, 0, 'b'}};
     fachada.recibirMensaje(1, o);
 
     compareNotificaciones(fachada.notificaciones(1), {
@@ -80,3 +91,30 @@ TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_ilegitima) {
     });
 };
 
+TEST_F(JuegoTrivialTest, jugador_recibe_mal_ante_jugada_ilegitima_sin_limpiar) {
+    /*
+     * A B B
+     * A
+     * A
+     */
+    fachada.recibirMensaje(0, {{0, 0, 'a'},
+                               {0, 1, 'a'},
+                               {0, 2, 'a'}});
+
+    Ocurrencia o = {{1, 0, 'b'},
+                    {2, 0, 'b'}};
+    fachada.recibirMensaje(1, o);
+
+    compareNotificaciones(fachada.notificaciones(1), {
+            Notificacion::nuevaIdCliente(1),
+            Notificacion::nuevaEmpezar(this->tamanoTab),
+            Notificacion::nuevaTurnoDe(0),
+            Notificacion::nuevaReponer({'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b', 'a', 'b'}),
+            Notificacion::nuevaUbicar(0, {{0, 0, 'a'},
+                                          {0, 1, 'a'},
+                                          {0, 2, 'a'}}),
+            Notificacion::nuevaSumaPuntos(0, 6),
+            Notificacion::nuevaTurnoDe(1),
+            Notificacion::nuevaMal()
+    });
+};

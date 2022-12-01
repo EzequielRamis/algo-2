@@ -18,7 +18,7 @@ Servidor::Servidor(
 
 IdCliente Servidor::conectarCliente() {
     Notificacion n = Notificacion::nuevaIdCliente(_jugadoresConectados);
-    _notificacionesParticulares[n.idCliente()].emplace_front(_cantMensajesRecibidos,
+    _notificacionesParticulares[n.idCliente()].emplace_front(-1,
                                                              n);
     _jugadoresConectados++;
 
@@ -44,28 +44,33 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
     // Preludio son las notificaciones antes de que empieze el juego.
     list<Notificacion> preludio;
     auto gIt = _notificacionesGlobales.begin();
-    auto pIt = _notificacionesParticulares[id].begin();
-    if (_indiceDeMensajesSinConsultar[id] == -1) {
-        if (_notificacionesParticulares[id].size() > 0) {
-            // IdCliente
-            preludio.push_front(pIt->second);
-            pIt++;
-            // Mensajes inválidos
-            while (pIt->second.tipoNotificacion() == TipoNotificacion::Mal) {
-                preludio.push_front(pIt->second);
-                pIt++;
-            }
-            if (empezo()) {
-                // Empezar
-                preludio.push_front(gIt->second);
-                gIt++;
-                // TurnoDe
-                preludio.push_front(gIt->second);
-                // Reponer
-                preludio.push_front(pIt->second);
-            }
+    if (_notificacionesParticulares[id].back()
+                .second.tipoNotificacion() == TipoNotificacion::IdCliente) {
+        // IdCliente
+        preludio.push_back(_notificacionesParticulares[id].back().second);
+        _notificacionesParticulares[id].pop_back();
+        // Mensajes inválidos
+        while (!_notificacionesParticulares[id].empty() &&
+               _notificacionesParticulares[id].back()
+                       .second.tipoNotificacion() == TipoNotificacion::Mal) {
+            preludio.push_back(_notificacionesParticulares[id].back().second);
+            _notificacionesParticulares[id].pop_back();
+        }
+        if (empezo()) {
+            // Empezar
+            gIt++;
+            preludio.push_back(gIt->second);
+            gIt--;
+            // TurnoDe
+            preludio.push_back(gIt->second);
+            // Reponer
+            preludio.push_back(_notificacionesParticulares[id].back().second);
+            _notificacionesParticulares[id].pop_back();
         }
     }
+    gIt++;
+
+    auto pIt = _notificacionesParticulares[id].begin();
 
     while (gIt != _notificacionesGlobales.end() &&
            gIt->first > _indiceDeMensajesSinConsultar[id]) {
@@ -101,8 +106,10 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
 
     _notificacionesParticulares[id].clear();
 
-    for (auto p: preludio)
-        res.push_back(p);
+    while (!preludio.empty()) {
+        res.push_back(preludio.front());
+        preludio.pop_front();
+    }
 
     return res;
 }
