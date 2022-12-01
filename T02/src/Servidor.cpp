@@ -68,6 +68,8 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
             } else {
                 res.push_front(gIt->second);
                 gIt++;
+                res.push_front(gIt->second);
+                gIt++;
                 if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
                     //                    true) {
                     gIt->first == pIt->first) {
