@@ -19,17 +19,16 @@ protected:
     Fachada_Variante variante;
     Fachada_Servidor fachada;
 
-    JuegoEmpezadoTest():
-      puntajes(puntajesIngles),
-      palabrasLegitimas(begin(palabrasComunes), end(palabrasComunes)),
-      repo(RepositorioGrande::repositorioChico()),
-      variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas),
-      fachada(cantJugadores, variante, repo)
-      {
-        for (Nat i = 0; i < cantJugadores; i++){
+    JuegoEmpezadoTest() :
+            puntajes(puntajesIngles),
+            palabrasLegitimas(begin(palabrasComunes), end(palabrasComunes)),
+            repo(RepositorioGrande::repositorioChico()),
+            variante(tamanoTab, cantFichas, puntajes, palabrasLegitimas),
+            fachada(cantJugadores, variante, repo) {
+        for (Nat i = 0; i < cantJugadores; i++) {
             fachada.conectarCliente();
         }
-      }
+    }
 
 };
 
@@ -37,7 +36,8 @@ TEST_F(JuegoEmpezadoTest, jugador_reciba_mal_si_juega_en_otro_turno) {
     // limpiar notifs
     fachada.notificaciones(2);
 
-    fachada.recibirMensaje(2, {{1, 2, 'f'}, {1, 3, 'a'}});
+    fachada.recibirMensaje(2, {{1, 2, 'f'},
+                               {1, 3, 'a'}});
 
     compareNotificaciones(fachada.notificaciones(2), {
             Notificacion::nuevaMal()
@@ -60,10 +60,11 @@ TEST_F(JuegoEmpezadoTest, jugador_recibe_mal_si_posiciones_ocupadas) {
 
     // Limpiar notifs
     fachada.notificaciones(1);
-    fachada.recibirMensaje(1, {{1, 2, 'd'}, {2, 2, 'e'}});
+    fachada.recibirMensaje(1, {{1, 2, 'd'},
+                               {2, 2, 'e'}});
 
     compareNotificaciones(fachada.notificaciones(1), {
-        Notificacion::nuevaMal()
+            Notificacion::nuevaMal()
     });
 };
 
@@ -117,11 +118,47 @@ TEST_F(JuegoEmpezadoTest, jugadores_reciben_notificaciones_ante_jugada_vacia) {
 
 };
 
+TEST_F(JuegoEmpezadoTest, jugadores_reciben_notificaciones_ante_jugada_vacia_sin_limpiar) {
+    Ocurrencia o = {};
+    fachada.recibirMensaje(0, o);
+
+    compareNotificaciones(fachada.notificaciones(0), {
+            Notificacion::nuevaIdCliente(0),
+            Notificacion::nuevaEmpezar(this->tamanoTab),
+            Notificacion::nuevaTurnoDe(0),
+            Notificacion::nuevaReponer({'e', 'e', 'e', 'e', 'e'}),
+            Notificacion::nuevaUbicar(0, o),
+            Notificacion::nuevaSumaPuntos(0, 0),
+            Notificacion::nuevaReponer({}),
+            Notificacion::nuevaTurnoDe(1)
+    });
+
+    compareNotificaciones(fachada.notificaciones(1), {
+            Notificacion::nuevaIdCliente(1),
+            Notificacion::nuevaEmpezar(this->tamanoTab),
+            Notificacion::nuevaTurnoDe(0),
+            Notificacion::nuevaReponer({'e', 'e', 'e', 'e', 'e'}),
+            Notificacion::nuevaUbicar(0, o),
+            Notificacion::nuevaSumaPuntos(0, 0),
+            Notificacion::nuevaTurnoDe(1)
+    });
+    compareNotificaciones(fachada.notificaciones(2), {
+            Notificacion::nuevaIdCliente(2),
+            Notificacion::nuevaEmpezar(this->tamanoTab),
+            Notificacion::nuevaTurnoDe(0),
+            Notificacion::nuevaReponer({'e', 'e', 'a', 'a', 'a'}),
+            Notificacion::nuevaUbicar(0, o),
+            Notificacion::nuevaSumaPuntos(0, 0),
+            Notificacion::nuevaTurnoDe(1)
+    });
+
+};
 
 TEST_F(JuegoEmpezadoTest, jugador_recibe_mal_si_posiciones_diagonales) {
     // Limpiar notifs
     fachada.notificaciones(0);
-    fachada.recibirMensaje(0, {{1, 1, 'd'}, {2, 2, 'o'}});
+    fachada.recibirMensaje(0, {{1, 1, 'd'},
+                               {2, 2, 'o'}});
 
     compareNotificaciones(fachada.notificaciones(0), {
             Notificacion::nuevaMal()

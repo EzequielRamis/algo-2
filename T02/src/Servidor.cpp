@@ -44,32 +44,44 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
     auto gIt = _notificacionesGlobales.begin();
     auto pIt = _notificacionesParticulares[id].begin();
 
-    while (gIt != _notificacionesGlobales.end() ||
+    while ((gIt != _notificacionesGlobales.end() &&
+            gIt->first >= _indiceDeMensajesSinConsultar[id]
+           ) ||
            pIt != _notificacionesParticulares[id].end()) {
 
         if (pIt->second.tipoNotificacion() == TipoNotificacion::Mal ||
-            pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente
-                ) {
+            pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente) {
             res.push_front(pIt->second);
             pIt++;
-            _indiceDeMensajesSinConsultar[id]++;
-            break;
         } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
-            if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer) {
-                res.push_front(pIt->second);
-                pIt++;
+            if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::Empezar) {
+                if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
+                    //                    true) {
+                    gIt->first == pIt->first) {
+                    res.push_front(pIt->second);
+                    pIt++;
+                }
+                res.push_front(gIt->second);
+                gIt++;
+                res.push_front(gIt->second);
+                gIt++;
+            } else {
+                res.push_front(gIt->second);
+                gIt++;
+                if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
+                    //                    true) {
+                    gIt->first == pIt->first) {
+                    res.push_front(pIt->second);
+                    pIt++;
+                }
+                res.push_front(gIt->second);
+                gIt++;
             }
-            res.push_front(gIt->second);
-            gIt++;
-            res.push_front(gIt->second);
-            gIt++;
-            _indiceDeMensajesSinConsultar[id]++;
         } else {
             res.push_front(gIt->second);
             gIt++;
-            _indiceDeMensajesSinConsultar[id]++;
-            break;
         }
+        _indiceDeMensajesSinConsultar[id]++;
     }
 
     _notificacionesParticulares[id].clear();
