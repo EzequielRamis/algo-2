@@ -48,7 +48,6 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
             gIt->first >= _indiceDeMensajesSinConsultar[id]
            ) ||
            pIt != _notificacionesParticulares[id].end()) {
-
         if (pIt != _notificacionesParticulares[id].end() && (
                 pIt->second.tipoNotificacion() == TipoNotificacion::Mal ||
                 pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)) {
@@ -69,7 +68,8 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
             } else {
                 res.push_front(gIt->second);
                 gIt++;
-                if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
+                if (pIt != _notificacionesParticulares[id].end() &&
+                    pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
                     gIt->first == pIt->first) {
                     res.push_front(pIt->second);
                     pIt++;
