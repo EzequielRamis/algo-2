@@ -41,7 +41,7 @@ multiset<Letra> Juego::ubicar(const Ocurrencia &o) {
         letrasRespuestas.insert(nuevaFicha);
     }
     if (!o.empty()) {
-        j.historial.push_back(make_pair(o, _tiempo));
+        j.historial.emplace_back(o, _tiempo);
         j.jugadasSinCalcularPuntaje++;
     }
     _tiempo++;

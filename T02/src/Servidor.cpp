@@ -56,30 +56,20 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
                 _indiceDeMensajesSinConsultar[id]++;
             pIt++;
         } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
-            if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::Empezar) {
-                if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
-                    gIt->first == pIt->first) {
-                    res.push_front(pIt->second);
-                    pIt++;
-                }
-                res.push_front(gIt->second);
-                gIt++;
-                res.push_front(gIt->second);
-                gIt++;
-            } else {
-                res.push_front(gIt->second);
-                gIt++;
-                if (pIt != _notificacionesParticulares[id].end() &&
-                    pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
-                    gIt->first == pIt->first) {
-                    res.push_front(pIt->second);
-                    pIt++;
-                }
-                res.push_front(gIt->second);
-                gIt++;
+            if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::SumaPuntos) {
                 res.push_front(gIt->second);
                 gIt++;
             }
+            if (pIt != _notificacionesParticulares[id].end() &&
+                pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
+                gIt->first == pIt->first) {
+                res.push_front(pIt->second);
+                pIt++;
+            }
+            res.push_front(gIt->second);
+            gIt++;
+            res.push_front(gIt->second);
+            gIt++;
             _indiceDeMensajesSinConsultar[id]++;
         } else {
             res.push_front(gIt->second);
