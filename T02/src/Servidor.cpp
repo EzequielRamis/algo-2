@@ -54,10 +54,10 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
                 pIt->second.tipoNotificacion() == TipoNotificacion::IdCliente)) {
             res.push_front(pIt->second);
             pIt++;
+            _indiceDeMensajesSinConsultar[id]++;
         } else if (gIt->second.tipoNotificacion() == TipoNotificacion::TurnoDe) {
             if (next(gIt)->second.tipoNotificacion() == TipoNotificacion::Empezar) {
                 if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
-                    //                    true) {
                     gIt->first == pIt->first) {
                     res.push_front(pIt->second);
                     pIt++;
@@ -70,7 +70,6 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
                 res.push_front(gIt->second);
                 gIt++;
                 if (pIt->second.tipoNotificacion() == TipoNotificacion::Reponer &&
-                    //                    true) {
                     gIt->first == pIt->first) {
                     res.push_front(pIt->second);
                     pIt++;
@@ -80,11 +79,11 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
                 res.push_front(gIt->second);
                 gIt++;
             }
+            _indiceDeMensajesSinConsultar[id]++;
         } else {
             res.push_front(gIt->second);
             gIt++;
         }
-        _indiceDeMensajesSinConsultar[id]++;
     }
 
     _notificacionesParticulares[id].clear();
@@ -94,7 +93,6 @@ list<Notificacion> Servidor::notificaciones(IdCliente id) {
 
 void Servidor::recibirMensaje(IdCliente id, const Ocurrencia &o) {
     _cantMensajesRecibidos++;
-    _indiceDeMensajesSinConsultar[id]++;
     if (empezo() && _juego.turno() == id && _juego.jugadaValida(o)) {
         Nat puntajeViejo = _juego.puntaje(id);
         multiset<Letra> letrasRepuestas = _juego.ubicar(o);
